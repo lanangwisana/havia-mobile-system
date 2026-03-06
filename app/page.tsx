@@ -6,16 +6,23 @@ import {
   MessageSquare, ClipboardList, Calendar, FileText, 
   Clock, DollarSign, Settings, ArrowLeft, Sparkles, 
   MapPin, ArrowRight, LogIn, LogOut, Activity, 
-  ChevronRight, Plus, Home, User, Info, Users
+  ChevronRight, Plus, Home, User, Info, Users, Key
 } from 'lucide-react';
+import { loginWithToken } from './actions';
 
 export default function HaviaMobileApp() {
-  // State Management
+   // State Management
   const [currentView, setCurrentView] = useState('login'); // login, dashboard, id, presensi, subpage
   const [activeNav, setActiveNav] = useState('home');
   const [subpageTitle, setSubpageTitle] = useState('');
   const [toastMsg, setToastMsg] = useState('');
   const [currentTime, setCurrentTime] = useState('');
+  
+  // Real Data States
+  const [apiToken, setApiToken] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
 
   // Colors based on Logo
   const colors = {
@@ -46,6 +53,52 @@ export default function HaviaMobileApp() {
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(''), 3000);
+  };
+
+  // --- API Handlers ---
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!apiToken || !loginEmail) {
+      showToast('Email dan API Token wajib diisi');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Panggil Server Action agar tidak terkena CORS block di browser
+      const result = await loginWithToken(apiToken);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      const users = result.data;
+      console.log("Data from server action:", users);
+      
+      let matchedUser = null;
+
+      if (Array.isArray(users)) {
+        // Cari user yang emailnya cocok dengan yang diinputkan
+        matchedUser = users.find((u: any) => u.email === loginEmail);
+      } else if (users && typeof users === 'object') {
+        if (users.email === loginEmail) {
+           matchedUser = users;
+        }
+      }
+
+      if (matchedUser) {
+        setUserData(matchedUser);
+        setCurrentView('dashboard');
+        setActiveNav('home');
+        showToast('Berhasil masuk aplikasi');
+      } else {
+        throw new Error('Data user tidak ditemukan untuk email tersebut.');
+      }
+    } catch (error: any) {
+      showToast(error.message || 'Terjadi kesalahan jaringan.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // --- Subpage Content Components ---
@@ -113,10 +166,70 @@ export default function HaviaMobileApp() {
     </div>
   );
 
+  const AkunContent = () => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32">
+      <div className="flex flex-col items-center mb-6">
+        <div className="relative w-28 h-28 mb-4">
+          <div className="absolute inset-0 rounded-full border border-[#D4AF37]/50 shadow-[0_0_20px_rgba(212,175,55,0.2)]"></div>
+          <div className="absolute inset-[3px] rounded-full bg-[#111] z-10 flex items-center justify-center overflow-hidden">
+            <img src={userData?.image || "https://4nesia.com/img/andiagus2.png"} className="w-full h-full object-cover" alt={userData?.first_name || "M. Rofii Sultan"} />
+          </div>
+        </div>
+        <h2 className="text-2xl font-bold text-white tracking-wide">{userData?.first_name} {userData?.last_name}</h2>
+        <span style={{ color: colors.gold }} className="text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{userData?.job_title || 'TEAM MEMBER'}</span>
+        <div className="mt-4 px-4 py-1.5 bg-neutral-900 border border-[#D4AF37]/20 rounded-full flex items-center gap-2">
+          <Mail className="w-3 h-3 text-neutral-400" />
+          <span className="text-xs text-neutral-400">{userData?.email || 'email@haviastudio.com'}</span>
+        </div>
+      </div>
+
+      <div className="space-y-3 pt-4 border-t border-neutral-800">
+        <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold mb-3 pl-1">Pengaturan Akun</p>
+        
+        {/* Edit Profile Button */}
+        <button onClick={() => showToast('Edit Profile clicked')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-full text-left flex items-center justify-between p-4 rounded-2xl border active:scale-[0.98] transition-all group hover:border-[#D4AF37]/50">
+          <div className="flex items-center gap-4">
+            <div className="bg-neutral-800/80 p-3 rounded-xl group-hover:bg-[#D4AF37]/10 transition-colors">
+              <User className="w-5 h-5 text-neutral-400 group-hover:text-[#D4AF37] transition-colors" />
+            </div>
+            <div>
+              <h4 className="font-bold text-white text-sm">Edit Profile</h4>
+              <p className="text-[10px] text-neutral-500 tracking-wider">Perbarui informasi data diri</p>
+            </div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-neutral-500 group-hover:text-[#D4AF37] transition-colors" />
+        </button>
+
+        {/* Reset Password Button */}
+        <button onClick={() => showToast('Reset Password clicked')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-full text-left flex items-center justify-between p-4 rounded-2xl border active:scale-[0.98] transition-all group hover:border-[#D4AF37]/50 mt-3">
+          <div className="flex items-center gap-4">
+            <div className="bg-neutral-800/80 p-3 rounded-xl group-hover:bg-[#D4AF37]/10 transition-colors">
+              <Lock className="w-5 h-5 text-neutral-400 group-hover:text-[#D4AF37] transition-colors" />
+            </div>
+            <div>
+              <h4 className="font-bold text-white text-sm">Reset Password</h4>
+              <p className="text-[10px] text-neutral-500 tracking-wider">Ganti kata sandi keamanan</p>
+            </div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-neutral-500 group-hover:text-[#D4AF37] transition-colors" />
+        </button>
+      </div>
+
+      <div className="pt-6">
+        {/* Logout Button */}
+        <button onClick={() => { handleNav('login'); showToast('Berhasil Logout'); }} style={{ backgroundColor: 'rgba(239, 68, 68, 0.05)', borderColor: 'rgba(239, 68, 68, 0.2)' }} className="w-full text-left flex items-center justify-center gap-3 p-4 rounded-2xl border active:scale-[0.98] transition-all hover:bg-red-500/10 group">
+          <LogOut className="w-5 h-5 text-red-500 group-hover:scale-110 transition-transform" />
+          <h4 className="font-bold text-red-500 text-sm tracking-wider uppercase">Keluar Aplikasi</h4>
+        </button>
+      </div>
+    </div>
+  );
+
   const renderSubpageContent = () => {
     switch(subpageTitle) {
-      case 'Project': return <ProyekContent />;
-      case 'Jadwal': return <JadwalContent />;
+      case 'Project': return ProyekContent();
+      case 'Jadwal': return JadwalContent();
+      case 'Akun': return AkunContent();
       default: return (
         <div className="flex flex-col items-center justify-center h-64 opacity-50 animate-in fade-in">
           <Info className="w-12 h-12 mb-4" style={{ color: colors.gold }} />
@@ -152,30 +265,44 @@ export default function HaviaMobileApp() {
               <p className="text-[9px] text-neutral-500 tracking-[0.3em] uppercase">Enterprise App</p>
             </div>
 
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleNav('dashboard', 'home'); }}>
+            <form className="space-y-6" onSubmit={handleLogin}>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Email</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Mail className="text-neutral-500 w-5 h-5 group-focus-within:text-[#D4AF37] transition-colors" />
                   </div>
-                  <input type="email" defaultValue="andi.as@haviastudio.com" style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-full text-white text-sm rounded-xl focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37] block pl-12 p-4 placeholder-neutral-600 transition-all border outline-none" />
+                  <input 
+                    type="email" 
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    placeholder="Masukkan Email..." 
+                    style={{ backgroundColor: colors.card, borderColor: colors.border }} 
+                    className="w-full text-white text-sm rounded-xl focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37] block pl-12 p-4 placeholder-neutral-600 transition-all border outline-none" 
+                  />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Password</label>
+                <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">API Token</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="text-neutral-500 w-5 h-5 group-focus-within:text-[#D4AF37] transition-colors" />
+                    <Key className="text-neutral-500 w-5 h-5 group-focus-within:text-[#D4AF37] transition-colors" />
                   </div>
-                  <input type="password" defaultValue="password123" style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-full text-white text-sm rounded-xl focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37] block pl-12 p-4 placeholder-neutral-600 transition-all border outline-none" />
+                  <input 
+                    type="text" 
+                    value={apiToken}
+                    onChange={(e) => setApiToken(e.target.value)}
+                    placeholder="Masukkan API Token..." 
+                    style={{ backgroundColor: colors.card, borderColor: colors.border }} 
+                    className="w-full text-white text-sm rounded-xl focus:ring-1 focus:ring-[#D4AF37] focus:border-[#D4AF37] block pl-12 p-4 placeholder-neutral-600 transition-all border outline-none" 
+                  />
                 </div>
               </div>
 
-              <button type="submit" className="w-full gold-gradient text-black font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all transform active:scale-[0.98] flex justify-center items-center gap-2 mt-8">
-                <Fingerprint className="w-5 h-5" />
-                <span className="uppercase tracking-widest text-xs">Masuk Aplikasi</span>
+              <button disabled={isLoading} type="submit" className={`w-full gold-gradient text-black font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all transform active:scale-[0.98] flex justify-center items-center gap-2 mt-8 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                <Fingerprint className={`w-5 h-5 ${isLoading ? 'animate-pulse' : ''}`} />
+                <span className="uppercase tracking-widest text-xs">{isLoading ? 'MENGHUBUNGKAN...' : 'Masuk Aplikasi'}</span>
               </button>
             </form>
           </div>
@@ -190,7 +317,7 @@ export default function HaviaMobileApp() {
         <section className="h-full w-full flex flex-col relative overflow-y-auto scrollbar-hide pb-28 animate-in fade-in duration-300">
           <div style={{ backgroundColor: `${colors.bg}FA` }} className="px-6 pt-12 pb-6 flex justify-between items-center backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
             <div>
-              <p style={{ color: colors.gold }} className="text-[10px] uppercase tracking-widest mb-1 font-bold">Selamat Pagi,</p>
+              <p style={{ color: colors.gold }} className="text-[10px] uppercase tracking-widest mb-1 font-bold">Selamat Pagi, {userData?.first_name || ''}</p>
               <h2 className="text-xl font-bold text-white flex items-center gap-2">Semangat Bekerja! 🚀</h2>
             </div>
             <button onClick={() => showToast('Tidak ada notifikasi baru')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-10 h-10 rounded-full border flex items-center justify-center relative hover:bg-neutral-800 transition-colors">
@@ -207,11 +334,11 @@ export default function HaviaMobileApp() {
               <div className="flex justify-between items-start relative z-10">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 rounded-full border border-[#D4AF37]/50 p-1">
-                    <img src="https://4nesia.com/img/andiagus2.png" className="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Profile" />
+                    <img src={userData?.image || "https://4nesia.com/img/andiagus2.png"} className="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Profile" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg text-white tracking-wide">Andi Agus Salim</h3>
-                    <p style={{ color: colors.gold }} className="text-xs font-bold uppercase tracking-widest mt-1">CEO</p>
+                    <h3 className="font-bold text-lg text-white tracking-wide">{userData?.first_name} {userData?.last_name}</h3>
+                    <p style={{ color: colors.gold }} className="text-xs font-bold uppercase tracking-widest mt-1">{userData?.job_title || 'TEAM MEMBER'}</p>
                   </div>
                 </div>
                 <div className="bg-white/5 backdrop-blur-sm p-2 rounded-xl border border-white/10">
@@ -300,11 +427,11 @@ export default function HaviaMobileApp() {
                 <div className="relative w-36 h-36 mb-6">
                   <div className="absolute inset-0 rounded-full avatar-glow"></div>
                   <div className="absolute inset-[3px] rounded-full bg-[#111] z-10 flex items-center justify-center overflow-hidden">
-                    <img src="https://4nesia.com/img/andiagus2.png" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" alt="Andi Agus Salim" />
+                    <img src={userData?.image || "https://4nesia.com/img/andiagus2.png"} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" alt={userData?.first_name || "Andi Agus Salim"} />
                   </div>
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2 tracking-wide text-center">Andi Agus Salim</h2>
-                <span style={{ color: colors.gold }} className="text-[10px] font-bold uppercase tracking-[0.3em]">CEO / Principal</span>
+                <h2 className="text-2xl font-bold text-white mb-2 tracking-wide text-center">{userData?.first_name} {userData?.last_name}</h2>
+                <span style={{ color: colors.gold }} className="text-[10px] font-bold uppercase tracking-[0.3em]">{userData?.job_title || 'TEAM MEMBER'}</span>
               </div>
 
               <div className="flex justify-center mb-10 relative z-10">
@@ -411,7 +538,7 @@ export default function HaviaMobileApp() {
             <h2 style={{ color: colors.gold }} className="font-bold text-sm uppercase tracking-widest">{subpageTitle}</h2>
             <div className="w-10"></div>
           </div>
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className="flex-1 p-6 pb-40 overflow-y-auto">
             {renderSubpageContent()}
           </div>
         </section>
