@@ -297,7 +297,9 @@ export default function HaviaMobileApp() {
         </div>
       ) : projects.length > 0 ? (
         projects.map((project: any, index: number) => {
-           const progress = parseInt(project.progress || project.total_progress || "0", 10);
+           const totalPoints = parseFloat(project.total_points || "0");
+           const completedPoints = parseFloat(project.completed_points || "0");
+           const progress = project.progress ? parseInt(project.progress, 10) : (totalPoints > 0 ? Math.round((completedPoints / totalPoints) * 100) : 0);
            const isDone = progress === 100 || String(project.status).toLowerCase() === 'completed';
            let statusText = project.status_title || project.status || (isDone ? 'COMPLETED' : 'IN PROGRESS');
            statusText = String(statusText).toUpperCase();
@@ -326,9 +328,9 @@ export default function HaviaMobileApp() {
                     </div>
                     <div>
                       <h4 className="font-bold text-white text-base leading-tight group-hover:text-[#D4AF37] transition-colors">{project.title || `Project ${project.id}`}</h4>
-                      {project.client_name ? (
+                      {project.company_name ? (
                         <p className="text-[10px] text-neutral-400 mt-1 flex items-center gap-1">
-                          <User className="w-3 h-3 text-neutral-500" /> {project.client_name}
+                          <User className="w-3 h-3 text-neutral-500" /> {project.company_name}
                         </p>
                       ) : (
                         <p className="text-[10px] text-neutral-500 mt-1 uppercase tracking-widest">Internal Project</p>
