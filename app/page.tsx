@@ -195,7 +195,6 @@ export default function HaviaMobileApp() {
             console.log("Mencoba tarik data dari /api/projects...");
             const res = await fetchFromApi('projects', apiToken);
             console.log("HASIL FETCH PROJECTS:", res);
-            
             if (res.success && Array.isArray(res.data)) {
               setProjects(res.data);
             } else {
@@ -271,6 +270,23 @@ export default function HaviaMobileApp() {
 
     setIsLoading(true);
     try {
+      // Validasi JWT Payload (Token wajib milik Email tersebut)
+      try {
+        const payloadBase64 = apiToken.split('.')[1];
+        if (payloadBase64) {
+          const decodedPayload = JSON.parse(atob(payloadBase64));
+          const tokenEmail = decodedPayload.user || decodedPayload.email;
+          if (tokenEmail && tokenEmail !== loginEmail) {
+            throw new Error(`Autentikasi Ditolak`);
+          }
+        }
+      } catch (jwtError: any) {
+        if (jwtError.message.includes('Autentikasi')) {
+           throw jwtError;
+        }
+        // Jika token bukan JWT standar, biarkan berlanjut untuk diverifikasi server
+      }
+
       // Panggil Server Action agar tidak terkena CORS block di browser
       const result = await loginWithToken(apiToken);
 
@@ -330,10 +346,18 @@ export default function HaviaMobileApp() {
            const completedPoints = parseFloat(project.completed_points || "0");
            const progress = project.progress ? parseInt(project.progress, 10) : (totalPoints > 0 ? Math.round((completedPoints / totalPoints) * 100) : 0);
            const isDone = progress === 100 || String(project.status).toLowerCase() === 'completed';
-           let statusText = project.status_title || project.status || (isDone ? 'COMPLETED' : 'IN PROGRESS');
+           let statusText = project.status_title || project.status || (isDone ? 'COMPLETED' : 'OPEN');
            statusText = String(statusText).toUpperCase();
-           if (statusText === 'OPEN') statusText = 'AKTIF';
-           if (statusText === 'COMPLETED') statusText = 'SELESAI';
+           
+           // Status Colors
+           let statusColorClasses = 'bg-[#C69C3D]/10 text-[#C69C3D] border-[#C69C3D]/20 shadow-[0_0_10px_rgba(198,156,61,0.1)]'; // Default OPEN
+           if (statusText === 'COMPLETED' || statusText === 'DONE') {
+              statusColorClasses = 'bg-green-500/10 text-green-400 border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.2)]';
+           } else if (statusText === 'HOLD' || statusText === 'ON HOLD') {
+              statusColorClasses = 'bg-orange-500/10 text-orange-400 border-orange-500/20 shadow-[0_0_10px_rgba(249,115,22,0.2)]';
+           } else if (statusText === 'CANCELED' || statusText === 'CANCELLED') {
+              statusColorClasses = 'bg-red-500/10 text-red-400 border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.2)]';
+           }
            
            return (
             <div 
@@ -357,17 +381,25 @@ export default function HaviaMobileApp() {
                     </div>
                     <div>
                       <h4 className="font-bold text-white text-base leading-tight group-hover:text-[#C69C3D] transition-colors">{project.title || `Project ${project.id}`}</h4>
-                      {project.company_name ? (
-                        <p className="text-[10px] text-neutral-400 mt-1 flex items-center gap-1">
-                          <User className="w-3 h-3 text-neutral-500" /> {project.company_name}
-                        </p>
-                      ) : (
-                        <p className="text-[10px] text-neutral-500 mt-1 uppercase tracking-widest">Internal Project</p>
-                      )}
+                      {(() => {
+                        const clientNameRes = project.client_name || project.company_name;
+                        const isInternal = project.project_type === 'internal_project' || project.client_id === '0' || !clientNameRes;
+                        if (!isInternal && clientNameRes) {
+                          return (
+                            <p className="text-[10px] text-neutral-400 mt-1 flex items-center gap-1">
+                              <User className="w-3 h-3 text-neutral-500" /> {clientNameRes}
+                            </p>
+                          );
+                        } else {
+                          return (
+                            <p className="text-[10px] text-neutral-500 mt-1 uppercase tracking-widest">Internal Project</p>
+                          );
+                        }
+                      })()}
                     </div>
                   </div>
                   
-                  <span className={`text-[9px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest border shrink-0 ${isDone ? 'bg-green-500/10 text-green-400 border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : 'bg-[#C69C3D]/10 text-[#C69C3D] border-[#C69C3D]/20 shadow-[0_0_10px_rgba(212,175,55,0.1)]'}`}>
+                  <span className={`text-[9px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest border shrink-0 ${statusColorClasses}`}>
                     {statusText}
                   </span>
                 </div>
@@ -671,9 +703,24 @@ export default function HaviaMobileApp() {
                       )}
                     </div>
                     <div className="ml-auto">
-                      <span className={`text-[8px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-[0.15em] border whitespace-nowrap shadow-sm ${isDone ? 'bg-green-500/10 text-green-400 border-green-500/30' : 'bg-blue-500/10 text-blue-400 border-blue-500/30'}`}>
-                        {String(task.status_title || task.status || 'Aktif').toUpperCase()}
-                      </span>
+                      {(() => {
+                        const tStatus = String(task.status_title || task.status || 'OPEN').toUpperCase();
+                        let badgeClass = 'bg-[#C69C3D]/10 text-[#C69C3D] border-[#C69C3D]/30'; // Default Open
+                        if (tStatus === 'COMPLETED' || tStatus === 'DONE') {
+                           badgeClass = 'bg-green-500/10 text-green-400 border-green-500/30';
+                        } else if (tStatus === 'IN PROGRESS') {
+                           badgeClass = 'bg-blue-500/10 text-blue-400 border-blue-500/30';
+                        } else if (tStatus === 'ON HOLD' || tStatus === 'HOLD') {
+                           badgeClass = 'bg-orange-500/10 text-orange-400 border-orange-500/30';
+                        } else if (tStatus === 'CANCELED' || tStatus === 'CANCELLED') {
+                           badgeClass = 'bg-red-500/10 text-red-400 border-red-500/30';
+                        }
+                        return (
+                          <span className={`text-[8px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-[0.15em] border whitespace-nowrap shadow-sm ${badgeClass}`}>
+                            {tStatus}
+                          </span>
+                        );
+                      })()}
                     </div>
                   </div>
                   </div>
@@ -730,9 +777,24 @@ export default function HaviaMobileApp() {
                         </div>
                       )}
                       <div className="ml-auto">
-                        <span className={`text-[9px] px-2 py-1 rounded font-bold uppercase tracking-wider border ${isDone ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-neutral-800 text-neutral-300 border-neutral-700'}`}>
-                          {String(task.status_title || task.status || 'Aktif').toUpperCase()}
-                        </span>
+                        {(() => {
+                          const pTaskStatus = String(task.status_title || task.status || 'OPEN').toUpperCase();
+                          let taskBadgeClass = 'bg-[#C69C3D]/10 text-[#C69C3D] border-[#C69C3D]/20';
+                          if (pTaskStatus === 'COMPLETED' || pTaskStatus === 'DONE') {
+                             taskBadgeClass = 'bg-green-500/10 text-green-400 border-green-500/20';
+                          } else if (pTaskStatus === 'IN PROGRESS') {
+                             taskBadgeClass = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+                          } else if (pTaskStatus === 'ON HOLD' || pTaskStatus === 'HOLD') {
+                             taskBadgeClass = 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+                          } else if (pTaskStatus === 'CANCELED' || pTaskStatus === 'CANCELLED') {
+                             taskBadgeClass = 'bg-red-500/10 text-red-400 border-red-500/20';
+                          }
+                          return (
+                            <span className={`text-[9px] px-2 py-1 rounded font-bold uppercase tracking-wider border ${taskBadgeClass}`}>
+                              {pTaskStatus}
+                            </span>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -1061,7 +1123,13 @@ export default function HaviaMobileApp() {
         <section className="h-full w-full flex flex-col relative z-40 animate-in slide-in-from-right-4 duration-300 bg-[#0a0a0a] overflow-hidden">
           {/* Top Navigation Bar */}
           <div style={{ backgroundColor: `${colors.bg}FA` }} className="px-6 py-6 flex items-center justify-between border-b border-white/5 backdrop-blur-md sticky top-0 z-[70]">
-            <button onClick={() => handleNav('dashboard')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-neutral-800 transition-colors">
+            <button onClick={() => {
+               if (subpageTitle === 'Project Tasks') {
+                 handleNav('subpage', 'project', 'Project');
+               } else {
+                 handleNav('dashboard', 'home');
+               }
+            }} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-neutral-800 transition-colors">
               <ArrowLeft className="w-5 h-5 text-white" />
             </button>
             <h2 style={{ color: colors.gold }} className="font-bold text-sm uppercase tracking-widest">{subpageTitle}</h2>
