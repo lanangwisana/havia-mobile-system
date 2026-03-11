@@ -52,7 +52,6 @@ export default function HaviaMobileApp() {
 
   // Edit Profile States
   const [editForm, setEditForm] = useState<any>({});
-  const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // Events States
   const [events, setEvents] = useState<any[]>([]);
