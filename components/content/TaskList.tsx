@@ -35,52 +35,58 @@ export const TaskList: React.FC<{
         const projName = projectName || (proj ? proj.title : `Project ${task.project_id}`);
         
         return (
-          <div key={task.id || index} style={{ backgroundColor: colors.card, borderColor: isDone ? 'rgba(34,197,94,0.3)' : colors.border }} 
-            className="p-5 rounded-[2rem] border relative overflow-hidden group shadow-xl">
-            <div className="flex gap-4 items-start relative z-10">
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shrink-0 shadow-inner ${isDone ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-neutral-800 border-neutral-700 text-neutral-400'}`}>
-                <ClipboardList className="w-5 h-5" />
+          <div key={task.id || index} 
+            className="p-px rounded-3xl overflow-hidden shadow-xl active:scale-[0.98] transition-all duration-300 mb-4"
+            style={{ background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent)' }}
+          >
+            <div className="bg-[#141414] p-5 rounded-[1.4rem] relative overflow-hidden">
+               {/* Header: Icon & Title */}
+               <div className="flex items-center gap-4 mb-5 relative z-10">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 ${isDone ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-neutral-800 border-neutral-700 text-neutral-400'}`}>
+                  <ClipboardList className="w-5 h-5" />
+                </div>
+                <h4 className={`font-bold text-[15px] flex-1 truncate ${isDone ? 'text-green-500/60 line-through' : 'text-white'}`}>
+                  {task.title}
+                </h4>
               </div>
-              <div className="flex-1 min-w-0">
-                <h4 className={`font-bold text-base mb-2 truncate ${isDone ? 'text-green-400/90 line-through' : 'text-white'}`}>{task.title}</h4>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#1A1818]/60 rounded-lg border border-white/5 text-[9px] font-bold uppercase tracking-widest text-[#C69C3D]">
-                    <Briefcase className="w-3 h-3" /> {projName}
+
+              <div className="relative z-10 space-y-4">
+                {/* Badges */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1.2 bg-white/5 rounded-lg border border-white/5 text-[8px] font-bold uppercase tracking-wider text-[#C69C3D]">
+                    <Briefcase className="w-3 h-3 opacity-70" /> {projName}
                   </span>
                   {task.userRole && (
-                    <span className={`text-[8px] px-1.5 py-1 rounded-lg font-bold uppercase tracking-widest border ${
+                    <span className={`text-[7px] px-2 py-1.2 rounded-lg font-bold uppercase tracking-widest border ${
                       task.userRole === 'PIC' 
-                        ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
-                        : 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20'
+                         ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
+                         : 'bg-white/5 text-neutral-500 border-white/10'
                     }`}>
                       {task.userRole}
                     </span>
                   )}
                 </div>
-                <p className="text-xs leading-relaxed text-neutral-400 line-clamp-2 mb-4">
+                
+                {/* Description */}
+                <p className="text-[11px] leading-relaxed text-neutral-400 line-clamp-2">
                   {task.description?.replace(/(<([^>]+)>)/gi, "") || 'Tidak ada deskripsi rinci.'}
                 </p>
                 
-                <div className="flex flex-wrap items-center justify-between gap-y-4 pt-4 border-t border-white/5">
-                  <div className="flex gap-6">
-                    {task.start_date && (
-                      <div>
-                        <p className="text-[8px] text-neutral-500 uppercase tracking-[0.2em] mb-1 font-bold">Mulai</p>
-                        <p className="text-[10px] text-neutral-300 font-medium font-mono">{task.start_date.split(' ')[0]}</p>
-                      </div>
-                    )}
-                    {task.deadline && (
-                      <div>
-                        <p className="text-[8px] text-red-500/90 uppercase tracking-[0.2em] mb-1 font-bold">Deadline</p>
-                        <p className="text-[10px] text-red-200 font-medium font-mono">{task.deadline.split(' ')[0]}</p>
-                      </div>
-                    )}
+                {/* Footer Meta */}
+                <div className="flex items-center justify-between gap-2 pt-4 border-t border-white/5">
+                  <div className="flex gap-5">
+                    <div className="flex flex-col gap-0.5">
+                      <p className="text-[7px] text-neutral-500 uppercase tracking-widest font-bold">Mulai</p>
+                      <p className="text-[10px] text-neutral-300 font-bold">{task.start_date?.split(' ')[0] || '-'}</p>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <p className="text-[7px] text-red-500/60 uppercase tracking-widest font-bold">Deadline</p>
+                      <p className="text-[10px] text-red-200/80 font-bold">{task.deadline?.split(' ')[0] || '-'}</p>
+                    </div>
                   </div>
-                  <div className="ml-auto">
-                    <span className={`text-[8px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-[0.15em] border whitespace-nowrap shadow-sm ${isDone ? 'bg-green-500/10 text-green-400 border-green-500/30' : 'bg-blue-500/10 text-blue-400 border-blue-500/30'}`}>
-                      {String(task.status_title || task.status || 'Aktif').toUpperCase()}
-                    </span>
-                  </div>
+                  <span className={`text-[7px] px-3 py-1.5 rounded-lg font-bold uppercase tracking-[0.1em] border shrink-0 ${isDone ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}`}>
+                    {String(task.status_title || task.status || 'Active').toUpperCase()}
+                  </span>
                 </div>
               </div>
             </div>

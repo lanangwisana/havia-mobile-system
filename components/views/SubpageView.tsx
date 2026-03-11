@@ -64,7 +64,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           isLoading={props.isLoadingTasks} 
           projects={props.projects} 
         />;
-      case 'Project Tasks': 
+      case 'Tasks': 
         return <TaskList 
           tasks={props.projectTasks} 
           isLoading={props.isLoadingTasks} 

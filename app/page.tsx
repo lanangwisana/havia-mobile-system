@@ -293,7 +293,7 @@ export default function HaviaMobileApp() {
     setActiveProjectId(id);
     setActiveProjectName(name);
     loadTasks(id);
-    handleNav('subpage', null, 'Project Tasks');
+    handleNav('subpage', null, 'Tasks');
   };
 
   const handleSaveProfile = async () => {
