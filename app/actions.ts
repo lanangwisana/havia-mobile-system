@@ -1,8 +1,10 @@
 "use server";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://brain.havia.id/index.php/api';
+
 export async function loginWithToken(token: string) {
   try {
-    const response = await fetch('https://brain.havia.id/index.php/api/users', {
+    const response = await fetch(`${API_BASE_URL}/users`, {
       method: 'GET',
       headers: {
         'authtoken': token,
@@ -16,9 +18,48 @@ export async function loginWithToken(token: string) {
     }
     
     const parsedRes = await response.json();
-    console.log("=== API RESPONSE FROM SERVER ===");
-    console.log(parsedRes);
     return { success: true, data: parsedRes.data || parsedRes };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Terjadi kesalahan koneksi server.' };
+  }
+}
+
+export async function loginWithEmailPassword(email: string, password: string) {
+  try {
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('password', password);
+
+    console.log(`Mencoba login ke: ${API_BASE_URL}/login dengan email: ${email}`);
+
+    const response = await fetch(`${API_BASE_URL}/login`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json'
+      },
+      body: formData,
+      cache: 'no-store',
+    });
+    
+    const textRes = await response.text();
+    console.log("=== LOGIN API RESPONSE ===", textRes);
+
+    let parsedRes;
+    try {
+      parsedRes = JSON.parse(textRes);
+    } catch (e) {
+      return { success: false, error: 'Gagal parse JSON dari server.' };
+    }
+    
+    if (!response.ok || parsedRes.success === false) {
+      return { success: false, error: parsedRes.message || 'Email atau password salah.' };
+    }
+    
+    return { 
+      success: true, 
+      data: parsedRes.user, 
+      token: parsedRes.token 
+    };
   } catch (error: any) {
     return { success: false, error: error.message || 'Terjadi kesalahan koneksi server.' };
   }
@@ -27,7 +68,9 @@ export async function loginWithToken(token: string) {
 // Fungsi Generic untuk fetch endpoint API apa saja dari RISE CRM (CORS safe)
 export async function fetchFromApi(endpoint: string, token: string) {
   try {
-    const url = `https://brain.havia.id/index.php/api/${endpoint}`;
+    const url = `${API_BASE_URL}/${endpoint}`;
+    console.log(`Fetching from: ${url}`);
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -164,7 +207,7 @@ export async function fetchFromApi(endpoint: string, token: string) {
 // Fungsi Generic untuk POST (create data) ke API RISE CRM
 export async function postToApi(endpoint: string, token: string, body: Record<string, string>) {
   try {
-    const url = `https://brain.havia.id/index.php/api/${endpoint}`;
+    const url = `${API_BASE_URL}/${endpoint}`;
     
     // RISE CRM API menggunakan multipart/form-data untuk POST
     const formData = new FormData();
@@ -210,7 +253,7 @@ export async function postToApi(endpoint: string, token: string, body: Record<st
 // Fungsi Generic untuk PUT (update data) ke API RISE CRM
 export async function putToApi(endpoint: string, token: string, body: Record<string, string>) {
   try {
-    const url = `https://brain.havia.id/index.php/api/${endpoint}`;
+    const url = `${API_BASE_URL}/${endpoint}`;
     
     // RISE CRM API menggunakan multipart/form-data untuk POST/PUT
     const formData = new FormData();

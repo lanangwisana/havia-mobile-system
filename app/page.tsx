@@ -9,7 +9,7 @@ import {
   ChevronRight, Plus, Home, User, Info, Users, Key,
   TrendingUp, TrendingDown, Receipt, Tag, CalendarRange
 } from 'lucide-react';
-import { loginWithToken, fetchFromApi, putToApi, postToApi } from './actions';
+import { loginWithToken, loginWithEmailPassword, fetchFromApi, putToApi, postToApi } from './actions';
 
 export default function HaviaMobileApp() {
    // State Management
@@ -22,6 +22,7 @@ export default function HaviaMobileApp() {
   // Real Data States
   const [apiToken, setApiToken] = useState('');
   const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [userData, setUserData] = useState<any>(null);
@@ -291,46 +292,36 @@ export default function HaviaMobileApp() {
   // --- API Handlers ---
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!apiToken || !loginEmail) {
-      showToast('Email dan API Token wajib diisi');
+    if (!loginEmail || !loginPassword) {
+      showToast('Email dan Password wajib diisi');
       return;
     }
 
     setIsLoading(true);
     try {
       // Panggil Server Action agar tidak terkena CORS block di browser
-      const result = await loginWithToken(apiToken);
+      const result = await loginWithEmailPassword(loginEmail, loginPassword);
 
       if (!result.success) {
         throw new Error(result.error);
       }
 
-      const users = result.data;
-      console.log("Data from server action:", users);
+      const userDataResult = result.data;
+      const token = result.token;
       
-      let matchedUser = null;
-
-      if (Array.isArray(users)) {
-        // Cari user yang emailnya cocok dengan yang diinputkan
-        matchedUser = users.find((u: any) => u.email === loginEmail);
-      } else if (users && typeof users === 'object') {
-        if (users.email === loginEmail) {
-           matchedUser = users;
-        }
-      }
-
-      if (matchedUser) {
-        setUserData(matchedUser);
+      if (userDataResult && token) {
+        setUserData(userDataResult);
+        setApiToken(token);
         
         // Simpan data login agar tidak perlu login lagi setelah refresh
-        localStorage.setItem('havia_user', JSON.stringify(matchedUser));
-        localStorage.setItem('havia_token', apiToken);
+        localStorage.setItem('havia_user', JSON.stringify(userDataResult));
+        localStorage.setItem('havia_token', token);
 
         setCurrentView('dashboard');
         setActiveNav('home');
         showToast('Berhasil masuk aplikasi');
       } else {
-        throw new Error('Data user tidak ditemukan untuk email tersebut.');
+        throw new Error('Gagal mendapatkan data user dari server.');
       }
     } catch (error: any) {
       showToast(error.message || 'Terjadi kesalahan jaringan.');
@@ -1622,16 +1613,16 @@ export default function HaviaMobileApp() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">API Token</label>
+                <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Password</label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Key className="text-neutral-500 w-5 h-5 group-focus-within:text-[#C69C3D] transition-colors" />
+                    <Lock className="text-neutral-500 w-5 h-5 group-focus-within:text-[#C69C3D] transition-colors" />
                   </div>
                   <input 
-                    type="text" 
-                    value={apiToken}
-                    onChange={(e) => setApiToken(e.target.value)}
-                    placeholder="Masukkan API Token..." 
+                    type="password" 
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    placeholder="Masukkan Password..." 
                     style={{ backgroundColor: colors.card, borderColor: colors.border }} 
                     className="w-full text-white text-sm rounded-xl focus:ring-1 focus:ring-[#C69C3D] focus:border-[#C69C3D] block pl-12 p-4 placeholder-neutral-600 transition-all border outline-none" 
                   />
