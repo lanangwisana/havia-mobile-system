@@ -67,21 +67,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
           </div>
         </div>
 
-        <div className="flex-1 pt-2 pb-6">
-          <div className="grid grid-cols-2 gap-y-8 gap-x-6 h-full content-center">
+        <div className="pt-2 pb-6">
+          <div className="grid grid-cols-3 gap-x-4 content-center">
             {[
-              { id: 'Project', label: 'Project', icon: Briefcase },
               { id: 'Semua Task', label: 'Task', icon: ClipboardList },
               { id: 'Tim', label: 'Tim', icon: Users },
-              { id: 'Finance', label: 'Finance', icon: DollarSign },
-              { id: 'Jadwal', label: 'Jadwal', icon: Calendar },
-              { id: 'Absensi', label: 'Absensi', icon: Clock }
+              { id: 'Finance', label: 'Finance', icon: DollarSign }
             ].map((item) => (
-              <button key={item.id} onClick={() => onNav('subpage', null, item.id)} className="flex flex-col items-center gap-4 group active:scale-95 transition-transform w-full">
-                <div className="w-full aspect-square max-w-[120px] btn-3d flex items-center justify-center group-hover:border-[#C69C3D] group-active:border-[#C69C3D] transition-all duration-300">
-                  <item.icon className="w-12 h-12 text-neutral-400 group-hover:text-[#C69C3D] group-active:text-[#C69C3D] transition-colors drop-shadow-md" strokeWidth={1.5} />
+              <button key={item.id} onClick={() => onNav('subpage', null, item.id)} className="flex flex-col items-center gap-3 group active:scale-95 transition-transform w-full">
+                <div className="w-full aspect-square btn-3d flex items-center justify-center group-hover:border-[#C69C3D] group-active:border-[#C69C3D] transition-all duration-300">
+                  <item.icon className="w-8 h-8 text-neutral-400 group-hover:text-[#C69C3D] group-active:text-[#C69C3D] transition-colors drop-shadow-md" strokeWidth={1.5} />
                 </div>
-                <span className="text-sm font-bold tracking-widest text-neutral-400 group-hover:text-white group-active:text-[#C69C3D] transition-colors uppercase">{item.label}</span>
+                <span className="text-[10px] font-bold tracking-widest text-neutral-500 group-hover:text-white group-active:text-[#C69C3D] transition-colors uppercase">{item.label}</span>
               </button>
             ))}
           </div>
