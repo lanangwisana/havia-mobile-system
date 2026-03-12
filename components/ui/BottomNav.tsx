@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Briefcase, Fingerprint, MessageSquare, User } from 'lucide-react';
+import { Home, Briefcase, Fingerprint, Calendar, User } from 'lucide-react';
 import { colors } from '@/lib/utils';
 
 interface BottomNavProps {
@@ -29,8 +29,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeNav, onNav }) => {
         </button>
       </div>
       
-      <button onClick={() => onNav('subpage', 'chat', 'Chat')} className={`flex flex-col items-center transition-colors p-2 ${activeNav === 'chat' ? 'text-[#C69C3D]' : 'text-neutral-500 hover:text-white'}`}>
-        <MessageSquare className="w-6 h-6" strokeWidth={activeNav === 'chat' ? 2.5 : 1.5} />
+      <button onClick={() => onNav('subpage', 'jadwal', 'Jadwal')} className={`flex flex-col items-center transition-colors p-2 ${activeNav === 'jadwal' ? 'text-[#C69C3D]' : 'text-neutral-500 hover:text-white'}`}>
+        <Calendar className="w-6 h-6" strokeWidth={activeNav === 'jadwal' ? 2.5 : 1.5} />
       </button>
       
       <button onClick={() => onNav('subpage', 'akun', 'Akun')} className={`flex flex-col items-center transition-colors p-2 ${activeNav === 'akun' ? 'text-[#C69C3D]' : 'text-neutral-500 hover:text-white'}`}>
