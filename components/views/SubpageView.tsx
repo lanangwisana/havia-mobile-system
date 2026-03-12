@@ -30,6 +30,8 @@ interface SubpageViewProps {
   setSelectedEvent: (v: any) => void;
   attendances: any[];
   isLoadingAttendances: boolean;
+  leaves: any[];
+  isLoadingLeaves: boolean;
   notifications: any[];
   isLoadingNotif: boolean;
   userData: any;
@@ -85,7 +87,12 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           onCreateEvent={() => {}}
         />;
       case 'Tim': 
-        return <TimContent onNav={onNav} />;
+        return <TimContent 
+          onNav={onNav} 
+          attendances={props.attendances} 
+          isLoadingAttendances={props.isLoadingAttendances} 
+          leaves={props.leaves}
+        />;
       case 'Absensi': 
         return <AbsensiContent 
           attendances={props.attendances} 
