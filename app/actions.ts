@@ -211,15 +211,13 @@ export async function fetchFromApi(endpoint: string, token: string) {
 }
 
 // Fungsi Generic untuk POST (create data) ke API RISE CRM
-export async function postToApi(endpoint: string, token: string, body: Record<string, string>) {
+export async function postToApi(endpoint: string, token: string, body: Record<string, any>) {
   try {
     const url = `${API_BASE_URL}/${endpoint}`;
-    
-    // RISE CRM API menggunakan multipart/form-data untuk POST
     const formData = new FormData();
     Object.entries(body).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        formData.append(key, value);
+      if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
       }
     });
 
@@ -234,89 +232,95 @@ export async function postToApi(endpoint: string, token: string, body: Record<st
     });
     
     const textRes = await response.text();
-    console.log(`=== RAW POST RESP FROM ${endpoint} ===`, textRes.substring(0, 300));
-
     let parsedRes;
     try {
       parsedRes = JSON.parse(textRes);
     } catch (e) {
-      return { success: false, error: `Gagal parse response dari ${endpoint}. Status: ${response.status}.` };
+      return { success: false, error: `Server Error (${response.status})` };
     }
     
     if (!response.ok) {
-      return { 
-        success: false, 
-        error: parsedRes.message || parsedRes.error || `Gagal membuat data (Status: ${response.status}).`
-      };
+      const errorMsg = parsedRes.message || parsedRes.error || parsedRes.messages?.error || 
+                       `Error ${response.status}: ${JSON.stringify(parsedRes).substring(0, 100)}`;
+      return { success: false, error: errorMsg };
     }
     
-    return { success: true, data: parsedRes.data || parsedRes, message: parsedRes.message || 'Berhasil dibuat.' };
+    return { success: true, data: parsedRes.data || parsedRes };
   } catch (error: any) {
-    return { success: false, error: error.message || `Terjadi kesalahan koneksi saat membuat ${endpoint}.` };
+    return { success: false, error: error.message || 'Kesalahan koneksi.' };
   }
 }
 
 // Fungsi Generic untuk PUT (update data) ke API RISE CRM
-export async function putToApi(endpoint: string, token: string, body: Record<string, string>) {
+export async function putToApi(endpoint: string, token: string, body: Record<string, any>) {
   try {
     const url = `${API_BASE_URL}/${endpoint}`;
     
-    // RISE CRM API menggunakan multipart/form-data untuk POST/PUT
-    const formData = new FormData();
-    Object.entries(body).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        formData.append(key, value);
-      }
-    });
-
+    // Gunakan JSON untuk PUT sesuai standar REST Controller Brain
     const response = await fetch(url, {
-      method: 'PUT',
+      method: 'PUT', 
       headers: {
         'authtoken': token,
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: formData,
+      body: JSON.stringify(body),
       cache: 'no-store',
     });
     
     const textRes = await response.text();
-    console.log(`=== RAW PUT RESP FROM ${endpoint} ===`, textRes.substring(0, 300));
+    if (response.status === 204 || !textRes) {
+      return { success: true, message: 'Updated' };
+    }
 
     let parsedRes;
     try {
       parsedRes = JSON.parse(textRes);
     } catch (e) {
-      return { success: false, error: `Gagal parse response dari ${endpoint}. Status: ${response.status}. Resp: ${textRes.substring(0,100)}` };
+      return { success: false, error: `Status ${response.status}: Response bukan JSON.` };
     }
 
     if (!response.ok) {
-      return { 
-        success: false, 
-        error: parsedRes?.message || parsedRes?.error || `Gagal update data (Status: ${response.status}).`
-      };
+      return { success: false, error: parsedRes.message || parsedRes.error || `Gagal update (${response.status}).` };
     }
     
-    // Check for success using both status code and message structure
-    const isSuccess = response.ok && (
-      parsedRes.success === true || 
-      parsedRes.status === true || 
-      parsedRes.status === 200 || 
-      (parsedRes.messages && parsedRes.messages.success !== undefined)
-    );
-
-    if (isSuccess) {
-      return { 
-        success: true, 
-        data: parsedRes.data || parsedRes, 
-        message: parsedRes?.messages?.success || parsedRes?.message || 'Berhasil diperbarui.' 
-      };
-    } else {
-      return {
-        success: false,
-        error: parsedRes?.messages?.error || parsedRes?.message || parsedRes?.error || 'Gagal menyimpan perubahan ke server.'
-      };
-    }
+    return { success: true, data: parsedRes.data || parsedRes };
   } catch (error: any) {
-    return { success: false, error: error.message || `Terjadi kesalahan koneksi saat update ${endpoint}.` };
+    return { success: false, error: error.message || 'Kesalahan koneksi.' };
+  }
+}
+
+// Fungsi Generic untuk DELETE data di API RISE CRM
+export async function deleteFromApi(endpoint: string, token: string) {
+  try {
+    const url = `${API_BASE_URL}/${endpoint}`;
+    
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'authtoken': token,
+        'Accept': 'application/json'
+      },
+      cache: 'no-store',
+    });
+    
+    if (response.status === 204) return { success: true };
+
+    const textRes = await response.text();
+    let parsedRes;
+    try {
+      parsedRes = JSON.parse(textRes);
+    } catch (e) {
+      if (response.ok) return { success: true };
+      return { success: false, error: `Status ${response.status}: Gagal hapus.` };
+    }
+    
+    if (!response.ok) {
+      return { success: false, error: parsedRes.message || 'Gagal menghapus data.' };
+    }
+    
+    return { success: true, message: parsedRes.message || 'Berhasil dihapus.' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Kesalahan koneksi.' };
   }
 }
