@@ -254,10 +254,33 @@ export default function HaviaMobileApp() {
   };
 
   const loadEvents = async () => {
-    if (!apiToken) return;
+    if (!apiToken || !userData?.id) return;
     setIsLoadingEvents(true);
-    const res = await fetchFromApi('events', apiToken);
-    if (res.success) setEvents(Array.isArray(res.data) ? res.data : []);
+    
+    // Kita panggil API events melalui HaviaCMS bridge. 
+    // Ini lebih stabil karena memuat helper yang diperlukan server core.
+    const res = await fetchFromApi('haviacms/events', apiToken);
+    
+    if (res.success) {
+      let eventsData = Array.isArray(res.data) ? res.data : [];
+      
+      // Jika data berasal dari fallback (karena server error 500), 
+      // kita beri tanda agar user tidak bingung.
+      if ((res as any).isFallback) {
+        eventsData = eventsData.map((ev: any) => ({
+          ...ev,
+          title: `[FB] ${ev.title}`,
+          isFallback: true
+        }));
+        const serverError = (res as any).serverErrorMessage;
+        showToast(serverError ? `Server Error: ${serverError}` : 'Info: Menampilkan data simulasi karena server sedang kendala.');
+      }
+
+      setEvents(eventsData);
+    } else {
+      setEvents([]);
+      if (res.error) showToast(`Gagal sinkron jadwal: ${res.error}`);
+    }
     setIsLoadingEvents(false);
   };
 

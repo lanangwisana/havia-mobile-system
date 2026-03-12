@@ -9,7 +9,6 @@ import { FinanceContent } from '../content/FinanceContent';
 import { JadwalContent, EventDetailContent } from '../content/JadwalContent';
 import { TimContent } from '../content/TimContent';
 import { AbsensiContent } from '../content/AbsensiContent';
-import { CreateEventContent } from '../content/CreateEventContent';
 import { AkunContent } from '../content/AkunContent';
 import { EditProfileContent } from '../content/EditProfileContent';
 import { NotifikasiContent } from '../content/NotifikasiContent';
@@ -83,7 +82,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
             props.setSelectedEvent(ev);
             onNav('subpage', null, 'Detail Event');
           }} 
-          onCreateEvent={() => onNav('subpage', null, 'Buat Event')}
+          onCreateEvent={() => {}}
         />;
       case 'Tim': 
         return <TimContent onNav={onNav} />;
@@ -96,14 +95,6 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
         return <EventDetailContent 
           selectedEvent={props.selectedEvent} 
           onBack={() => onNav('subpage', null, 'Jadwal')} 
-        />;
-      case 'Buat Event': 
-        return <CreateEventContent 
-          newEvent={props.newEvent} 
-          setNewEvent={props.setNewEvent} 
-          handleCreateEvent={props.handleCreateEvent} 
-          isSavingEvent={props.isSavingEvent} 
-          onCancel={() => onNav('subpage', null, 'Jadwal')} 
         />;
       case 'Akun': 
         return <AkunContent 
@@ -139,7 +130,17 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
   return (
     <section className="h-full w-full flex flex-col relative z-40 animate-in slide-in-from-right-4 duration-300 bg-[#0a0a0a] overflow-hidden">
       <div style={{ backgroundColor: `${colors.bg}FA` }} className="px-6 py-6 flex items-center justify-between border-b border-white/5 backdrop-blur-md sticky top-0 z-[70]">
-        <button onClick={() => onNav('dashboard')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-neutral-800 transition-colors">
+        <button 
+          onClick={() => {
+            if (subpageTitle === 'Detail Event') {
+              onNav('subpage', null, 'Jadwal');
+            } else {
+              onNav('dashboard');
+            }
+          }} 
+          style={{ backgroundColor: colors.card, borderColor: colors.border }} 
+          className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-neutral-800 transition-colors"
+        >
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
         <h2 style={{ color: colors.gold }} className="font-bold text-sm uppercase tracking-widest">{subpageTitle}</h2>

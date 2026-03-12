@@ -94,8 +94,8 @@ export async function fetchFromApi(endpoint: string, token: string) {
       console.log(`=== API HTTP ERROR ${response.status} ===`, parsedRes);
       
       // FALLBACK WORKAROUND KHUSUS API EVENTS (Menangani Error 500 dari Server)
-      if (endpoint === 'events' && response.status >= 500) {
-        console.warn("MENGGUNAKAN FALLBACK DATA KARENA API EVENTS ERROR 500");
+      if ((endpoint === 'events' || endpoint === 'haviacms/events') && response.status >= 500) {
+        console.warn("MENGGUNAKAN FALLBACK DATA KARENA API EVENTS ERROR 500. Detail:", parsedRes);
         // Membuat data dummy yang terinspirasi dari screenshot dashboard CRM asli
         const currentYear = new Date().getFullYear();
         const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
@@ -110,7 +110,8 @@ export async function fetchFromApi(endpoint: string, token: string) {
             start_time: '10:00',
             end_time: '12:00',
             location: 'Havia HQ',
-            color: '#84c529', // Green
+            color: '#84c529',
+            share_with: 'all',
           },
           {
             id: 'mock-2',
@@ -121,7 +122,8 @@ export async function fetchFromApi(endpoint: string, token: string) {
             start_time: '13:00',
             end_time: '15:00',
             location: '',
-            color: '#3b82f6', // Blue
+            color: '#3b82f6',
+            share_with: 'all',
           },
           {
             id: 'mock-3',
@@ -132,7 +134,8 @@ export async function fetchFromApi(endpoint: string, token: string) {
             start_time: '17:00',
             end_time: '20:00',
             location: 'Restoran',
-            color: '#c4b5fd', // Purple
+            color: '#c4b5fd',
+            share_with: 'all',
           },
           {
             id: 'mock-4',
@@ -143,10 +146,16 @@ export async function fetchFromApi(endpoint: string, token: string) {
             start_time: '09:00',
             end_time: '11:00',
             location: 'Ruang Rapat 1',
-            color: '#84c529', // Green
+            color: '#84c529',
+            share_with: 'all',
           }
         ];
-        return { success: true, data: fallbackEvents, isFallback: true };
+        return { 
+          success: true, 
+          data: fallbackEvents, 
+          isFallback: true, 
+          serverErrorMessage: parsedRes.message || JSON.stringify(parsedRes) 
+        };
       }
 
       // FALLBACK WORKAROUND KHUSUS API ATTENDANCE (Error 500 Server)
