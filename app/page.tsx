@@ -6,7 +6,8 @@ import {
   loginWithEmailPassword, 
   fetchFromApi, 
   putToApi, 
-  postToApi 
+  postToApi,
+  deleteFromApi
 } from './actions';
 
 // Import Lib & Utils
@@ -75,6 +76,10 @@ export default function HaviaMobileApp() {
   // Attendances States
   const [attendances, setAttendances] = useState<any[]>([]);
   const [isLoadingAttendances, setIsLoadingAttendances] = useState(false);
+  const [activeAttendance, setActiveAttendance] = useState<any | null>(null);
+  const [lastFinishedAttendance, setLastFinishedAttendance] = useState<any | null>(null);
+  const [leaves, setLeaves] = useState<any[]>([]);
+  const [isLoadingLeaves, setIsLoadingLeaves] = useState(false);
   const [isSubmittingAttendance, setIsSubmittingAttendance] = useState(false);
 
   // --- EFFECTS & HELPERS ---
@@ -284,12 +289,56 @@ export default function HaviaMobileApp() {
     setIsLoadingEvents(false);
   };
 
+  const loadLeaves = async () => {
+    if (!userData?.id || !apiToken) return;
+    setIsLoadingLeaves(true);
+    const res = await fetchFromApi(`leave-applications?applicant_id=${userData.id}`, apiToken);
+    if (res.success) setLeaves(Array.isArray(res.data) ? res.data : []);
+    setIsLoadingLeaves(false);
+  };
+
   const loadAttendances = async () => {
     if (!userData?.id || !apiToken) return;
     setIsLoadingAttendances(true);
-    // Filter by staff user_id
-    const res = await fetchFromApi(`attendance?user_id=${userData.id}`, apiToken);
-    if (res.success) setAttendances(Array.isArray(res.data) ? res.data : []);
+    // Pakai API haviacms yang baru agar lebih akurat
+    const res = await fetchFromApi(`haviacms/attendance`, apiToken);
+    if (res.success) {
+      const data = Array.isArray(res.data) ? res.data : [];
+      // Pastikan urutan terbaru di atas
+      data.sort((a: any, b: any) => parseInt(b.id) - parseInt(a.id));
+      setAttendances(data);
+      
+      // Cari yang statusnya masih aktif (belum ada jam keluar valid)
+      const active = data.find(att => {
+        const isStatusActive = att.status === 'incomplete';
+        const isOutTimeEmpty = !att.out_time || 
+                               att.out_time.startsWith('0000') || 
+                               att.out_time.startsWith('-0001');
+        return isStatusActive || (att.status === 'pending' && isOutTimeEmpty);
+      });
+      setActiveAttendance(active || null);
+      
+      // AUTO-HEAL: Jika record aktif memiliki junk data (0000-00-00), langsung HAPUS dari server
+      if (active && (active.out_time?.startsWith('0000') || active.out_time?.startsWith('-0001'))) {
+        console.log("Rogue record detected! Auto-healing by deletion...");
+        (async () => {
+          const res = await deleteFromApi(`attendance/${active.id}`, apiToken);
+          if (res.success) {
+            console.log("Rogue record deleted successfully.");
+            loadAttendances();
+          }
+        })();
+      }
+
+      // Cari record terakhir yang benar-benar sudah selesai (Clock Out valid)
+      const lastFinished = data.find(att => {
+        const hasOutTime = att.out_time && 
+                           !att.out_time.startsWith('0000') && 
+                           !att.out_time.startsWith('-0001');
+        return hasOutTime;
+      });
+      setLastFinishedAttendance(lastFinished || null);
+    }
     setIsLoadingAttendances(false);
   };
 
@@ -299,7 +348,12 @@ export default function HaviaMobileApp() {
       else if (subpageTitle === 'Semua Task') loadTasks();
       else if (subpageTitle === 'Finance') loadExpenses();
       else if (subpageTitle === 'Jadwal') loadEvents(); 
-      else if (subpageTitle === 'Absensi' || subpageTitle === 'Tim') loadAttendances();
+      else if (subpageTitle === 'Absensi') {
+        loadAttendances();
+      } else if (subpageTitle === 'Tim') {
+        loadAttendances();
+        loadLeaves();
+      }
       else if (subpageTitle === 'Notifikasi') {
         const loadNotif = async () => {
           setIsLoadingNotif(true);
@@ -363,20 +417,106 @@ export default function HaviaMobileApp() {
     finally { setIsSavingEvent(false); }
   };
 
-  const handleAddAttendance = async () => {
+  const handleResetAttendance = async () => {
+    if (!activeAttendance || !apiToken) return;
+    if (!confirm('Hapus sesi absen ini? (Data di Brain akan dibersihkan)')) return;
+    
     setIsSubmittingAttendance(true);
+    const res = await deleteFromApi(`haviacms/attendance/${activeAttendance.id}`, apiToken);
+    if (res.success) {
+      showToast('Sesi absen berhasil direset! 🧹');
+      setActiveAttendance(null);
+      loadAttendances();
+    } else {
+      showToast(res.error || 'Gagal mereset sesi.');
+    }
+    setIsSubmittingAttendance(false);
+  };
+
+  const handleAddAttendance = async () => {
+    if (!userData?.id || !apiToken) return;
+    setIsSubmittingAttendance(true);
+    
+    // Format waktu UTC: YYYY-MM-DD HH:mm:ss (RISE CRM prefers UTC in DB)
+    const formattedNow = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
     try {
-      const res = await postToApi('attendance', apiToken, {
-        note: `Presensi via Mobile @ ${currentTime}`,
-        status: 'present'
-      });
-      if (res.success) {
-        showToast('Presensi berhasil dicatat! ✅');
-        loadAttendances();
-        handleNav('subpage', null, 'Absensi');
-      } else { showToast(res.error || 'Gagal mencatat presensi.'); }
-    } catch (e: any) { showToast(e.message || 'Error koneksi.'); }
-    finally { setIsSubmittingAttendance(false); }
+      if (activeAttendance) {
+        // --- JUNK DETECTION ---
+        const isJunk = activeAttendance.out_time?.startsWith('0000') || 
+                       activeAttendance.out_time?.startsWith('-0001');
+
+        if (isJunk) {
+          showToast('Data rusak terdeteksi, membersihkan Brain... 🧹');
+          const delRes = await deleteFromApi(`attendance/${activeAttendance.id}`, apiToken);
+          if (delRes.success) {
+            setActiveAttendance(null);
+            loadAttendances();
+            showToast('Havia Brain Bersih! Silahkan Clock In ulang. ✨');
+          } else {
+            showToast('Gagal membersihkan data rusak.');
+          }
+          return; // Stop di sini agar user bisa klik Clock In lagi setelah bersih
+        }
+
+        // --- CLOCK OUT (Update existing record via HaviaCMS) ---
+        const res = await putToApi(`haviacms/attendance/${activeAttendance.id}`, apiToken, {
+          out_time: formattedNow,
+          status: 'pending',
+          note: activeAttendance.note ? `${activeAttendance.note} | Clock out via Mobile` : 'Clock out via Mobile'
+        });
+
+        if (res.success) {
+          showToast('Clock Out Berhasil! Sampai jumpa besok. 👋');
+          loadAttendances();
+        } else {
+          showToast(res.error || 'Gagal Clock Out.');
+        }
+      } else {
+        // --- AUTO-HEAL: Hapus record 'sampah' jika ada (Record dengan Out Time -0001 atau 0000) ---
+        // Ini untuk membersihkan dashboard Brain Bapak dari durasi jutaan jam
+        const rogueRecord = attendances.find(a => 
+          a.out_time?.startsWith('0000') || a.out_time?.startsWith('-0001')
+        );
+        if (rogueRecord) {
+          try {
+            await deleteFromApi(`haviacms/attendance/${rogueRecord.id}`, apiToken);
+          } catch (e) {
+            console.error("Gagal membersihkan data sampah:", e);
+          }
+        }
+
+        // --- CLOCK IN (Create new record via HaviaCMS) ---
+        const res = await postToApi('haviacms/attendance', apiToken, {
+          in_time: formattedNow,
+          note: 'Clock in via Mobile (HaviaCMS API)'
+        });
+
+        if (res.success) {
+          const resAny = res as any;
+          const createdId = resAny.id || resAny.data?.id;
+          
+          // --- OPTIMISTIC UPDATE ---
+          const mockActive = {
+            id: createdId,
+            user_id: userData.id,
+            in_time: formattedNow,
+            status: 'incomplete', 
+            out_time: null
+          };
+          setActiveAttendance(mockActive);
+
+          showToast('Clock In Berhasil! 🚀');
+          loadAttendances();
+        } else {
+          showToast(res.error || 'Gagal Clock In.');
+        }
+      }
+    } catch (e: any) {
+      showToast('Error koneksi ke server.');
+    } finally {
+      setIsSubmittingAttendance(false);
+    }
   };
 
   // --- RENDER ---
@@ -404,7 +544,12 @@ export default function HaviaMobileApp() {
       )}
 
       {currentView === 'dashboard' && (
-        <DashboardView userData={userData} currentTime={currentTime} onNav={handleNav} />
+        <DashboardView 
+          userData={userData} 
+          currentTime={currentTime} 
+          onNav={handleNav} 
+          activeAttendance={activeAttendance} 
+        />
       )}
 
       {currentView === 'id' && (
@@ -414,7 +559,11 @@ export default function HaviaMobileApp() {
       {currentView === 'presensi' && (
         <PresensiView 
           onNav={handleNav} currentTime={currentTime} 
-          handleAddAttendance={handleAddAttendance} isSubmittingAttendance={isSubmittingAttendance} 
+          handleAddAttendance={handleAddAttendance} 
+          handleResetAttendance={handleResetAttendance}
+          isSubmittingAttendance={isSubmittingAttendance}
+          activeAttendance={activeAttendance} 
+          lastFinishedAttendance={lastFinishedAttendance}
         />
       )}
 
@@ -435,6 +584,8 @@ export default function HaviaMobileApp() {
           setSelectedEvent={setSelectedEvent}
           attendances={attendances}
           isLoadingAttendances={isLoadingAttendances}
+          leaves={leaves}
+          isLoadingLeaves={isLoadingLeaves}
           notifications={notifications}
           isLoadingNotif={isLoadingNotif}
           userData={userData}

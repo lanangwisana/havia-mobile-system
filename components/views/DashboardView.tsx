@@ -6,9 +6,10 @@ interface DashboardViewProps {
   userData: any;
   currentTime: string;
   onNav: (view: string, nav?: string | null, title?: string) => void;
+  activeAttendance?: any;
 }
 
-export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentTime, onNav }) => {
+export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentTime, onNav, activeAttendance }) => {
   return (
     <section className="h-full w-full flex flex-col relative overflow-y-auto scrollbar-hide pb-28 animate-in fade-in duration-300">
       <div style={{ backgroundColor: `${colors.bg}FA` }} className="px-6 pt-12 pb-6 flex justify-between items-center backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
@@ -57,8 +58,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
             <h2 className="text-3xl font-light text-white font-mono tracking-tighter">{currentTime || '14:20:25'}</h2>
             <span className="text-[10px] text-neutral-500 font-medium">WIB / Western Indonesia</span>
           </div>
-          <div className="text-right border-l border-white/5 pl-4">
-            <Clock className="w-6 h-6 text-neutral-600 mb-1" />
+          <div className="text-right border-l border-white/5 pl-4 flex flex-col items-end gap-2">
+            <Clock className="w-6 h-6 text-neutral-600" />
+            {activeAttendance && (
+              <span className="flex items-center gap-1.5 px-2 py-0.5 bg-green-500/10 text-green-500 rounded-md text-[8px] font-black border border-green-500/20 uppercase tracking-tighter">
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                LIVE
+              </span>
+            )}
           </div>
         </div>
 

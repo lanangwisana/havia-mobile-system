@@ -6,9 +6,10 @@ interface TimContentProps {
   onNav: (view: string, nav?: string | null, title?: string) => void;
   attendances: any[];
   isLoadingAttendances: boolean;
+  leaves: any[];
 }
 
-export const TimContent: React.FC<TimContentProps> = ({ onNav, attendances, isLoadingAttendances }) => {
+export const TimContent: React.FC<TimContentProps> = ({ onNav, attendances, isLoadingAttendances, leaves }) => {
   // Filter only for today or last few records if needed, but here we show all as "Time Cards"
   
   return (
@@ -21,14 +22,34 @@ export const TimContent: React.FC<TimContentProps> = ({ onNav, attendances, isLo
       </div>
       
       {/* Quick Stats / Summary like Timecards in Brain */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <div className="bg-[#171717] border border-neutral-800 rounded-3xl p-4 flex flex-col items-center justify-center shadow-lg">
           <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest mb-1 text-center">Total Hari</span>
-          <span className="text-xl font-black text-white">{new Set(attendances.map(a => a.date)).size}</span>
+          <span className="text-xl font-black text-white">{new Set(attendances.map(a => a.date || (a.in_time ? a.in_time.split(' ')[0] : null))).size}</span>
+        </div>
+        <div className="bg-[#171717] border border-neutral-800 rounded-3xl p-4 flex flex-col items-center justify-center shadow-lg">
+          <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest mb-1 text-center">Total Jam</span>
+          <span className="text-xl font-black text-[#C69C3D]">
+            {(() => {
+              let totalMinutes = 0;
+              // Ambil 20 record terakhir (atau semua jika kurang dari 20)
+              const recentRecords = attendances.slice(0, 20);
+              recentRecords.forEach(att => {
+                if (att.in_time && att.out_time && !att.out_time.startsWith('0000')) {
+                  const cin = new Date(att.in_time.replace(' ', 'T') + 'Z');
+                  const cout = new Date(att.out_time.replace(' ', 'T') + 'Z');
+                  if (!isNaN(cin.getTime()) && !isNaN(cout.getTime())) {
+                    totalMinutes += (cout.getTime() - cin.getTime()) / (1000 * 60);
+                  }
+                }
+              });
+              return Math.floor(totalMinutes / 60) + ' J';
+            })()}
+          </span>
         </div>
         <div className="bg-[#171717] border border-neutral-800 rounded-3xl p-4 flex flex-col items-center justify-center shadow-lg">
           <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest mb-1 text-center">Izin/Cuti</span>
-          <span className="text-xl font-black text-purple-400">0</span>
+          <span className="text-xl font-black text-purple-400">{leaves.length}</span>
         </div>
       </div>
 
@@ -63,11 +84,25 @@ export const TimContent: React.FC<TimContentProps> = ({ onNav, attendances, isLo
            </div>
          ) : attendances.length > 0 ? (
            <div className="space-y-4">
-             {attendances.slice(0, 5).map((att: any, idx: number) => {
-               const dateObj = new Date(att.date || new Date());
+             {attendances.slice(0, 10).map((att: any, idx: number) => {
+               // Konversi UTC dari server ke Local untuk tampilan
+               const formatLocalTime = (utcStr: string | null) => {
+                 if (!utcStr || utcStr.startsWith('0000') || utcStr.startsWith('-0001')) return null;
+                 const date = new Date(utcStr.replace(' ', 'T') + 'Z');
+                 if (isNaN(date.getTime())) return utcStr;
+                 return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
+               };
+
+               const inTimeLocal = formatLocalTime(att.in_time);
+               const outTimeLocal = formatLocalTime(att.out_time);
+               
+               const dateObj = new Date(att.in_time ? att.in_time.split(' ')[0] : (att.date || new Date()));
                const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'short' });
                const dayNum = dateObj.getDate();
-               const isClockedIn = !att.out_time && att.status === 'incomplete';
+               const isOutTimeEmpty = !att.out_time || 
+                                      att.out_time.startsWith('0000') || 
+                                      att.out_time.startsWith('-0001');
+               const isClockedIn = att.status === 'incomplete' || (att.status === 'pending' && outTimeLocal === null && isOutTimeEmpty);
 
                return (
                  <div key={att.id || idx} className="flex items-center gap-4 group">
@@ -84,7 +119,7 @@ export const TimContent: React.FC<TimContentProps> = ({ onNav, attendances, isLo
                           {isClockedIn ? 'Sedang Bekerja' : 'Selesai Kerja'}
                         </span>
                         <span className="text-[9px] font-bold text-neutral-500">
-                          {att.in_time} - {att.out_time || 'Present'}
+                          {inTimeLocal || '--:--'} - {outTimeLocal || 'Present'}
                         </span>
                       </div>
                       
