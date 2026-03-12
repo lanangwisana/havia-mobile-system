@@ -47,10 +47,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
               <p className="text-[9px] text-neutral-500 uppercase tracking-widest mb-1">Company</p>
               <p className="text-xs font-semibold text-neutral-300 tracking-wider">HAVIA STUDIO & GAMPAWORKS</p>
             </div>
-            <span className={`px-3 py-1.5 bg-neutral-900 ${getAttendanceStatus().color} text-[9px] font-bold rounded-full border border-neutral-800 flex items-center gap-1.5`}>
-              <div className={`w-1.5 h-1.5 rounded-full ${getAttendanceStatus().status === 'ON TIME' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'}`}></div>
-              {getAttendanceStatus().status}
-            </span>
           </div>
         </div>
 
@@ -62,7 +58,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
             <span className="text-[10px] text-neutral-500 font-medium">WIB / Western Indonesia</span>
           </div>
           <div className="text-right border-l border-white/5 pl-4">
-            <div className="text-green-500 text-[10px] font-bold uppercase tracking-widest mb-1">On Time</div>
+            <div className={`${getAttendanceStatus().color} text-[10px] font-bold uppercase tracking-widest mb-1`}>
+              {getAttendanceStatus().status}
+            </div>
             <p className="text-[10px] text-neutral-500">Shift: 08:00 - 17:00</p>
           </div>
         </div>
