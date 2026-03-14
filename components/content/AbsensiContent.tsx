@@ -45,10 +45,6 @@ export const AbsensiContent: React.FC<AbsensiContentProps> = ({
                   <h4 className="font-bold text-white text-sm mb-1">{displayDate}</h4>
                   {att.note && <p className="text-[10px] text-neutral-400 italic">Catatan: {att.note}</p>}
                 </div>
-                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border border-green-500/20 bg-green-500/10 text-green-400`}>
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-                  {att.status_title || att.status || 'Hadir'}
-                </span>
               </div>
               
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-neutral-800/50">
