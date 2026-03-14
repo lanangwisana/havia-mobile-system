@@ -23,15 +23,44 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({
         </div>
       ) : projects.length > 0 ? (
         projects.map((project: any, index: number) => {
-           const totalPoints = parseFloat(project.total_points || "0");
-           const completedPoints = parseFloat(project.completed_points || "0");
-           const progress = project.progress ? parseInt(project.progress, 10) : (totalPoints > 0 ? Math.round((completedPoints / totalPoints) * 100) : 0);
-           const isDone = progress === 100 || String(project.status).toLowerCase() === 'completed';
-           let statusText = project.status_title || project.status || (isDone ? 'COMPLETED' : 'IN PROGRESS');
-           statusText = String(statusText).toUpperCase();
-           if (statusText === 'OPEN') statusText = 'AKTIF';
-           if (statusText === 'COMPLETED') statusText = 'SELESAI';
-           
+            const totalPoints = parseFloat(project.total_points || "0");
+            const completedPoints = parseFloat(project.completed_points || "0");
+            const progress = project.progress ? parseInt(project.progress, 10) : (totalPoints > 0 ? Math.round((completedPoints / totalPoints) * 100) : 0);
+            
+            // Logika Wording & Warna Berdasarkan Status & Progress
+            const rawStatus = String(project.status || '').toLowerCase();
+            let statusText = 'AKTIF';
+            let statusColor = 'text-[#C69C3D] border-[#C69C3D]/20 bg-[#C69C3D]/10'; // In Progress (Gold)
+            let progColor = 'bg-[#C69C3D]';
+            let glowColor = 'bg-[#C69C3D]';
+
+            if (rawStatus === 'completed') {
+              statusText = 'SELESAI';
+              statusColor = 'text-green-400 border-green-400/20 bg-green-400/10';
+              progColor = 'bg-green-500';
+              glowColor = 'bg-green-500';
+            } else if (rawStatus === 'hold') {
+              statusText = 'HOLD';
+              statusColor = 'text-amber-400 border-amber-400/20 bg-amber-400/10';
+              progColor = 'bg-amber-500';
+              glowColor = 'bg-amber-500';
+            } else if (rawStatus === 'canceled') {
+              statusText = 'CANCELED';
+              statusColor = 'text-red-400 border-red-400/20 bg-red-400/10';
+              progColor = 'bg-red-500';
+              glowColor = 'bg-red-500';
+            } else {
+              // Status AKTIF (Open)
+              if (progress === 0) {
+                statusText = 'AKTIF';
+                statusColor = 'text-neutral-400 border-neutral-800 bg-neutral-900'; // To Do (Neutral)
+                progColor = 'bg-neutral-600';
+                glowColor = 'bg-neutral-400';
+              }
+            }
+
+            const isDone = rawStatus === 'completed';
+            
             return (
             <div 
               key={project.id || index} 
@@ -40,13 +69,13 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({
               style={{ background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent)' }}
             >
               <div className="bg-[#121212] rounded-[1.95rem] p-5 h-full relative overflow-hidden">
-                <div className={`absolute -right-8 -top-8 w-24 h-24 rounded-full blur-3xl opacity-10 pointer-events-none ${isDone ? 'bg-green-500' : 'bg-[#C69C3D]'}`}></div>
+                <div className={`absolute -right-8 -top-8 w-24 h-24 rounded-full blur-3xl opacity-10 pointer-events-none ${glowColor}`}></div>
                 
                 <div className="relative z-10">
                   <div className="flex justify-between items-start gap-3 mb-4">
                     <div className="flex gap-3 items-start min-w-0 flex-1">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 ${isDone ? 'bg-green-500/10 border-green-500/20' : 'bg-[#C69C3D]/10 border-[#C69C3D]/20'}`}>
-                        {isDone ? <Activity className="w-5 h-5 text-green-400" /> : <Briefcase className="w-5 h-5 text-[#C69C3D]" />}
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 ${statusColor}`}>
+                        {isDone ? <Activity className="w-5 h-5" /> : <Briefcase className="w-5 h-5" />}
                       </div>
                       <div className="flex flex-col gap-1 min-w-0">
                         <h4 className="font-bold text-white text-[15px] leading-tight group-hover:text-[#C69C3D] transition-colors truncate">{project.title || `Project ${project.id}`}</h4>
@@ -66,7 +95,7 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({
                         </div>
                       </div>
                     </div>
-                    <span className={`text-[7px] px-2 py-1 rounded-lg font-bold uppercase tracking-widest border shrink-0 ${isDone ? 'bg-green-400/10 text-green-400 border-green-400/20' : 'bg-[#C69C3D]/10 text-[#C69C3D] border-[#C69C3D]/20'}`}>
+                    <span className={`text-[7px] px-2 py-1 rounded-lg font-bold uppercase tracking-widest border shrink-0 ${statusColor}`}>
                       {statusText}
                     </span>
                   </div>
@@ -90,7 +119,7 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({
                     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                       <div 
                          style={{ width: `${progress}%` }} 
-                         className={`h-full rounded-full transition-all duration-1000 ${isDone ? 'bg-green-500' : 'bg-[#C69C3D]'}`}
+                         className={`h-full rounded-full transition-all duration-1000 ${progColor}`}
                       ></div>
                     </div>
                   </div>

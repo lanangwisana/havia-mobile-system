@@ -11,6 +11,7 @@ import { TimContent } from '../content/TimContent';
 import { AbsensiContent } from '../content/AbsensiContent';
 import { AkunContent } from '../content/AkunContent';
 import { EditProfileContent } from '../content/EditProfileContent';
+import { ResetPasswordContent } from '../content/ResetPasswordContent';
 import { NotifikasiContent } from '../content/NotifikasiContent';
 
 interface SubpageViewProps {
@@ -39,6 +40,8 @@ interface SubpageViewProps {
   setEditForm: (v: any) => void;
   isSavingProfile: boolean;
   handleSaveProfile: () => void;
+  isResettingPassword: boolean;
+  handleResetPassword: (password: string) => void;
   onLogout: () => void;
   showToast: (msg: string) => void;
   newEvent: any;
@@ -106,9 +109,26 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
       case 'Akun': 
         return <AkunContent 
           userData={props.userData} 
-          onEditProfile={() => onNav('subpage', null, 'Edit Profile')} 
+          onEditProfile={() => {
+            props.setEditForm({
+              first_name: props.userData?.first_name || '',
+              last_name: props.userData?.last_name || '',
+              job_title: props.userData?.job_title || '',
+              phone: props.userData?.phone || '',
+              address: props.userData?.address || '',
+              gender: props.userData?.gender || 'male',
+            });
+            onNav('subpage', null, 'Edit Profile');
+          }} 
+          onResetPassword={() => onNav('subpage', null, 'Reset Password')}
           onLogout={props.onLogout} 
           showToast={props.showToast} 
+        />;
+      case 'Reset Password':
+        return <ResetPasswordContent 
+          onSave={props.handleResetPassword}
+          onCancel={() => onNav('subpage', null, 'Akun')}
+          isSaving={props.isResettingPassword}
         />;
       case 'Edit Profile': 
         return <EditProfileContent 
@@ -141,8 +161,12 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           onClick={() => {
             if (subpageTitle === 'Detail Event') {
               onNav('subpage', null, 'Jadwal');
+            } else if (subpageTitle === 'Tasks') {
+              onNav('subpage', null, 'Project');
+            } else if (subpageTitle === 'Edit Profile' || subpageTitle === 'Reset Password') {
+              onNav('subpage', null, 'Akun');
             } else {
-              onNav('dashboard');
+              onNav('dashboard', 'home');
             }
           }} 
           style={{ backgroundColor: colors.card, borderColor: colors.border }} 

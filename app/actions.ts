@@ -256,19 +256,30 @@ export async function putToApi(endpoint: string, token: string, body: Record<str
   try {
     const url = `${API_BASE_URL}/${endpoint}`;
     
-    // Gunakan JSON untuk PUT sesuai standar REST Controller Brain
+    // PHP CodeIgniter (RISE CRM) seringkali tidak bisa membaca multipart/form-data di request PUT murni.
+    // Solusi: Gunakan POST tapi tambahkan field _method=PUT (Method Spoofing)
+    const formData = new FormData();
+    formData.append('_method', 'PUT'); // Spoofing agar server mengenali ini sebagai PUT
+    
+    Object.entries(body).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    });
+
     const response = await fetch(url, {
-      method: 'PUT', 
+      method: 'POST', // Gunakan POST untuk kompatibilitas form-data
       headers: {
         'authtoken': token,
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(body),
+      body: formData,
       cache: 'no-store',
     });
     
     const textRes = await response.text();
+    console.log(`=== PUT/POST SPOOF RESP FROM ${endpoint} ===`, textRes.substring(0, 200));
+
     if (response.status === 204 || !textRes) {
       return { success: true, message: 'Updated' };
     }
@@ -277,7 +288,7 @@ export async function putToApi(endpoint: string, token: string, body: Record<str
     try {
       parsedRes = JSON.parse(textRes);
     } catch (e) {
-      return { success: false, error: `Status ${response.status}: Response bukan JSON.` };
+      return { success: false, error: `Status ${response.status}: Server tidak merespon JSON.` };
     }
 
     if (!response.ok) {

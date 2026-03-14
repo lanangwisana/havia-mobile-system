@@ -50,18 +50,8 @@ export const EditProfileContent: React.FC<EditProfileContentProps> = ({
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Telepon Alternatif</label>
-        <input type="tel" value={editForm.alternative_phone || ''} onChange={(e) => setEditForm({...editForm, alternative_phone: e.target.value})} placeholder="Opsional" style={{ backgroundColor: colors.card, borderColor: colors.border }} className={inputClass} />
-      </div>
-
-      <div className="space-y-1.5">
         <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Alamat</label>
         <textarea value={editForm.address || ''} onChange={(e) => setEditForm({...editForm, address: e.target.value})} placeholder="Alamat lengkap..." rows={3} style={{ backgroundColor: colors.card, borderColor: colors.border }} className={`${inputClass} resize-none`} />
-      </div>
-
-      <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Alamat Alternatif</label>
-        <textarea value={editForm.alternative_address || ''} onChange={(e) => setEditForm({...editForm, alternative_address: e.target.value})} placeholder="Opsional" rows={2} style={{ backgroundColor: colors.card, borderColor: colors.border }} className={`${inputClass} resize-none`} />
       </div>
 
       <div className="space-y-1.5">

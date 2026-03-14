@@ -54,6 +54,7 @@ export default function HaviaMobileApp() {
   // Edit Profile States
   const [editForm, setEditForm] = useState<any>({});
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   // Events States
   const [events, setEvents] = useState<any[]>([]);
@@ -118,19 +119,10 @@ export default function HaviaMobileApp() {
             setActiveNav('home');
             
             // Sync with server in background
-            loginWithToken(savedToken).then(result => {
+            fetchFromApi(`users/${savedUser.id}`, savedToken).then(result => {
               if (result.success && result.data) {
-                const users = result.data;
-                let latestUser = null;
-                if (Array.isArray(users)) {
-                  latestUser = users.find((u: any) => u.email === savedUser.email);
-                } else if (users && typeof users === 'object') {
-                  if (users.email === savedUser.email) latestUser = users;
-                }
-                if (latestUser) {
-                  setUserData(latestUser);
-                  localStorage.setItem('havia_user', JSON.stringify(latestUser));
-                }
+                setUserData(result.data);
+                localStorage.setItem('havia_user', JSON.stringify(result.data));
               }
             }).catch(e => console.warn("Sync error", e));
 
@@ -159,10 +151,23 @@ export default function HaviaMobileApp() {
     try {
       const res = await loginWithEmailPassword(loginEmail, loginPassword);
       if (res.success && res.data) {
-        setUserData(res.data);
         setApiToken(res.token || '');
-        localStorage.setItem('havia_user', JSON.stringify(res.data));
         localStorage.setItem('havia_token', res.token || '');
+        
+        // AMBIL DATA PROFIL LENGKAP SETELAH LOGIN SUKSES
+        // Karena API /login biasanya hanya mengembalikan data dasar (id, email)
+        const fullProfileRes = await fetchFromApi(`users/${res.data.id}`, res.token || '');
+        
+        if (fullProfileRes.success && fullProfileRes.data) {
+          const fullUser = fullProfileRes.data;
+          setUserData(fullUser);
+          localStorage.setItem('havia_user', JSON.stringify(fullUser));
+        } else {
+          // Fallback jika fetch profil gagal
+          setUserData(res.data);
+          localStorage.setItem('havia_user', JSON.stringify(res.data));
+        }
+
         setCurrentView('dashboard');
         setActiveNav('home');
         showToast('Selamat Datang!');
@@ -392,6 +397,38 @@ export default function HaviaMobileApp() {
     finally { setIsSavingProfile(false); }
   };
 
+  const handleResetPassword = async (newPassword: string) => {
+    if (!userData?.id || userData.id === '0') {
+      showToast('Tidak bisa reset password di Dev Mode');
+      return;
+    }
+    setIsResettingPassword(true);
+    try {
+      // Send more complete data as some APIs ignore partial updates for sensitive fields
+      // and include 'retype_password' which is common in RISE CRM/CI environments
+      const updateData = {
+        password: newPassword,
+        retype_password: newPassword,
+        first_name: userData?.first_name || '',
+        last_name: userData?.last_name || '',
+        email: userData?.email || '',
+        user_type: userData?.user_type || 'staff'
+      };
+
+      const res = await putToApi(`users/${userData.id}`, apiToken, updateData);
+      if (res.success) {
+        showToast('Password berhasil diperbarui! 🔒');
+        handleNav('subpage', null, 'Akun');
+      } else { 
+        showToast(res.error || 'Gagal reset password.'); 
+      }
+    } catch (error: any) { 
+      showToast(error.message || 'Terjadi kesalahan.'); 
+    } finally { 
+      setIsResettingPassword(false); 
+    }
+  };
+
   const handleCreateEvent = async () => {
     if (!newEvent.title || !newEvent.start_date) {
       showToast('Judul dan Tanggal wajib diisi.');
@@ -593,6 +630,8 @@ export default function HaviaMobileApp() {
           setEditForm={(form) => setEditForm(form)}
           isSavingProfile={isSavingProfile}
           handleSaveProfile={handleSaveProfile}
+          isResettingPassword={isResettingPassword}
+          handleResetPassword={handleResetPassword}
           onLogout={onLogout}
           showToast={showToast}
           newEvent={newEvent}

@@ -5,12 +5,13 @@ import { colors, getUserImage } from '@/lib/utils';
 interface AkunContentProps {
   userData: any;
   onEditProfile: () => void;
+  onResetPassword: () => void;
   onLogout: () => void;
   showToast: (msg: string) => void;
 }
 
 export const AkunContent: React.FC<AkunContentProps> = ({
-  userData, onEditProfile, onLogout, showToast
+  userData, onEditProfile, onResetPassword, onLogout, showToast
 }) => (
   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32">
     <div className="flex flex-col items-center mb-6">
@@ -42,33 +43,12 @@ export const AkunContent: React.FC<AkunContentProps> = ({
           <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Alamat (Mailing)</span>
           <span className="text-sm text-white font-medium break-words leading-relaxed">{userData?.address || 'Belum diatur'}</span>
         </div>
-
-        {(userData?.alternative_phone || userData?.alternative_address) && (
-          <>
-            {userData?.alternative_phone && (
-              <div className="flex flex-col gap-1 pt-3 border-t border-neutral-800">
-                <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Telepon Alternatif</span>
-                <span className="text-sm text-white font-medium">{userData?.alternative_phone}</span>
-              </div>
-            )}
-            {userData?.alternative_address && (
-              <div className="flex flex-col gap-1 pt-3 border-t border-neutral-800">
-                <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Alamat Alternatif</span>
-                <span className="text-sm text-white font-medium break-words leading-relaxed">{userData?.alternative_address}</span>
-              </div>
-            )}
-          </>
-        )}
         
-        {(userData?.gender || userData?.dob) && (
-          <div className="grid grid-cols-2 gap-4 pt-3 border-t border-neutral-800">
+        {userData?.gender && (
+          <div className="pt-3 border-t border-neutral-800">
             <div className="flex flex-col gap-1">
               <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Gender</span>
               <span className="text-sm text-white font-medium capitalize">{userData?.gender || '-'}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Tgl Lahir</span>
-              <span className="text-sm text-white font-medium">{userData?.dob || '-'}</span>
             </div>
           </div>
         )}
@@ -94,7 +74,7 @@ export const AkunContent: React.FC<AkunContentProps> = ({
       </button>
 
       {/* Reset Password Button */}
-      <button onClick={() => showToast('Reset Password clicked')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-full text-left flex items-center justify-between p-4 rounded-2xl border active:scale-[0.98] transition-all group hover:border-[#C69C3D]/50 mt-3">
+      <button onClick={onResetPassword} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-full text-left flex items-center justify-between p-4 rounded-2xl border active:scale-[0.98] transition-all group hover:border-[#C69C3D]/50 mt-3">
         <div className="flex items-center gap-4">
           <div className="bg-neutral-800/80 p-3 rounded-xl group-hover:bg-[#C69C3D]/10 transition-colors">
             <Lock className="w-5 h-5 text-neutral-400 group-hover:text-[#C69C3D] transition-colors" />
