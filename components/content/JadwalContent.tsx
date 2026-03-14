@@ -7,18 +7,56 @@ interface JadwalContentProps {
   events: any[];
   onEventClick: (event: any) => void;
   onCreateEvent: () => void;
+  // New filtering props
+  labels: any[];
+  filterType: string;
+  setFilterType: (type: string) => void;
+  filterLabel: string;
+  setFilterLabel: (label: string) => void;
 }
 
 export const JadwalContent: React.FC<JadwalContentProps> = ({
-  isLoadingEvents, events, onEventClick, onCreateEvent
+  isLoadingEvents, events, onEventClick, onCreateEvent,
+  labels, filterType, setFilterType, filterLabel, setFilterLabel
 }) => (
   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32">
-    <div className="flex items-center justify-between px-1">
-      <div className="flex flex-col">
-        <h3 className="text-base font-extrabold text-white tracking-tight">Jadwal Havia</h3>
-        <p className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold">Agenda & Event Internal</p>
+    <div className="flex flex-col gap-4 px-1">
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col">
+          <h3 className="text-base font-extrabold text-white tracking-tight">Jadwal Havia</h3>
+          <p className="text-[10px] text-neutral-500 uppercase tracking-widest font-bold">Agenda & Event Internal</p>
+        </div>
+        <div className="w-10"></div>
       </div>
-      <div className="w-10"></div>
+
+      {/* Filter Row */}
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <select 
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+          className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[10px] font-bold text-neutral-300 focus:outline-none focus:border-[#C69C3D]/50 transition-colors"
+        >
+          <option value="event" className="bg-[#121212]">Events Only</option>
+          <option value="all" className="bg-[#121212]">All (Events, Tasks, Projects)</option>
+          <option value="task_start_date" className="bg-[#121212]">Task Start Date</option>
+          <option value="task_deadline" className="bg-[#121212]">Task Deadline</option>
+          <option value="project_start_date" className="bg-[#121212]">Project Start Date</option>
+          <option value="project_deadline" className="bg-[#121212]">Project Deadline</option>
+        </select>
+
+        <select 
+          value={filterLabel}
+          onChange={(e) => setFilterLabel(e.target.value)}
+          className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[10px] font-bold text-neutral-300 focus:outline-none focus:border-[#C69C3D]/50 transition-colors min-w-[120px]"
+        >
+          <option value="" className="bg-[#121212]">- Semua Label -</option>
+          {labels.map(label => (
+            <option key={label.id} value={label.id} className="bg-[#121212]">
+              {label.title}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
 
     {isLoadingEvents ? (
@@ -32,6 +70,14 @@ export const JadwalContent: React.FC<JadwalContentProps> = ({
           const date = new Date(event.start_date || '');
           const month = date.toLocaleDateString('id-ID', { month: 'short' }).toUpperCase();
           const day = date.getDate();
+
+          // Helper for badges
+          const getBadge = (source: string) => {
+            if (source?.startsWith('task')) return { label: 'Task', color: '#3498db', bg: 'bg-[#3498db]/10' };
+            if (source?.startsWith('project')) return { label: 'Project', color: '#2ecc71', bg: 'bg-[#2ecc71]/10' };
+            return { label: 'Event', color: '#C69C3D', bg: 'bg-[#C69C3D]/10' };
+          };
+          const badge = getBadge(event.event_source);
           
           return (
             <div 
@@ -48,18 +94,23 @@ export const JadwalContent: React.FC<JadwalContentProps> = ({
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-[15px] text-white group-hover:text-[#C69C3D] transition-colors truncate mb-1.5 leading-tight">{event.title}</h4>
+                    <h4 className="font-bold text-[14px] text-white group-hover:text-[#C69C3D] transition-colors truncate mb-1.5 leading-tight">{event.title}</h4>
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-1">
                         <Clock className="w-3 h-3 text-neutral-500" />
                         <span className="text-[10px] text-neutral-400 font-bold">{event.start_time || '08:00'}</span>
                       </div>
-                      {event.location && (
-                        <div className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-neutral-500" />
-                          <span className="text-[10px] text-neutral-400 font-bold truncate max-w-[100px]">{event.location}</span>
+                      <div className="flex items-center gap-2">
+                        {event.location && (
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-neutral-500" />
+                            <span className="text-[10px] text-neutral-400 font-bold truncate max-w-[100px]">{event.location}</span>
+                          </div>
+                        )}
+                        <div className={`px-1.5 py-0.5 rounded-[6px] ${badge.bg} border border-white/5 shrink-0 flex items-center justify-center`}>
+                          <span className="text-[8px] font-black uppercase tracking-widest leading-none" style={{ color: badge.color }}>{badge.label}</span>
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                   

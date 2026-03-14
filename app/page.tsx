@@ -69,6 +69,9 @@ export default function HaviaMobileApp() {
     color: '#C69C3D'
   });
   const [isSavingEvent, setIsSavingEvent] = useState(false);
+  const [eventLabels, setEventLabels] = useState<any[]>([]);
+  const [eventFilterType, setEventFilterType] = useState('event');
+  const [eventFilterLabel, setEventFilterLabel] = useState('');
 
   // Expenses States
   const [expenses, setExpenses] = useState<any[]>([]);
@@ -290,15 +293,17 @@ export default function HaviaMobileApp() {
     if (!apiToken || !userData?.id) return;
     setIsLoadingEvents(true);
     
-    // Kita panggil API events melalui HaviaCMS bridge. 
-    // Ini lebih stabil karena memuat helper yang diperlukan server core.
-    const res = await fetchFromApi('haviacms/events', apiToken);
+    // Pass filters to API
+    let url = `haviacms/events?type=${eventFilterType}`;
+    if (eventFilterLabel) {
+      url += `&label_id=${eventFilterLabel}`;
+    }
+
+    const res = await fetchFromApi(url, apiToken);
     
     if (res.success) {
       let eventsData = Array.isArray(res.data) ? res.data : [];
       
-      // Jika data berasal dari fallback (karena server error 500), 
-      // kita beri tanda agar user tidak bingung.
       if ((res as any).isFallback) {
         eventsData = eventsData.map((ev: any) => ({
           ...ev,
@@ -315,6 +320,14 @@ export default function HaviaMobileApp() {
       if (res.error) showToast(`Gagal sinkron jadwal: ${res.error}`);
     }
     setIsLoadingEvents(false);
+  };
+
+  const loadEventLabels = async () => {
+    if (!apiToken) return;
+    const res = await fetchFromApi('haviacms/events/labels', apiToken);
+    if (res.success) {
+      setEventLabels(Array.isArray(res.data) ? res.data : []);
+    }
   };
 
   const loadLeaves = async () => {
@@ -379,7 +392,10 @@ export default function HaviaMobileApp() {
       if (subpageTitle === 'Project') loadProjects();
       else if (subpageTitle === 'Semua Task') loadTasks();
       else if (subpageTitle === 'Finance') loadExpenses();
-      else if (subpageTitle === 'Jadwal') loadEvents(); 
+      else if (subpageTitle === 'Jadwal') {
+        loadEvents();
+        loadEventLabels();
+      }
       else if (subpageTitle === 'Absensi') {
         loadAttendances();
       } else if (subpageTitle === 'Tim') {
@@ -582,6 +598,13 @@ export default function HaviaMobileApp() {
     }
   };
 
+  // Reload events when filters change
+  useEffect(() => {
+    if (apiToken && currentView === 'subpage' && subpageTitle === 'Jadwal') {
+      loadEvents();
+    }
+  }, [eventFilterType, eventFilterLabel]);
+
   // --- RENDER ---
   if (isCheckingAuth) {
     return (
@@ -666,6 +689,11 @@ export default function HaviaMobileApp() {
           apiToken={apiToken}
           onUploadImage={handleUploadImage}
           isUploadingImage={isUploadingImage}
+          eventLabels={eventLabels}
+          eventFilterType={eventFilterType}
+          setEventFilterType={setEventFilterType}
+          eventFilterLabel={eventFilterLabel}
+          setEventFilterLabel={setEventFilterLabel}
         />
       )}
 

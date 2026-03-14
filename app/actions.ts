@@ -124,13 +124,13 @@ export async function fetchFromApi(endpoint: string, token: string, retryCount =
       // Kita kembalikan data minimal agar UI tidak kosong melompong (khusus demo/troubleshooting)
       if (response.status === 401 || response.status >= 500) {
         if (endpoint.includes('projects/search')) {
-           return { success: true, data: [{ id: '35', title: 'Desain Rumah Modern 2 Lantai (RK House)', status: 'open' }], isFallback: true };
+           return { success: true, data: [{ id: '35', title: 'Desain Rumah Modern 2 Lantai (RK House)', status: 'open' }], isFallback: true, serverErrorMessage: errorDetail };
         }
         if (endpoint.includes('tasks/search')) {
-           return { success: true, data: [{ id: '31', title: 'Pembuatan Konsep Desain Arsitektur', project_id: '35', project_title: 'RK House', collaborators: 'asep_id' }], isFallback: true };
+           return { success: true, data: [{ id: '31', title: 'Pembuatan Konsep Desain Arsitektur', project_id: '35', project_title: 'RK House', collaborators: 'asep_id' }], isFallback: true, serverErrorMessage: errorDetail };
         }
         if (endpoint.includes('events')) {
-           return { success: true, data: [{ id: 'e1', title: 'Rapat RK House', start_date: new Date().toISOString().split('T')[0], color: '#f1c40f' }], isFallback: true };
+           return { success: true, data: [{ id: 'e1', title: 'Rapat RK House', start_date: new Date().toISOString().split('T')[0], color: '#f1c40f' }], isFallback: true, serverErrorMessage: errorDetail };
         }
       }
 
