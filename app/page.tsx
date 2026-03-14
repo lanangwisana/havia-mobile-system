@@ -190,33 +190,40 @@ export default function HaviaMobileApp() {
     if (!userData?.id || !apiToken) return;
     setIsLoadingProjects(true);
     
-    // Fetch all projects and all my tasks (including collaborators)
-    const [pRes, tRes] = await Promise.all([
-      fetchFromApi('projects', apiToken),
-      fetchFromApi('tasks', apiToken)
-    ]);
+    console.log(`[LoadProjects] Using HaviaCMS Bridge for user ${userData.id}...`);
 
-    if (pRes.success && tRes.success) {
-      const allProjects = Array.isArray(pRes.data) ? pRes.data : [];
-      const allTasks = Array.isArray(tRes.data) ? tRes.data : [];
+    // Ambil data proyek melalui Bridge HaviaCMS yang sudah menangani Kolaborator secara otomatis
+    const pRes = await fetchFromApi('haviacms/projects', apiToken);
+    const tRes = await fetchFromApi('haviacms/tasks', apiToken);
+
+    if (pRes.success) {
+      const projectPool = Array.isArray(pRes.data) ? pRes.data : [];
+      const taskPool = Array.isArray(tRes.data) ? tRes.data : [];
+      
       const myId = String(userData.id);
+      const isAdmin = String(userData.is_admin) === "1" || userData.role_id === "admin";
 
-      // Map roles to projects
-      const enrichedProjects = allProjects.filter((p: any) => {
-        // Cek apakah user terlibat di project ini via task
-        const projectTasks = allTasks.filter(t => String(t.project_id) === String(p.id));
-        const isAssigned = projectTasks.some(t => String(t.assigned_to) === myId);
-        const isCollab = projectTasks.some(t => t.collaborators && String(t.collaborators).split(',').includes(myId));
+      const enriched = projectPool.map((p: any) => {
+        const pId = String(p.id);
+        const projectTasks = taskPool.filter((t: any) => String(t.project_id) === pId);
         
-        if (isAssigned) p.userRole = 'PIC';
+        const isPic = projectTasks.some((t: any) => String(t.assigned_to) === myId);
+        const isCollab = projectTasks.some((t: any) => {
+          const collabs = t.collaborators ? String(t.collaborators).split(',').map((id: string) => id.trim()) : [];
+          return collabs.includes(myId);
+        });
+
+        if (isAdmin) p.userRole = 'ADMIN';
+        else if (isPic) p.userRole = 'PIC';
         else if (isCollab) p.userRole = 'KOLABORATOR';
-        
-        return isAssigned || isCollab;
+        else p.userRole = 'MEMBER';
+
+        return p;
       });
 
-      setProjects(enrichedProjects);
-    } else if (pRes.success) {
-      setProjects([]);
+      setProjects(enriched);
+    } else {
+      showToast(`Gagal memuat proyek: ${pRes.error}`);
     }
     
     setIsLoadingProjects(false);
@@ -226,25 +233,27 @@ export default function HaviaMobileApp() {
     if (!userData?.id || !apiToken) return;
     setIsLoadingTasks(true);
     
-    const res = await fetchFromApi('tasks', apiToken);
-    if (res.success) {
-      const allTasks = Array.isArray(res.data) ? res.data : [];
-      const myId = String(userData.id);
+    const myId = String(userData.id);
+    console.log(`[LoadTasks] Using HaviaCMS Bridge for tasks...`);
 
-      let myTasks = allTasks.filter((t: any) => 
-        String(t.assigned_to) === myId || 
-        (t.collaborators && String(t.collaborators).split(',').includes(myId))
-      ).map((t: any) => {
-        // Attach role to task
-        t.userRole = String(t.assigned_to) === myId ? 'PIC' : 'KOLABORATOR';
+    const endpoint = projectId ? `haviacms/tasks?project_id=${projectId}` : 'haviacms/tasks';
+    const res = await fetchFromApi(endpoint, apiToken);
+
+    if (res.success) {
+      const tasks = Array.isArray(res.data) ? res.data : [];
+      const enrichedTasks = tasks.map((t: any) => {
+        const isPic = String(t.assigned_to) === myId;
+        const collabs = t.collaborators ? String(t.collaborators).split(',').map((id: string) => id.trim()) : [];
+        const isCollab = collabs.includes(myId);
+        
+        if (isPic) t.userRole = 'PIC';
+        else if (isCollab) t.userRole = 'KOLABORATOR';
+        
         return t;
       });
-
-      if (projectId) {
-        myTasks = myTasks.filter((t: any) => String(t.project_id) === String(projectId));
-      }
-
-      setProjectTasks(myTasks);
+      setProjectTasks(enrichedTasks);
+    } else {
+      showToast(`Gagal memuat tugas: ${res.error}`);
     }
     setIsLoadingTasks(false);
   };
@@ -309,7 +318,7 @@ export default function HaviaMobileApp() {
       setAttendances(data);
       
       // Cari yang statusnya masih aktif (belum ada jam keluar valid)
-      const active = data.find(att => {
+      const active = data.find((att: any) => {
         const isStatusActive = att.status === 'incomplete';
         const isOutTimeEmpty = !att.out_time || 
                                att.out_time.startsWith('0000') || 
@@ -331,7 +340,7 @@ export default function HaviaMobileApp() {
       }
 
       // Cari record terakhir yang benar-benar sudah selesai (Clock Out valid)
-      const lastFinished = data.find(att => {
+      const lastFinished = data.find((att: any) => {
         const hasOutTime = att.out_time && 
                            !att.out_time.startsWith('0000') && 
                            !att.out_time.startsWith('-0001');

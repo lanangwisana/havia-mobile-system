@@ -55,13 +55,17 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({
                             <User className="w-2.5 h-2.5 text-neutral-500 shrink-0" /> {project.company_name || 'Client Internal'}
                           </p>
                           {project.userRole && (
-                             <span className={`text-[7px] px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider border shrink-0 ${
-                               project.userRole === 'PIC' 
-                                 ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
-                                 : 'bg-white/5 text-neutral-500 border-white/10'
-                             }`}>
-                               {project.userRole}
-                             </span>
+                              <span className={`text-[7px] px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider border shrink-0 ${
+                                project.userRole === 'PIC' 
+                                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
+                                  : project.userRole === 'KOLABORATOR'
+                                    ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                                    : project.userRole === 'ADMIN'
+                                      ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                                      : 'bg-white/5 text-neutral-500 border-white/10'
+                              }`}>
+                                {project.userRole === 'MEMBER' ? 'STAFF' : project.userRole}
+                              </span>
                            )}
                         </div>
                       </div>
