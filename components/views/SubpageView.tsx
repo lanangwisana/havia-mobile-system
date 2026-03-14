@@ -50,6 +50,12 @@ interface SubpageViewProps {
   apiToken: string;
   onUploadImage: (file: File) => void;
   isUploadingImage: boolean;
+  // Events Filtering
+  eventLabels: any[];
+  eventFilterType: string;
+  setEventFilterType: (v: string) => void;
+  eventFilterLabel: string;
+  setEventFilterLabel: (v: string) => void;
 }
 
 export const SubpageView: React.FC<SubpageViewProps> = (props) => {
@@ -89,6 +95,11 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
             onNav('subpage', null, 'Detail Event');
           }} 
           onCreateEvent={() => {}}
+          labels={props.eventLabels}
+          filterType={props.eventFilterType}
+          setFilterType={props.setEventFilterType}
+          filterLabel={props.eventFilterLabel}
+          setFilterLabel={props.setEventFilterLabel}
         />;
       case 'Tim': 
         return <TimContent 
