@@ -356,6 +356,10 @@ export default function HaviaMobileApp() {
   };
 
   useEffect(() => {
+    if (apiToken && (currentView === 'dashboard' || currentView === 'presensi')) {
+      loadAttendances();
+    }
+
     if (currentView === 'subpage' && apiToken) {
       if (subpageTitle === 'Project') loadProjects();
       else if (subpageTitle === 'Semua Task') loadTasks();
