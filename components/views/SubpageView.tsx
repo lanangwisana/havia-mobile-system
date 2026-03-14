@@ -141,6 +141,8 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           onClick={() => {
             if (subpageTitle === 'Detail Event') {
               onNav('subpage', null, 'Jadwal');
+            } else if (subpageTitle === 'Absensi') {
+              onNav('subpage', null, 'Tim');
             } else {
               onNav('dashboard');
             }
