@@ -54,6 +54,7 @@ export default function HaviaMobileApp() {
   // Edit Profile States
   const [editForm, setEditForm] = useState<any>({});
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // Events States
   const [events, setEvents] = useState<any[]>([]);
@@ -103,7 +104,21 @@ export default function HaviaMobileApp() {
     } else if (view === 'dashboard') {
       setActiveNav('home');
     }
-    if (title) setSubpageTitle(title);
+    
+    if (title) {
+      setSubpageTitle(title);
+      // Pre-fill edit form when entering Edit Profile
+      if (title === 'Edit Profile' && userData) {
+        setEditForm({
+          first_name: userData.first_name || '',
+          last_name: userData.last_name || '',
+          job_title: userData.job_title || '',
+          phone: userData.phone || '',
+          address: userData.address || '',
+          gender: userData.gender || 'male'
+        });
+      }
+    }
   };
 
   // --- AUTH LOGIC ---
@@ -397,7 +412,7 @@ export default function HaviaMobileApp() {
     }
     setIsSavingProfile(true);
     try {
-      const res = await putToApi(`users/${userData.id}`, apiToken, editForm);
+      const res = await putToApi('haviacms/profile/update', apiToken, editForm);
       if (res.success) {
         const updatedUser = { ...userData, ...editForm };
         setUserData(updatedUser);
@@ -407,6 +422,37 @@ export default function HaviaMobileApp() {
       } else { showToast(res.error || 'Gagal memperbarui profil.'); }
     } catch (error: any) { showToast(error.message || 'Terjadi kesalahan.'); }
     finally { setIsSavingProfile(false); }
+  };
+
+  const handleUploadImage = async (file: File) => {
+    setIsUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://brain.havia.id/index.php/api'}/haviacms/profile/upload_avatar`, {
+        method: 'POST',
+        headers: {
+          'authtoken': apiToken.trim(),
+          'Accept': 'application/json'
+        },
+        body: formData,
+      });
+
+      const res = await response.json();
+      if (res.success) {
+        const updatedUser = { ...userData, image: res.image };
+        setUserData(updatedUser);
+        localStorage.setItem('havia_user', JSON.stringify(updatedUser));
+        showToast('Foto profil berhasil diperbarui! 📸');
+      } else {
+        showToast(res.message || 'Gagal mengunggah foto.');
+      }
+    } catch (error: any) {
+      showToast(error.message || 'Terjadi kesalahan koneksi.');
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const handleCreateEvent = async () => {
@@ -617,6 +663,9 @@ export default function HaviaMobileApp() {
           handleCreateEvent={handleCreateEvent}
           isSavingEvent={isSavingEvent}
           onProjectClick={handleProjectClick}
+          apiToken={apiToken}
+          onUploadImage={handleUploadImage}
+          isUploadingImage={isUploadingImage}
         />
       )}
 

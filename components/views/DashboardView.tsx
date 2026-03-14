@@ -14,7 +14,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
     <section className="h-full w-full flex flex-col relative overflow-y-auto scrollbar-hide pb-28 animate-in fade-in duration-300">
       <div style={{ backgroundColor: `${colors.bg}FA` }} className="px-6 pt-12 pb-6 flex justify-between items-center backdrop-blur-md sticky top-0 z-30 border-b border-white/5">
         <div>
-          <p style={{ color: colors.gold }} className="text-[10px] uppercase tracking-widest mb-1 font-bold">{getGreeting()}, {userData?.first_name || ''}</p>
+          <p style={{ color: colors.gold }} className="text-[10px] uppercase tracking-widest mb-1 font-bold">{getGreeting()}, {userData?.first_name || userData?.name || 'User'}</p>
           <h2 className="text-xl font-bold text-white flex items-center gap-2">Semangat Bekerja! 🚀</h2>
         </div>
         <button onClick={() => onNav('subpage', null, 'Notifikasi')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-10 h-10 rounded-full border flex items-center justify-center relative hover:bg-neutral-800 transition-colors">
@@ -34,7 +34,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
                 <img src={getUserImage(userData)} className="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Profile" />
               </div>
               <div>
-                <h3 className="font-bold text-lg text-white tracking-wide">{userData?.first_name} {userData?.last_name}</h3>
+                <h3 className="font-bold text-lg text-white tracking-wide">
+                  {userData?.first_name ? `${userData.first_name} ${userData.last_name || ''}` : (userData?.name || 'User')}
+                </h3>
                 <p style={{ color: colors.gold }} className="text-xs font-bold uppercase tracking-widest mt-1">{userData?.job_title || 'TEAM MEMBER'}</p>
               </div>
             </div>

@@ -4,13 +4,14 @@ import { colors, getUserImage } from '@/lib/utils';
 
 interface AkunContentProps {
   userData: any;
+  onNav: (view: string, nav?: string | null, title?: string) => void;
   onEditProfile: () => void;
   onLogout: () => void;
   showToast: (msg: string) => void;
 }
 
 export const AkunContent: React.FC<AkunContentProps> = ({
-  userData, onEditProfile, onLogout, showToast
+  userData, onNav, onEditProfile, onLogout, showToast
 }) => (
   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32">
     <div className="flex flex-col items-center mb-6">
@@ -20,60 +21,15 @@ export const AkunContent: React.FC<AkunContentProps> = ({
           <img src={getUserImage(userData)} className="w-full h-full object-cover" alt={userData?.first_name || "User"} />
         </div>
       </div>
-      <h2 className="text-2xl font-bold text-white tracking-wide">{userData?.first_name} {userData?.last_name}</h2>
-      <span style={{ color: colors.gold }} className="text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{userData?.job_title || 'TEAM MEMBER'}</span>
+      <h2 className="text-2xl font-bold text-white tracking-wide">{userData?.first_name} {userData?.last_name || ''}</h2>
+      <span style={{ color: colors.gold }} className="text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{userData?.job_title || 'USER'}</span>
       <div className="mt-4 px-4 py-1.5 bg-neutral-900 border border-[#C69C3D]/20 rounded-full flex items-center gap-2">
         <Mail className="w-3 h-3 text-neutral-400" />
         <span className="text-xs text-neutral-400">{userData?.email || 'email@haviastudio.com'}</span>
       </div>
     </div>
 
-    {/* Informasi Personal Section */}
-    <div className="space-y-3 pt-6 border-t border-neutral-800">
-      <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold mb-3 pl-1">Informasi Personal</p>
-      
-      <div style={{ backgroundColor: colors.card, borderColor: colors.border }} className="p-4 rounded-2xl border space-y-4">
-        <div className="flex flex-col gap-1">
-          <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Nomor Telepon</span>
-          <span className="text-sm text-white font-medium">{userData?.phone || 'Belum diatur'}</span>
-        </div>
-        
-        <div className="flex flex-col gap-1 pt-3 border-t border-neutral-800">
-          <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Alamat (Mailing)</span>
-          <span className="text-sm text-white font-medium break-words leading-relaxed">{userData?.address || 'Belum diatur'}</span>
-        </div>
-
-        {(userData?.alternative_phone || userData?.alternative_address) && (
-          <>
-            {userData?.alternative_phone && (
-              <div className="flex flex-col gap-1 pt-3 border-t border-neutral-800">
-                <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Telepon Alternatif</span>
-                <span className="text-sm text-white font-medium">{userData?.alternative_phone}</span>
-              </div>
-            )}
-            {userData?.alternative_address && (
-              <div className="flex flex-col gap-1 pt-3 border-t border-neutral-800">
-                <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Alamat Alternatif</span>
-                <span className="text-sm text-white font-medium break-words leading-relaxed">{userData?.alternative_address}</span>
-              </div>
-            )}
-          </>
-        )}
-        
-        {(userData?.gender || userData?.dob) && (
-          <div className="grid grid-cols-2 gap-4 pt-3 border-t border-neutral-800">
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Gender</span>
-              <span className="text-sm text-white font-medium capitalize">{userData?.gender || '-'}</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Tgl Lahir</span>
-              <span className="text-sm text-white font-medium">{userData?.dob || '-'}</span>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+    {/* Informasi Personal Section? Removed to match Add User modal simplicity */}
 
     {/* Pengaturan Akun Section */}
     <div className="space-y-3 pt-6">
@@ -94,7 +50,7 @@ export const AkunContent: React.FC<AkunContentProps> = ({
       </button>
 
       {/* Reset Password Button */}
-      <button onClick={() => showToast('Reset Password clicked')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-full text-left flex items-center justify-between p-4 rounded-2xl border active:scale-[0.98] transition-all group hover:border-[#C69C3D]/50 mt-3">
+      <button onClick={() => onNav('subpage', null, 'Reset Password')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-full text-left flex items-center justify-between p-4 rounded-2xl border active:scale-[0.98] transition-all group hover:border-[#C69C3D]/50 mt-3">
         <div className="flex items-center gap-4">
           <div className="bg-neutral-800/80 p-3 rounded-xl group-hover:bg-[#C69C3D]/10 transition-colors">
             <Lock className="w-5 h-5 text-neutral-400 group-hover:text-[#C69C3D] transition-colors" />

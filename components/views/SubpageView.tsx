@@ -12,6 +12,7 @@ import { AbsensiContent } from '../content/AbsensiContent';
 import { AkunContent } from '../content/AkunContent';
 import { EditProfileContent } from '../content/EditProfileContent';
 import { NotifikasiContent } from '../content/NotifikasiContent';
+import { ResetPasswordContent } from '../content/ResetPasswordContent';
 
 interface SubpageViewProps {
   subpageTitle: string;
@@ -46,6 +47,9 @@ interface SubpageViewProps {
   handleCreateEvent: () => void;
   isSavingEvent: boolean;
   onProjectClick: (id: string, name: string) => void;
+  apiToken: string;
+  onUploadImage: (file: File) => void;
+  isUploadingImage: boolean;
 }
 
 export const SubpageView: React.FC<SubpageViewProps> = (props) => {
@@ -106,6 +110,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
       case 'Akun': 
         return <AkunContent 
           userData={props.userData} 
+          onNav={onNav}
           onEditProfile={() => onNav('subpage', null, 'Edit Profile')} 
           onLogout={props.onLogout} 
           showToast={props.showToast} 
@@ -118,11 +123,19 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           handleSaveProfile={props.handleSaveProfile} 
           isSavingProfile={props.isSavingProfile} 
           onCancel={() => onNav('subpage', null, 'Akun')} 
+          onUploadImage={props.onUploadImage}
+          isUploadingImage={props.isUploadingImage}
         />;
       case 'Notifikasi': 
         return <NotifikasiContent 
           isLoadingNotif={props.isLoadingNotif} 
           notifications={props.notifications} 
+        />;
+      case 'Reset Password':
+        return <ResetPasswordContent 
+          apiToken={props.apiToken}
+          showToast={props.showToast}
+          onSuccess={() => onNav('subpage', null, 'Akun')}
         />;
       default: 
         return (

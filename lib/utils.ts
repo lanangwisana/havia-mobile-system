@@ -19,9 +19,8 @@ export const getUserImage = (user: any) => {
   }
 
   if (imgUrl.trim() === "" || imgUrl.includes("avatar.jpg") || imgUrl.includes("default") || imgUrl === "null") {
-    const init1 = user.first_name || "User";
-    const init2 = user.last_name || "";
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(init1)}+${encodeURIComponent(init2)}&background=D4AF37&color=111`;
+    const name = user.name || (user.first_name ? `${user.first_name} ${user.last_name || ''}` : "U");
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name.trim())}&background=D4AF37&color=111&bold=true`;
   }
   
   return imgUrl;
