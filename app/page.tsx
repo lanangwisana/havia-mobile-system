@@ -98,7 +98,11 @@ export default function HaviaMobileApp() {
 
   const handleNav = (view: string, nav?: string | null, title: string = '') => {
     setCurrentView(view);
-    if (nav) setActiveNav(nav);
+    if (nav) {
+      setActiveNav(nav);
+    } else if (view === 'dashboard') {
+      setActiveNav('home');
+    }
     if (title) setSubpageTitle(title);
   };
 
