@@ -29,7 +29,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeNav, onNav }) => {
         </button>
       </div>
       
-      <button onClick={() => onNav('subpage', 'jadwal', 'Event')} className={`flex flex-col items-center transition-colors p-2 ${activeNav === 'jadwal' ? 'text-[#C69C3D]' : 'text-neutral-400 hover:text-neutral-900'}`}>
+      <button onClick={() => onNav('subpage', 'jadwal', 'Schedule')} className={`flex flex-col items-center transition-colors p-2 ${activeNav === 'jadwal' ? 'text-[#C69C3D]' : 'text-neutral-400 hover:text-neutral-900'}`}>
         <Calendar className="w-6 h-6" strokeWidth={activeNav === 'jadwal' ? 2.5 : 1.5} />
       </button>
       

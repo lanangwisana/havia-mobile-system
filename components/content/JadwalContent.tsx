@@ -23,7 +23,7 @@ export const JadwalContent: React.FC<JadwalContentProps> = ({
     <div className="flex flex-col gap-4 px-1">
       <div className="flex items-center justify-between">
         <div className="flex flex-col">
-          <h3 className="text-base font-extrabold text-neutral-900 tracking-tight">Havia Event</h3>
+          <h3 className="text-base font-extrabold text-neutral-900 tracking-tight">Havia Schedule</h3>
           <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-bold">Internal Agenda & Events</p>
         </div>
         <div className="w-10"></div>
@@ -62,7 +62,7 @@ export const JadwalContent: React.FC<JadwalContentProps> = ({
     {isLoadingEvents ? (
       <div className="flex flex-col items-center justify-center py-20">
          <Activity className="w-10 h-10 text-[#C69C3D] animate-pulse mb-4" />
-         <p className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] font-black">Syncing Events...</p>
+         <p className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] font-black">Syncing Agenda...</p>
       </div>
     ) : events.length > 0 ? (
       <div className="space-y-4">
@@ -126,8 +126,8 @@ export const JadwalContent: React.FC<JadwalContentProps> = ({
     ) : (
       <div className="flex flex-col items-center justify-center py-16 px-6 bg-neutral-50 rounded-[2rem] border border-neutral-200 border-dashed">
         <Calendar className="w-12 h-12 text-neutral-300 mb-4 opacity-50" />
-        <h4 className="text-neutral-900 font-bold text-sm mb-1">No Events Found</h4>
-        <p className="text-[10px] text-neutral-400 tracking-widest uppercase font-bold text-center leading-relaxed">No upcoming events have been scheduled for you.</p>
+        <h4 className="text-neutral-900 font-bold text-sm mb-1">Empty Agenda</h4>
+        <p className="text-[10px] text-neutral-400 tracking-widest uppercase font-bold text-center leading-relaxed">No schedule planned for you yet.</p>
       </div>
     )}
   </div>
