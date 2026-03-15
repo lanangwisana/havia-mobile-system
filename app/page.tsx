@@ -9,7 +9,8 @@ import {
   postToApi,
   deleteFromApi,
   uploadAvatar,
-  deleteAvatar
+  deleteAvatar,
+  verifyUserStatus
 } from './actions';
 
 // Import Lib & Utils
@@ -104,6 +105,16 @@ export default function HaviaMobileApp() {
   };
 
   const handleNav = (view: string, nav?: string | null, title: string = '') => {
+    // SECURITY GUARD: Check status on every navigation if logged in
+    if (apiToken && view !== 'login') {
+      verifyUserStatus(apiToken).then(statusCheck => {
+        if (!statusCheck.success && statusCheck.status === 'blocked') {
+          showToast(statusCheck.message || 'Akun dinonaktifkan');
+          handleLogout();
+        }
+      });
+    }
+
     setCurrentView(view);
     if (nav) {
       setActiveNav(nav);
@@ -150,12 +161,24 @@ export default function HaviaMobileApp() {
                 if (Array.isArray(users)) {
                   latestUser = users.find((u: any) => u.email === savedUser.email);
                 } else if (users && typeof users === 'object') {
-                  if (users.email === savedUser.email) latestUser = users;
+                  const u = users as any;
+                  if (u.email === savedUser.email) latestUser = u;
                 }
                 if (latestUser) {
                   setUserData(latestUser);
                   localStorage.setItem('havia_user', JSON.stringify(latestUser));
                 }
+
+                // Verify status in background to catch "Disable login" or "Inactive"
+                verifyUserStatus(savedToken).then(statusCheck => {
+                  if (!statusCheck.success && statusCheck.status === 'blocked') {
+                    showToast(statusCheck.message || 'Akun dinonaktifkan');
+                    handleLogout();
+                  }
+                });
+              } else {
+                // If token invalid, logout
+                handleLogout();
               }
             }).catch(e => console.warn("Sync error", e));
 
@@ -173,6 +196,15 @@ export default function HaviaMobileApp() {
     };
     checkAuth();
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('havia_user');
+    localStorage.removeItem('havia_token');
+    setUserData(null);
+    setApiToken('');
+    setCurrentView('login');
+    setActiveNav('home');
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
