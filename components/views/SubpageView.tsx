@@ -13,6 +13,7 @@ import { AkunContent } from '../content/AkunContent';
 import { EditProfileContent } from '../content/EditProfileContent';
 import { NotifikasiContent } from '../content/NotifikasiContent';
 import { ResetPasswordContent } from '../content/ResetPasswordContent';
+import { RiwayatPengajuanContent } from '../content/RiwayatPengajuanContent';
 
 interface SubpageViewProps {
   subpageTitle: string;
@@ -58,6 +59,7 @@ interface SubpageViewProps {
   setEventFilterType: (v: string) => void;
   eventFilterLabel: string;
   setEventFilterLabel: (v: string) => void;
+  onOpenLeaveModal?: (type: 'izin' | 'cuti') => void;
 }
 
 export const SubpageView: React.FC<SubpageViewProps> = (props) => {
@@ -109,6 +111,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           attendances={props.attendances} 
           isLoadingAttendances={props.isLoadingAttendances} 
           leaves={props.leaves}
+          onOpenLeaveModal={props.onOpenLeaveModal}
         />;
       case 'Absensi': 
         return <AbsensiContent 
@@ -152,6 +155,11 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           showToast={props.showToast}
           onSuccess={() => onNav('subpage', null, 'Akun')}
         />;
+      case 'Riwayat Pengajuan':
+        return <RiwayatPengajuanContent 
+          leaves={props.leaves}
+          isLoading={props.isLoadingLeaves}
+        />;
       default: 
         return (
           <div className="flex flex-col items-center justify-center h-64 opacity-50 animate-in fade-in">
@@ -169,7 +177,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           onClick={() => {
             if (subpageTitle === 'Detail Event') {
               onNav('subpage', null, 'Jadwal');
-            } else if (subpageTitle === 'Absensi') {
+            } else if (subpageTitle === 'Absensi' || subpageTitle === 'Riwayat Pengajuan') {
               onNav('subpage', null, 'Tim');
             } else if (subpageTitle === 'Tasks') {
               // Rincian Task dari Project -> Kembali ke List Project
