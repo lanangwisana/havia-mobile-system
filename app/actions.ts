@@ -321,3 +321,38 @@ export async function deleteAvatar(token: string) {
     return { success: false, error: error.message || 'Kesalahan koneksi saat menghapus foto.' };
   }
 }
+
+export async function verifyUserStatus(token: string) {
+  try {
+    const url = `${API_BASE_URL}/haviacms/profile/verify_status`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'authtoken': token.trim(),
+        'Accept': 'application/json'
+      },
+      cache: 'no-store',
+    });
+    
+    const textRes = await response.text();
+    let parsedRes;
+    try {
+      parsedRes = JSON.parse(textRes);
+    } catch (e) {
+      return { success: false, error: 'Server Error: Invalid Response.' };
+    }
+    
+    if (!response.ok) {
+      return { 
+        success: false, 
+        status: parsedRes.status || 'blocked', 
+        message: parsedRes.message || 'Akun dinonaktifkan.' 
+      };
+    }
+    
+    return { success: true, status: 'active' };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Gagal memverifikasi status user.' };
+  }
+}
