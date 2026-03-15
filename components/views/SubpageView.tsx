@@ -50,6 +50,8 @@ interface SubpageViewProps {
   apiToken: string;
   onUploadImage: (file: File) => void;
   isUploadingImage: boolean;
+  onDeleteImage: () => void;
+  isDeletingImage: boolean;
   // Events Filtering
   eventLabels: any[];
   eventFilterType: string;
@@ -136,6 +138,8 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           onCancel={() => onNav('subpage', null, 'Akun')} 
           onUploadImage={props.onUploadImage}
           isUploadingImage={props.isUploadingImage}
+          onDeleteImage={props.onDeleteImage}
+          isDeletingImage={props.isDeletingImage}
         />;
       case 'Notifikasi': 
         return <NotifikasiContent 

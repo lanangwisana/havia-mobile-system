@@ -257,3 +257,67 @@ export async function deleteFromApi(endpoint: string, token: string) {
     return { success: false, error: error.message || 'Kesalahan koneksi.' };
   }
 }
+// Fungsi khusus untuk upload avatar (karena butuh handling File/FormData di server side)
+export async function uploadAvatar(token: string, fileData: FormData) {
+  try {
+    const url = `${API_BASE_URL}/haviacms/profile/upload_avatar`;
+    console.log(`[UploadAvatar] Calling: ${url}`);
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'authtoken': token.trim(),
+        'Accept': 'application/json'
+      },
+      body: fileData,
+      cache: 'no-store',
+    });
+    
+    const textRes = await response.text();
+    let parsedRes;
+    try {
+      parsedRes = JSON.parse(textRes);
+    } catch (e) {
+      return { success: false, error: 'Server Error (Upload): Response bukan JSON.' };
+    }
+    
+    if (!response.ok) {
+      return { success: false, error: parsedRes.message || 'Gagal mengunggah foto profil.' };
+    }
+    
+    return { success: true, image: parsedRes.image };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Kesalahan koneksi saat upload.' };
+  }
+}
+
+export async function deleteAvatar(token: string) {
+  try {
+    const url = `${API_BASE_URL}/haviacms/profile/delete_avatar`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'authtoken': token.trim(),
+        'Accept': 'application/json'
+      },
+      cache: 'no-store',
+    });
+    
+    const textRes = await response.text();
+    let parsedRes;
+    try {
+      parsedRes = JSON.parse(textRes);
+    } catch (e) {
+      return { success: false, error: 'Server Error (Delete Avatar): Response bukan JSON.' };
+    }
+    
+    if (!response.ok) {
+      return { success: false, error: parsedRes.message || 'Gagal menghapus foto profil.' };
+    }
+    
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Kesalahan koneksi saat menghapus foto.' };
+  }
+}

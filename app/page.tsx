@@ -7,7 +7,9 @@ import {
   fetchFromApi, 
   putToApi, 
   postToApi,
-  deleteFromApi
+  deleteFromApi,
+  uploadAvatar,
+  deleteAvatar
 } from './actions';
 
 // Import Lib & Utils
@@ -55,6 +57,7 @@ export default function HaviaMobileApp() {
   const [editForm, setEditForm] = useState<any>({});
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isDeletingImage, setIsDeletingImage] = useState(false);
 
   // Events States
   const [events, setEvents] = useState<any[]>([]);
@@ -446,28 +449,40 @@ export default function HaviaMobileApp() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://brain.havia.id/index.php/api'}/haviacms/profile/upload_avatar`, {
-        method: 'POST',
-        headers: {
-          'authtoken': apiToken.trim(),
-          'Accept': 'application/json'
-        },
-        body: formData,
-      });
-
-      const res = await response.json();
+      // Gunakan server action agar terhindar dari CORS browser
+      const res = await uploadAvatar(apiToken, formData);
+      
       if (res.success) {
         const updatedUser = { ...userData, image: res.image };
         setUserData(updatedUser);
         localStorage.setItem('havia_user', JSON.stringify(updatedUser));
-        showToast('Foto profil berhasil diperbarui! 📸');
+        showToast('Berhasil Update Profile');
       } else {
-        showToast(res.message || 'Gagal mengunggah foto.');
+        showToast(res.error || 'Gagal mengunggah foto.');
       }
     } catch (error: any) {
       showToast(error.message || 'Terjadi kesalahan koneksi.');
     } finally {
       setIsUploadingImage(false);
+    }
+  };
+
+  const handleDeleteImage = async () => {
+    setIsDeletingImage(true);
+    try {
+      const res = await deleteAvatar(apiToken);
+      if (res.success) {
+        const updatedUser = { ...userData, image: "" };
+        setUserData(updatedUser);
+        localStorage.setItem('havia_user', JSON.stringify(updatedUser));
+        showToast('Berhasil Update Profile');
+      } else {
+        showToast(res.error || 'Gagal menghapus foto.');
+      }
+    } catch (error: any) {
+      showToast(error.message || 'Terjadi kesalahan koneksi.');
+    } finally {
+      setIsDeletingImage(false);
     }
   };
 
@@ -689,6 +704,8 @@ export default function HaviaMobileApp() {
           apiToken={apiToken}
           onUploadImage={handleUploadImage}
           isUploadingImage={isUploadingImage}
+          onDeleteImage={handleDeleteImage}
+          isDeletingImage={isDeletingImage}
           eventLabels={eventLabels}
           eventFilterType={eventFilterType}
           setEventFilterType={setEventFilterType}

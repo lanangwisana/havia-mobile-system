@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Camera } from 'lucide-react';
+import { Sparkles, Camera, Image as ImageIcon, User, X } from 'lucide-react';
 import { colors, getUserImage } from '@/lib/utils';
 
 interface EditProfileContentProps {
@@ -11,47 +11,107 @@ interface EditProfileContentProps {
   onCancel: () => void;
   onUploadImage: (file: File) => void;
   isUploadingImage: boolean;
+  onDeleteImage: () => void;
+  isDeletingImage: boolean;
 }
 
 export const EditProfileContent: React.FC<EditProfileContentProps> = ({
   userData, editForm, setEditForm, handleSaveProfile, isSavingProfile, onCancel,
-  onUploadImage, isUploadingImage
+  onUploadImage, isUploadingImage, onDeleteImage, isDeletingImage
 }) => {
+  const [showMenu, setShowMenu] = React.useState(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
   const inputClass = "w-full text-white text-sm rounded-xl focus:ring-1 focus:ring-[#C69C3D] focus:border-[#C69C3D] block p-4 placeholder-neutral-500 transition-all border outline-none";
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleImageClick = () => {
-    if (!isUploadingImage) fileInputRef.current?.click();
-  };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) onUploadImage(file);
+    if (file) {
+      onUploadImage(file);
+      setShowMenu(false);
+    }
   };
+
+  // Close menu on click outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMenu]);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32">
-      <div className="flex flex-col items-center mb-2">
+       <div className="flex flex-col items-center mb-2 relative">
         <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+        
+        {/* Profile Circle */}
         <div 
-          onClick={handleImageClick}
-          className={`relative w-24 h-24 mb-3 cursor-pointer group transition-all ${isUploadingImage ? 'opacity-50' : 'hover:scale-105 active:scale-95'}`}
+          onClick={() => !isUploadingImage && !isDeletingImage && setShowMenu(!showMenu)}
+          className={`relative w-24 h-24 mb-3 cursor-pointer group transition-all ${isUploadingImage || isDeletingImage ? 'opacity-50' : 'hover:scale-105 active:scale-95'}`}
         >
           <div className="absolute inset-0 rounded-full border border-[#C69C3D]/50 shadow-[0_0_15px_rgba(212,175,55,0.15)] group-hover:border-[#C69C3D] transition-colors"></div>
           <div className="absolute inset-[3px] rounded-full bg-[#2C2A29] z-10 flex items-center justify-center overflow-hidden">
-            {isUploadingImage ? (
+            {isUploadingImage || isDeletingImage ? (
                <div className="w-6 h-6 border-2 border-[#C69C3D] border-t-transparent rounded-full animate-spin"></div>
             ) : (
                <img src={getUserImage(userData)} className="w-full h-full object-cover" alt="Profile" />
             )}
           </div>
-          {!isUploadingImage && (
+          {!isUploadingImage && !isDeletingImage && (
             <div className="absolute bottom-0 right-0 w-8 h-8 bg-[#C69C3D] rounded-full border-2 border-[#121212] z-20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
               <Camera className="w-4 h-4 text-black" />
             </div>
           )}
         </div>
-        <p className="text-[10px] text-neutral-500 uppercase tracking-widest">Klik foto untuk unggah baru</p>
+
+        {/* Bubble Menu / Context Menu */}
+        {showMenu && (
+          <div 
+            ref={menuRef}
+            className="absolute top-20 z-[100] w-48 bg-[#1e1e1e]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-2 animate-in zoom-in-95 duration-200"
+          >
+            <div className="flex flex-col space-y-1">
+              <button 
+                onClick={() => { fileInputRef.current?.click(); setShowMenu(false); }}
+                className="flex items-center gap-3 w-full p-3 hover:bg-white/5 rounded-xl transition-colors text-left"
+              >
+                <ImageIcon className="w-4 h-4 text-[#C69C3D]" />
+                <span className="text-xs font-bold uppercase tracking-widest text-neutral-200">Unggah Foto</span>
+              </button>
+              
+              <button 
+                onClick={() => { onDeleteImage(); setShowMenu(false); }}
+                className="flex items-center gap-3 w-full p-3 hover:bg-white/5 rounded-xl transition-colors text-left text-red-400"
+              >
+                <User className="w-4 h-4" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Gunakan Inisial</span>
+              </button>
+
+              <div className="pt-1 border-t border-white/5">
+                <button 
+                  onClick={() => setShowMenu(false)}
+                  className="flex items-center gap-3 w-full p-2 hover:bg-white/5 rounded-xl transition-colors text-left opacity-50"
+                >
+                  <X className="w-4 h-4" />
+                  <span className="text-[9px] font-bold uppercase tracking-widest">Batal</span>
+                </button>
+              </div>
+            </div>
+            
+            {/* Arrow pointer for the bubble */}
+            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#1e1e1e] border-l border-t border-white/10 rotate-45"></div>
+          </div>
+        )}
+
+        <p className="text-[10px] text-neutral-500 uppercase tracking-widest leading-relaxed">Klik foto untuk opsi</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
