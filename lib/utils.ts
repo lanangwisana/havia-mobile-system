@@ -38,10 +38,15 @@ export const formatCurrency = (amount: string | number) => {
 };
 
 export const formatDate = (dateStr: string) => {
-  if (!dateStr) return '-';
+  if (!dateStr || dateStr === '0000-00-00' || dateStr.startsWith('-0001')) return '-';
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('id-ID', { 
+      day: 'numeric', 
+      month: 'short', 
+      year: 'numeric' 
+    });
   } catch { return dateStr; }
 };
 

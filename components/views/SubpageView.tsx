@@ -171,6 +171,12 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
               onNav('subpage', null, 'Jadwal');
             } else if (subpageTitle === 'Absensi') {
               onNav('subpage', null, 'Tim');
+            } else if (subpageTitle === 'Tasks') {
+              // Rincian Task dari Project -> Kembali ke List Project
+              onNav('subpage', 'project', 'Project');
+            } else if (subpageTitle === 'Semua Task') {
+              // Menu Task dari Dashboard -> Kembali ke Dashboard
+              onNav('dashboard');
             } else {
               onNav('dashboard');
             }
