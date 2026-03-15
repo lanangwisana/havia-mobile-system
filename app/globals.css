@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #1D1C1B;
-  --foreground: #ffffff;
+  --background: #FAFAFA;
+  --foreground: #111111;
 }
 
 @theme inline {
@@ -19,6 +19,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Scrollbar hide utility */
@@ -27,18 +28,18 @@ body {
 
 /* Custom gradients */
 .gold-gradient { background: linear-gradient(135deg, #C69C3D 0%, #a88434 100%); }
-.black-card-gradient { background: linear-gradient(135deg, #413E3D 0%, #101010 100%); }
+.black-card-gradient { background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%); }
 
 /* 3D Button Effects */
 .btn-3d {
-  background: linear-gradient(145deg, #413E3D 0%, #0d0d0d 100%);
-  box-shadow: 7px 7px 14px #040404, -7px -7px 14px #1c1c1c, inset 1px 1px 2px rgba(255,255,255,0.05);
-  border: 1px solid #2a2a2a;
+  background: linear-gradient(145deg, #FFFFFF 0%, #F0F0F0 100%);
+  box-shadow: 5px 5px 10px #D1D1D1, -5px -5px 10px #FFFFFF, inset 1px 1px 2px rgba(0,0,0,0.02);
+  border: 1px solid #E5E5E5;
   border-radius: 28px;
 }
 .btn-3d-hover {
   background: linear-gradient(145deg, #C69C3D 0%, #8c6e2b 100%);
-  box-shadow: 5px 5px 15px rgba(212, 175, 55, 0.25), inset 1px 1px 4px rgba(255,255,255,0.4);
+  box-shadow: 5px 5px 15px rgba(212, 175, 55, 0.2), inset 1px 1px 4px rgba(255,255,255,0.4);
   border: 1px solid #f9d77e;
 }
 

@@ -73,7 +73,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           isLoadingProjects={props.isLoadingProjects} 
           onProjectClick={props.onProjectClick} 
         />;
-      case 'Semua Task': 
+      case 'All Tasks': 
         return <TaskList 
           tasks={props.projectTasks} 
           isLoading={props.isLoadingTasks} 
@@ -90,13 +90,13 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           expenses={props.expenses} 
           isLoadingExpenses={props.isLoadingExpenses} 
         />;
-      case 'Jadwal': 
+      case 'Event': 
         return <JadwalContent 
           events={props.events} 
           isLoadingEvents={props.isLoadingEvents} 
           onEventClick={(ev) => {
             props.setSelectedEvent(ev);
-            onNav('subpage', null, 'Detail Event');
+            onNav('subpage', null, 'Event Detail');
           }} 
           onCreateEvent={() => {}}
           labels={props.eventLabels}
@@ -105,7 +105,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           filterLabel={props.eventFilterLabel}
           setFilterLabel={props.setEventFilterLabel}
         />;
-      case 'Tim': 
+      case 'Team': 
         return <TimContent 
           onNav={onNav} 
           attendances={props.attendances} 
@@ -113,17 +113,17 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           leaves={props.leaves}
           onOpenLeaveModal={props.onOpenLeaveModal}
         />;
-      case 'Absensi': 
+      case 'Attendance': 
         return <AbsensiContent 
           attendances={props.attendances} 
           isLoadingAttendances={props.isLoadingAttendances} 
         />;
-      case 'Detail Event': 
+      case 'Event Detail': 
         return <EventDetailContent 
           selectedEvent={props.selectedEvent} 
-          onBack={() => onNav('subpage', null, 'Jadwal')} 
+          onBack={() => onNav('subpage', null, 'Event')} 
         />;
-      case 'Akun': 
+      case 'Account': 
         return <AkunContent 
           userData={props.userData} 
           onNav={onNav}
@@ -138,13 +138,13 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           setEditForm={props.setEditForm} 
           handleSaveProfile={props.handleSaveProfile} 
           isSavingProfile={props.isSavingProfile} 
-          onCancel={() => onNav('subpage', null, 'Akun')} 
+          onCancel={() => onNav('subpage', null, 'Account')} 
           onUploadImage={props.onUploadImage}
           isUploadingImage={props.isUploadingImage}
           onDeleteImage={props.onDeleteImage}
           isDeletingImage={props.isDeletingImage}
         />;
-      case 'Notifikasi': 
+      case 'Notifications': 
         return <NotifikasiContent 
           isLoadingNotif={props.isLoadingNotif} 
           notifications={props.notifications} 
@@ -153,9 +153,9 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
         return <ResetPasswordContent 
           apiToken={props.apiToken}
           showToast={props.showToast}
-          onSuccess={() => onNav('subpage', null, 'Akun')}
+          onSuccess={() => onNav('subpage', null, 'Account')}
         />;
-      case 'Riwayat Pengajuan':
+      case 'Submission History':
         return <RiwayatPengajuanContent 
           leaves={props.leaves}
           isLoading={props.isLoadingLeaves}
@@ -164,25 +164,25 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
         return (
           <div className="flex flex-col items-center justify-center h-64 opacity-50 animate-in fade-in">
             <Info className="w-12 h-12 mb-4" style={{ color: colors.gold }} />
-            <p className="text-center text-neutral-400 text-sm">Fitur <strong className="text-white">{subpageTitle}</strong> sedang dalam tahap pengembangan.</p>
+            <p className="text-center text-neutral-400 text-sm">Feature <strong className="text-neutral-900">{subpageTitle}</strong> is currently under development.</p>
           </div>
         );
     }
   };
 
   return (
-    <section className="h-full w-full flex flex-col relative z-40 animate-in slide-in-from-right-4 duration-300 bg-[#0a0a0a] overflow-hidden">
-      <div style={{ backgroundColor: `${colors.bg}FA` }} className="px-6 py-6 flex items-center justify-between border-b border-white/5 backdrop-blur-md sticky top-0 z-[70]">
+    <section className="h-full w-full flex flex-col relative z-40 animate-in slide-in-from-right-4 duration-300 bg-white overflow-hidden">
+      <div style={{ backgroundColor: `${colors.bg}FA` }} className="px-6 py-6 flex items-center justify-between border-b border-neutral-100 backdrop-blur-md sticky top-0 z-[70]">
         <button 
           onClick={() => {
-            if (subpageTitle === 'Detail Event') {
-              onNav('subpage', null, 'Jadwal');
-            } else if (subpageTitle === 'Absensi' || subpageTitle === 'Riwayat Pengajuan') {
-              onNav('subpage', null, 'Tim');
+            if (subpageTitle === 'Event Detail') {
+              onNav('subpage', null, 'Event');
+            } else if (subpageTitle === 'Attendance' || subpageTitle === 'Submission History') {
+              onNav('subpage', null, 'Team');
             } else if (subpageTitle === 'Tasks') {
               // Rincian Task dari Project -> Kembali ke List Project
               onNav('subpage', 'project', 'Project');
-            } else if (subpageTitle === 'Semua Task') {
+            } else if (subpageTitle === 'All Tasks') {
               // Menu Task dari Dashboard -> Kembali ke Dashboard
               onNav('dashboard');
             } else {
@@ -190,9 +190,9 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
             }
           }} 
           style={{ backgroundColor: colors.card, borderColor: colors.border }} 
-          className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-neutral-800 transition-colors"
+          className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-neutral-100 transition-colors"
         >
-          <ArrowLeft className="w-5 h-5 text-white" />
+          <ArrowLeft className="w-5 h-5 text-neutral-900" />
         </button>
         <h2 style={{ color: colors.gold }} className="font-bold text-sm uppercase tracking-widest">{subpageTitle}</h2>
         <div className="w-10"></div>

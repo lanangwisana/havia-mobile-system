@@ -58,7 +58,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
       />
       
       {/* Modal Content */}
-      <div className="relative w-full max-w-lg bg-[#0A0A0A] border-t sm:border border-neutral-800 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full duration-500">
+      <div className="relative w-full max-w-lg bg-white border-t sm:border border-neutral-100 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full duration-500">
         <div className="p-6 pb-20 sm:pb-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
@@ -67,15 +67,15 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
                 <FileText className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-white uppercase tracking-wider">
-                  Pengajuan
+                <h3 className="text-lg font-black text-neutral-900 uppercase tracking-wider">
+                  Submission
                 </h3>
-                <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">Lengkapi data di bawah</p>
+                <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest">Complete the data below</p>
               </div>
             </div>
             <button 
               onClick={onClose}
-              className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+              className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-400 hover:text-neutral-600 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -84,15 +84,15 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Leave Type */}
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">Jenis Pengajuan</label>
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Submission Type</label>
               <div className="relative">
                 <select
                   required
                   value={formData.leave_type_id}
                   onChange={(e) => setFormData({ ...formData, leave_type_id: e.target.value })}
-                  className="w-full bg-[#111] border border-neutral-800 rounded-2xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#C69C3D] transition-all"
+                  className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl px-4 py-4 text-sm text-neutral-900 focus:outline-none focus:border-[#C69C3D] transition-all"
                 >
-                  <option value="" disabled>Pilih Jenis</option>
+                  <option value="" disabled>Select Type</option>
                   {leaveTypes.map((t) => (
                     <option key={t.id} value={t.id}>{t.title}</option>
                   ))}
@@ -106,45 +106,45 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
             {/* Date Range */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">Tanggal Mulai</label>
+                <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Start Date</label>
                 <input
                   type="date"
                   required
                   value={formData.start_date}
                   onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                  className="w-full bg-[#111] border border-neutral-800 rounded-2xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#C69C3D] transition-all"
+                  className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl px-4 py-4 text-sm text-neutral-900 focus:outline-none focus:border-[#C69C3D] transition-all"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">Tanggal Selesai</label>
+                <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">End Date</label>
                 <input
                   type="date"
                   required
                   value={formData.end_date}
                   onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                  className="w-full bg-[#111] border border-neutral-800 rounded-2xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#C69C3D] transition-all"
+                  className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl px-4 py-4 text-sm text-neutral-900 focus:outline-none focus:border-[#C69C3D] transition-all"
                 />
               </div>
             </div>
 
             {/* Reason */}
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.2em] ml-1">Alasan / Keterangan</label>
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Reason / Description</label>
               <textarea
                 required
                 rows={3}
-                placeholder="Jelaskan alasan pengajuan anda..."
+                placeholder="Explain the reason for your submission..."
                 value={formData.reason}
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                className="w-full bg-[#111] border border-neutral-800 rounded-2xl px-4 py-4 text-sm text-white focus:outline-none focus:border-[#C69C3D] transition-all resize-none placeholder:text-neutral-700"
+                className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl px-4 py-4 text-sm text-neutral-900 focus:outline-none focus:border-[#C69C3D] transition-all resize-none placeholder:text-neutral-400"
               />
             </div>
 
             {/* Info Box */}
             <div className="flex gap-3 p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl">
               <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
-              <p className="text-[10px] text-neutral-400 leading-relaxed font-medium">
-                Pengajuan akan dikirimkan ke HRD/Admin untuk ditinjau. Anda akan menerima notifikasi jika status pengajuan berubah.
+              <p className="text-[10px] text-neutral-500 leading-relaxed font-medium">
+                Submission will be sent to HRD/Admin for review. You will receive a notification if the status changes.
               </p>
             </div>
 
@@ -164,7 +164,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
                   Processing...
                 </>
               ) : (
-                'Kirim Pengajuan'
+                'Submit Request'
               )}
             </button>
           </form>

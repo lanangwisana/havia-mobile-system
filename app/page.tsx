@@ -100,7 +100,7 @@ export default function HaviaMobileApp() {
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
-      setCurrentTime(now.toLocaleTimeString('id-ID', { hour12: false }));
+      setCurrentTime(now.toLocaleTimeString('en-US', { hour12: false }));
     }, 1000);
     return () => clearInterval(timer);
   }, []);
@@ -115,7 +115,7 @@ export default function HaviaMobileApp() {
     if (apiToken && view !== 'login') {
       verifyUserStatus(apiToken).then(statusCheck => {
         if (!statusCheck.success && statusCheck.status === 'blocked') {
-          showToast(statusCheck.message || 'Akun dinonaktifkan');
+          showToast(statusCheck.message || 'Account disabled');
           handleLogout();
         }
       });
@@ -178,7 +178,7 @@ export default function HaviaMobileApp() {
                 // Verify status in background to catch "Disable login" or "Inactive"
                 verifyUserStatus(savedToken).then(statusCheck => {
                   if (!statusCheck.success && statusCheck.status === 'blocked') {
-                    showToast(statusCheck.message || 'Akun dinonaktifkan');
+                    showToast(statusCheck.message || 'Account disabled');
                     handleLogout();
                   }
                 });
@@ -215,7 +215,7 @@ export default function HaviaMobileApp() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginEmail || !loginPassword) {
-      showToast('Email dan Password wajib diisi.');
+      showToast('Email and Password are required.');
       return;
     }
     setIsLoading(true);
@@ -228,12 +228,12 @@ export default function HaviaMobileApp() {
         localStorage.setItem('havia_token', res.token || '');
         setCurrentView('dashboard');
         setActiveNav('home');
-        showToast('Selamat Datang!');
+        showToast('Welcome!');
       } else {
-        showToast(res.error || 'Login Gagal. Cek kembali akun Anda.');
+        showToast(res.error || 'Login Failed. Please check your credentials.');
       }
     } catch (error: any) {
-      showToast(error.message || 'Terjadi kesalahan koneksi.');
+      showToast(error.message || 'Connection error occurred.');
     } finally {
       setIsLoading(false);
     }
@@ -245,7 +245,7 @@ export default function HaviaMobileApp() {
     setUserData(null);
     setApiToken('');
     handleNav('login');
-    showToast('Berhasil Logout');
+    showToast('Logout Success');
   };
 
   // --- DATA FETCHING ---
@@ -284,7 +284,7 @@ export default function HaviaMobileApp() {
 
       setProjects(enriched);
     } else {
-      showToast(`Gagal memuat proyek: ${pRes.error}`);
+      showToast(`Failed to load projects: ${pRes.error}`);
     }
     
     setIsLoadingProjects(false);
@@ -314,7 +314,7 @@ export default function HaviaMobileApp() {
       });
       setProjectTasks(enrichedTasks);
     } else {
-      showToast(`Gagal memuat tugas: ${res.error}`);
+      showToast(`Failed to load tasks: ${res.error}`);
     }
     setIsLoadingTasks(false);
   };
@@ -350,13 +350,13 @@ export default function HaviaMobileApp() {
           isFallback: true
         }));
         const serverError = (res as any).serverErrorMessage;
-        showToast(serverError ? `Server Error: ${serverError}` : 'Info: Menampilkan data simulasi karena server sedang kendala.');
+        showToast(serverError ? `Server Error: ${serverError}` : 'Info: Displaying simulation data due to server issues.');
       }
 
       setEvents(eventsData);
     } else {
       setEvents([]);
-      if (res.error) showToast(`Gagal sinkron jadwal: ${res.error}`);
+      if (res.error) showToast(`Failed to sync schedule: ${res.error}`);
     }
     setIsLoadingEvents(false);
   };
@@ -390,11 +390,11 @@ export default function HaviaMobileApp() {
     setIsSubmittingLeave(true);
     const res = await postToApi('haviacms/leaves', apiToken, data);
     if (res.success) {
-      showToast("Pengajuan berhasil dikirim!");
+      showToast("Submission sent successfully!");
       setIsLeaveModalOpen(false);
       loadLeaves();
     } else {
-      showToast(`Gagal: ${(res as any).message || (res as any).error}`);
+      showToast(`Failed: ${(res as any).message || (res as any).error}`);
     }
     setIsSubmittingLeave(false);
   };
@@ -451,20 +451,20 @@ export default function HaviaMobileApp() {
 
     if (currentView === 'subpage' && apiToken) {
       if (subpageTitle === 'Project') loadProjects();
-      else if (subpageTitle === 'Semua Task') loadTasks();
+      else if (subpageTitle === 'All Tasks') loadTasks();
       else if (subpageTitle === 'Finance') loadExpenses();
-      else if (subpageTitle === 'Jadwal') {
+      else if (subpageTitle === 'Schedule') {
         loadEvents();
         loadEventLabels();
       }
-      else if (subpageTitle === 'Absensi') {
+      else if (subpageTitle === 'Attendance') {
         loadAttendances();
-      } else if (subpageTitle === 'Tim') {
+      } else if (subpageTitle === 'Team') {
         loadAttendances();
         loadLeaves();
         loadLeaveTypes();
       }
-      else if (subpageTitle === 'Notifikasi') {
+      else if (subpageTitle === 'Notifications') {
         const loadNotif = async () => {
           setIsLoadingNotif(true);
           const res = await fetchFromApi('notifications', apiToken);
@@ -495,10 +495,10 @@ export default function HaviaMobileApp() {
         const updatedUser = { ...userData, ...editForm };
         setUserData(updatedUser);
         localStorage.setItem('havia_user', JSON.stringify(updatedUser));
-        showToast('Profil berhasil diperbarui! ✅');
-        handleNav('subpage', null, 'Akun');
-      } else { showToast(res.error || 'Gagal memperbarui profil.'); }
-    } catch (error: any) { showToast(error.message || 'Terjadi kesalahan.'); }
+        showToast('Profile updated successfully! ✅');
+        handleNav('subpage', null, 'Account');
+      } else { showToast(res.error || 'Failed to update profile.'); }
+    } catch (error: any) { showToast(error.message || 'An error occurred.'); }
     finally { setIsSavingProfile(false); }
   };
 
@@ -515,12 +515,12 @@ export default function HaviaMobileApp() {
         const updatedUser = { ...userData, image: res.image };
         setUserData(updatedUser);
         localStorage.setItem('havia_user', JSON.stringify(updatedUser));
-        showToast('Berhasil Update Profile');
+        showToast('Profile updated successfully');
       } else {
-        showToast(res.error || 'Gagal mengunggah foto.');
+        showToast(res.error || 'Failed to upload photo.');
       }
     } catch (error: any) {
-      showToast(error.message || 'Terjadi kesalahan koneksi.');
+      showToast(error.message || 'Connection error occurred.');
     } finally {
       setIsUploadingImage(false);
     }
@@ -534,12 +534,12 @@ export default function HaviaMobileApp() {
         const updatedUser = { ...userData, image: "" };
         setUserData(updatedUser);
         localStorage.setItem('havia_user', JSON.stringify(updatedUser));
-        showToast('Berhasil Update Profile');
+        showToast('Profile updated successfully');
       } else {
-        showToast(res.error || 'Gagal menghapus foto.');
+        showToast(res.error || 'Failed to delete photo.');
       }
     } catch (error: any) {
-      showToast(error.message || 'Terjadi kesalahan koneksi.');
+      showToast(error.message || 'Connection error occurred.');
     } finally {
       setIsDeletingImage(false);
     }
@@ -554,9 +554,9 @@ export default function HaviaMobileApp() {
     try {
       const res = await postToApi('events', apiToken, newEvent);
       if (res.success) {
-        showToast('Event berhasil dibuat! 📅');
+        showToast('Event created successfully! 📅');
         loadEvents();
-        handleNav('subpage', null, 'Jadwal');
+        handleNav('subpage', null, 'Schedule');
         setNewEvent({
           title: '',
           start_date: new Date().toISOString().split('T')[0],
@@ -565,8 +565,8 @@ export default function HaviaMobileApp() {
           location: '',
           color: '#C69C3D'
         });
-      } else { showToast(res.error || 'Gagal menyimpan event.'); }
-    } catch (e: any) { showToast(e.message || 'Error koneksi.'); }
+      } else { showToast(res.error || 'Failed to save event.'); }
+    } catch (e: any) { showToast(e.message || 'Connection error.'); }
     finally { setIsSavingEvent(false); }
   };
 
@@ -577,11 +577,11 @@ export default function HaviaMobileApp() {
     setIsSubmittingAttendance(true);
     const res = await deleteFromApi(`haviacms/attendance/${activeAttendance.id}`, apiToken);
     if (res.success) {
-      showToast('Sesi absen berhasil direset! 🧹');
+      showToast('Attendance session reset successfully! 🧹');
       setActiveAttendance(null);
       loadAttendances();
     } else {
-      showToast(res.error || 'Gagal mereset sesi.');
+      showToast(res.error || 'Failed to reset session.');
     }
     setIsSubmittingAttendance(false);
   };
@@ -600,14 +600,14 @@ export default function HaviaMobileApp() {
                        activeAttendance.out_time?.startsWith('-0001');
 
         if (isJunk) {
-          showToast('Data rusak terdeteksi, membersihkan Brain... 🧹');
+          showToast('Corrupted data detected, cleaning Brain... 🧹');
           const delRes = await deleteFromApi(`attendance/${activeAttendance.id}`, apiToken);
           if (delRes.success) {
             setActiveAttendance(null);
             loadAttendances();
-            showToast('Havia Brain Bersih! Silahkan Clock In ulang. ✨');
+            showToast('Havia Brain Cleaned! Please Clock In again. ✨');
           } else {
-            showToast('Gagal membersihkan data rusak.');
+            showToast('Failed to clean corrupted data.');
           }
           return; // Stop di sini agar user bisa klik Clock In lagi setelah bersih
         }
@@ -620,10 +620,10 @@ export default function HaviaMobileApp() {
         });
 
         if (res.success) {
-          showToast('Clock Out Berhasil! Sampai jumpa besok. 👋');
+          showToast('Clock Out Success! See you tomorrow. 👋');
           loadAttendances();
         } else {
-          showToast(res.error || 'Gagal Clock Out.');
+          showToast(res.error || 'Failed to Clock Out.');
         }
       } else {
         // --- AUTO-HEAL: Hapus record 'sampah' jika ada (Record dengan Out Time -0001 atau 0000) ---
@@ -659,10 +659,10 @@ export default function HaviaMobileApp() {
           };
           setActiveAttendance(mockActive);
 
-          showToast('Clock In Berhasil! 🚀');
+          showToast('Clock In Success! 🚀');
           loadAttendances();
         } else {
-          showToast(res.error || 'Gagal Clock In.');
+          showToast(res.error || 'Failed to Clock In.');
         }
       }
     } catch (e: any) {
