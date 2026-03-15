@@ -21,24 +21,32 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({
     { id: 'COMPLETED', label: 'DONE', icon: CheckCircle2 },
   ];
 
+  const getProjectCategory = (p: any) => {
+    const s = String(p.status || '').toUpperCase().trim();
+    const st = String(p.status_title || '').toUpperCase().trim();
+    
+    if (s === 'COMPLETED' || s === 'DONE' || st === 'COMPLETED' || st === 'DONE' || st === 'SELESAI') return 'COMPLETED';
+    if (s === 'CANCELED' || st === 'CANCELED' || st === 'BATAL') return 'CANCELED';
+    if (s === 'HOLD' || st === 'HOLD') return 'HOLD';
+    if (s === 'OPEN' || st === 'OPEN' || st === 'AKTIF') return 'OPEN';
+    
+    return 'OPEN'; // Fallback for active projects
+  };
+
   const filteredProjects = projects.filter(project => {
     if (activeFilter === 'ALL') return true;
-    const status = String(project.status || '').toUpperCase();
-    if (activeFilter === 'COMPLETED') return status === 'COMPLETED' || status === 'DONE';
-    return status === activeFilter;
+    return getProjectCategory(project) === activeFilter;
   }).sort((a, b) => {
     if (activeFilter !== 'ALL') return 0;
     
-    const getPriority = (p: any) => {
-      const s = String(p.status || '').toUpperCase();
-      if (s === 'OPEN') return 1;
-      if (s === 'HOLD') return 2;
-      if (s === 'CANCELED') return 3;
-      if (s === 'COMPLETED' || s === 'DONE') return 4;
-      return 5;
+    const categoryToPriority: Record<string, number> = {
+      'OPEN': 1,
+      'HOLD': 2,
+      'CANCELED': 3,
+      'COMPLETED': 4
     };
     
-    return getPriority(a) - getPriority(b);
+    return (categoryToPriority[getProjectCategory(a)] || 5) - (categoryToPriority[getProjectCategory(b)] || 5);
   });
 
   return (
@@ -79,11 +87,11 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({
             const completedPoints = parseFloat(project.completed_points || "0");
             const progress = project.progress ? parseInt(project.progress, 10) : (totalPoints > 0 ? Math.round((completedPoints / totalPoints) * 100) : 0);
             
-            const statusRaw = String(project.status || '').toUpperCase();
-            const isDone = statusRaw === 'COMPLETED' || statusRaw === 'DONE';
-            const isHold = statusRaw === 'HOLD';
-            const isCanceled = statusRaw === 'CANCELED';
-            const isOpen = statusRaw === 'OPEN';
+            const category = getProjectCategory(project);
+            const isDone = category === 'COMPLETED';
+            const isHold = category === 'HOLD';
+            const isCanceled = category === 'CANCELED';
+            const isOpen = category === 'OPEN';
 
             const statusText = project.status_title || project.status || (isDone ? 'COMPLETED' : 'IN PROGRESS');
             
@@ -97,7 +105,7 @@ export const ProjectContent: React.FC<ProjectContentProps> = ({
                <div className="bg-[#141414] rounded-[1.95rem] p-6 h-full relative overflow-hidden">
                  {/* Glow effect on hover */}
                  <div className={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
-                   isDone ? 'from-green-500/5' : isOpen ? 'from-[#C69C3D]/5' : 'from-neutral-500/5'
+                   isDone ? 'from-green-500/5' : isOpen ? 'from-[#C69C3D]/5' : isHold ? 'from-orange-500/5' : 'from-red-500/5'
                  }`}></div>
                  
                  <div className="relative z-10">
