@@ -26,6 +26,7 @@ import { DashboardView } from '@/components/views/DashboardView';
 import { IDView } from '@/components/views/IDView';
 import { PresensiView } from '@/components/views/PresensiView';
 import { SubpageView } from '@/components/views/SubpageView';
+import { LeaveModal } from '@/components/ui/LeaveModal';
 
 export default function HaviaMobileApp() {
   // --- STATE MANAGEMENT ---
@@ -88,6 +89,11 @@ export default function HaviaMobileApp() {
   const [lastFinishedAttendance, setLastFinishedAttendance] = useState<any | null>(null);
   const [leaves, setLeaves] = useState<any[]>([]);
   const [isLoadingLeaves, setIsLoadingLeaves] = useState(false);
+  const [leaveTypes, setLeaveTypes] = useState<any[]>([]);
+  const [isLoadingLeaveTypes, setIsLoadingLeaveTypes] = useState(false);
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+  const [leaveModalType, setLeaveModalType] = useState<'izin' | 'cuti'>('izin');
+  const [isSubmittingLeave, setIsSubmittingLeave] = useState(false);
   const [isSubmittingAttendance, setIsSubmittingAttendance] = useState(false);
 
   // --- EFFECTS & HELPERS ---
@@ -364,11 +370,33 @@ export default function HaviaMobileApp() {
   };
 
   const loadLeaves = async () => {
-    if (!userData?.id || !apiToken) return;
+    if (!apiToken) return;
     setIsLoadingLeaves(true);
-    const res = await fetchFromApi(`leave-applications?applicant_id=${userData.id}`, apiToken);
+    const res = await fetchFromApi('haviacms/leaves', apiToken);
     if (res.success) setLeaves(Array.isArray(res.data) ? res.data : []);
     setIsLoadingLeaves(false);
+  };
+
+  const loadLeaveTypes = async () => {
+    if (!apiToken) return;
+    setIsLoadingLeaveTypes(true);
+    const res = await fetchFromApi('haviacms/leave_types', apiToken);
+    if (res.success) setLeaveTypes(Array.isArray(res.data) ? res.data : []);
+    setIsLoadingLeaveTypes(false);
+  };
+
+  const handleLeaveSubmit = async (data: any) => {
+    if (!apiToken) return;
+    setIsSubmittingLeave(true);
+    const res = await postToApi('haviacms/leaves', apiToken, data);
+    if (res.success) {
+      showToast("Pengajuan berhasil dikirim!");
+      setIsLeaveModalOpen(false);
+      loadLeaves();
+    } else {
+      showToast(`Gagal: ${(res as any).message || (res as any).error}`);
+    }
+    setIsSubmittingLeave(false);
   };
 
   const loadAttendances = async () => {
@@ -434,6 +462,7 @@ export default function HaviaMobileApp() {
       } else if (subpageTitle === 'Tim') {
         loadAttendances();
         loadLeaves();
+        loadLeaveTypes();
       }
       else if (subpageTitle === 'Notifikasi') {
         const loadNotif = async () => {
@@ -587,7 +616,7 @@ export default function HaviaMobileApp() {
         const res = await putToApi(`haviacms/attendance/${activeAttendance.id}`, apiToken, {
           out_time: formattedNow,
           status: 'pending',
-          note: activeAttendance.note ? `${activeAttendance.note} | Clock out via Mobile` : 'Clock out via Mobile'
+          note: 'Clock out via Mobile'
         });
 
         if (res.success) {
@@ -613,7 +642,7 @@ export default function HaviaMobileApp() {
         // --- CLOCK IN (Create new record via HaviaCMS) ---
         const res = await postToApi('haviacms/attendance', apiToken, {
           in_time: formattedNow,
-          note: 'Clock in via Mobile (HaviaCMS API)'
+          note: '' // Biarkan kosong agar di Brain tidak muncul teks otomatis
         });
 
         if (res.success) {
@@ -741,12 +770,25 @@ export default function HaviaMobileApp() {
           setEventFilterType={setEventFilterType}
           eventFilterLabel={eventFilterLabel}
           setEventFilterLabel={setEventFilterLabel}
+          onOpenLeaveModal={(type) => {
+            setLeaveModalType(type);
+            setIsLeaveModalOpen(true);
+          }}
         />
       )}
 
       {['dashboard', 'subpage', 'presensi'].includes(currentView) && (
         <BottomNav activeNav={activeNav} onNav={handleNav} />
       )}
+
+      <LeaveModal
+        isOpen={isLeaveModalOpen}
+        onClose={() => setIsLeaveModalOpen(false)}
+        leaveTypes={leaveTypes}
+        type={leaveModalType}
+        isSubmitting={isSubmittingLeave}
+        onSubmit={handleLeaveSubmit}
+      />
     </div>
   );
 }
