@@ -261,19 +261,17 @@ export default function HaviaMobileApp() {
       const isAdmin = String(userData.is_admin) === "1" || userData.role_id === "admin";
 
       const enriched = projectPool.map((p: any) => {
-        const pId = String(p.id);
-        const projectTasks = taskPool.filter((t: any) => String(t.project_id) === pId);
+        const myId = String(userData.id);
         
-        const isPic = projectTasks.some((t: any) => String(t.assigned_to) === myId);
-        const isCollab = projectTasks.some((t: any) => {
-          const collabs = t.collaborators ? String(t.collaborators).split(',').map((id: string) => id.trim()) : [];
-          return collabs.includes(myId);
-        });
+        // Priority 1: Direct Project Assignment (from Brain CRM)
+        const isProjectPic = String(p.assigned_to) === myId;
+        const pCollabs = p.collaborators ? String(p.collaborators).split(',').map((id: string) => id.trim()) : [];
+        const isProjectCollab = pCollabs.includes(myId);
 
         if (isAdmin) p.userRole = 'ADMIN';
-        else if (isPic) p.userRole = 'PIC';
-        else if (isCollab) p.userRole = 'KOLABORATOR';
-        else p.userRole = 'MEMBER';
+        else if (isProjectPic) p.userRole = 'PIC'; // Full Project PIC
+        else if (isProjectCollab) p.userRole = 'KOLABORATOR'; // Full Project Collab
+        else p.userRole = 'TEAM MEMBER'; // Default Project Role
 
         return p;
       });
