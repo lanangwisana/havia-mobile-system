@@ -1,13 +1,12 @@
 export const colors = {
-  gold: '#C69C3D',
-  darkGold: '#b59020',
-  bg: '#FFFFFF',
-  dark: '#2C2A29',
-  cream: '#FAF7EF',
+  primary: '#F2F1F0', // Global Background
+  gold: '#C69C3D',    // Secondary Brand
+  dark: '#2C2A29',    // Secondary Text/Elements
+  cream: '#F4EBD4',   // Third Color (Accents)
   card: '#FFFFFF',
-  border: '#E5E5E5',
-  textMuted: '#737373',
-  redAccent: '#F43F5E'
+  border: '#E8E4E1',
+  textMuted: '#6B6865',
+  redAccent: '#E04F3F'
 };
 
 

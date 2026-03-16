@@ -137,7 +137,7 @@ export async function fetchFromApi(endpoint: string, token: string, retryCount =
       return { success: false, error: errorDetail, status: response.status };
     }
     
-    return { success: true, data: parsedRes.data || parsedRes };
+    return { success: true, data: parsedRes.data || parsedRes, meta: parsedRes.meta };
   } catch (error: any) {
     return { success: false, error: error.message || 'Kesalahan koneksi.' };
   }
@@ -178,7 +178,7 @@ export async function postToApi(endpoint: string, token: string, body: Record<st
       return { success: false, error: errorMsg };
     }
     
-    return { success: true, data: parsedRes.data || parsedRes };
+    return { success: true, data: parsedRes.data || parsedRes, meta: parsedRes.meta };
   } catch (error: any) {
     return { success: false, error: error.message || 'Kesalahan koneksi.' };
   }
@@ -217,7 +217,7 @@ export async function putToApi(endpoint: string, token: string, body: Record<str
       return { success: false, error: parsedRes.message || parsedRes.error || `Gagal update (${response.status}).` };
     }
     
-    return { success: true, data: parsedRes.data || parsedRes };
+    return { success: true, data: parsedRes.data || parsedRes, meta: parsedRes.meta };
   } catch (error: any) {
     return { success: false, error: error.message || 'Kesalahan koneksi.' };
   }

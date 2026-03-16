@@ -49,6 +49,9 @@ export default function HaviaMobileApp() {
   
   const [projects, setProjects] = useState<any[]>([]);
   const [isLoadingProjects, setIsLoadingProjects] = useState(false);
+  const [projectPaginationMeta, setProjectPaginationMeta] = useState<any>(null);
+  const [currentProjectPage, setCurrentProjectPage] = useState(1);
+  const [currentProjectFilter, setCurrentProjectFilter] = useState('ALL');
   
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeProjectName, setActiveProjectName] = useState<string>('');
@@ -130,6 +133,13 @@ export default function HaviaMobileApp() {
     
     if (title) {
       setSubpageTitle(title);
+      
+      // Reset projects pagination & filter when entering the main project list
+      if (title === 'Project') {
+        setCurrentProjectFilter('ALL');
+        setCurrentProjectPage(1);
+      }
+
       // Pre-fill edit form when entering Edit Profile
       if (title === 'Edit Profile' && userData) {
         setEditForm({
@@ -249,42 +259,43 @@ export default function HaviaMobileApp() {
   };
 
   // --- DATA FETCHING ---
-  const loadProjects = async () => {
+  const loadProjects = async (status: string = 'ALL', page: number = 1) => {
     if (!userData?.id || !apiToken) return;
     setIsLoadingProjects(true);
+    setCurrentProjectFilter(status);
+    setCurrentProjectPage(page);
     
-    console.log(`[LoadProjects] Using HaviaCMS Bridge for user ${userData.id}...`);
+    console.log(`[LoadProjects] status=${status}, page=${page}`);
 
-    // Ambil data proyek melalui Bridge HaviaCMS yang sudah menangani Kolaborator secara otomatis
-    const pRes = await fetchFromApi('haviacms/projects', apiToken);
-    const tRes = await fetchFromApi('haviacms/tasks', apiToken);
+    const endpoint = `haviacms/projects?status=${status}&page=${page}`;
+    const res = await fetchFromApi(endpoint, apiToken);
 
-    if (pRes.success) {
-      const projectPool = Array.isArray(pRes.data) ? pRes.data : [];
-      const taskPool = Array.isArray(tRes.data) ? tRes.data : [];
+    if (res.success) {
+      const projectPool = Array.isArray(res.data) ? res.data : [];
       
-      const myId = String(userData.id);
       const isAdmin = String(userData.is_admin) === "1" || userData.role_id === "admin";
+      const myId = String(userData.id);
 
       const enriched = projectPool.map((p: any) => {
-        const myId = String(userData.id);
-        
-        // Priority 1: Direct Project Assignment (from Brain CRM)
+        // Priority logic for roles
         const isProjectPic = String(p.assigned_to) === myId;
         const pCollabs = p.collaborators ? String(p.collaborators).split(',').map((id: string) => id.trim()) : [];
         const isProjectCollab = pCollabs.includes(myId);
 
         if (isAdmin) p.userRole = 'ADMIN';
-        else if (isProjectPic) p.userRole = 'PIC'; // Full Project PIC
-        else if (isProjectCollab) p.userRole = 'KOLABORATOR'; // Full Project Collab
-        else p.userRole = 'TEAM MEMBER'; // Default Project Role
+        else if (isProjectPic) p.userRole = 'PIC';
+        else if (isProjectCollab) p.userRole = 'KOLABORATOR';
+        else p.userRole = 'TEAM MEMBER';
 
         return p;
       });
 
       setProjects(enriched);
+      if (res.meta) {
+        setProjectPaginationMeta(res.meta);
+      }
     } else {
-      showToast(`Failed to load projects: ${pRes.error}`);
+      showToast(`Failed to load projects: ${res.error}`);
     }
     
     setIsLoadingProjects(false);
@@ -450,7 +461,7 @@ export default function HaviaMobileApp() {
     }
 
     if (currentView === 'subpage' && apiToken) {
-      if (subpageTitle === 'Project') loadProjects();
+      if (subpageTitle === 'Project') loadProjects(currentProjectFilter, currentProjectPage);
       else if (subpageTitle === 'All Tasks') loadTasks();
       else if (subpageTitle === 'Finance') loadExpenses();
       else if (subpageTitle === 'Schedule') {
@@ -682,7 +693,7 @@ export default function HaviaMobileApp() {
   // --- RENDER ---
   if (isCheckingAuth) {
     return (
-      <div style={{ backgroundColor: colors.bg }} className="h-screen w-full flex flex-col items-center justify-center">
+      <div style={{ backgroundColor: colors.primary }} className="h-screen w-full flex flex-col items-center justify-center">
         <div className="w-16 h-16 rounded-full border-t-2 border-[#C69C3D] animate-spin mb-4"></div>
         <p className="text-[#C69C3D] text-[10px] font-bold uppercase tracking-widest animate-pulse">Autentikasi Havia...</p>
       </div>
@@ -690,7 +701,7 @@ export default function HaviaMobileApp() {
   }
 
   return (
-    <div style={{ backgroundColor: colors.bg, fontFamily: 'var(--font-sans)' }} 
+    <div style={{ backgroundColor: colors.primary, fontFamily: 'var(--font-sans)' }} 
       className="text-dark h-screen w-full overflow-hidden relative selection:bg-gold selection:text-black">
 
 
@@ -737,6 +748,10 @@ export default function HaviaMobileApp() {
           projectTasks={projectTasks}
           isLoadingTasks={isLoadingTasks}
           activeProjectName={activeProjectName}
+          onProjectClick={handleProjectClick}
+          projectPaginationMeta={projectPaginationMeta}
+          onProjectPageChange={(p: number) => loadProjects(currentProjectFilter, p)}
+          onProjectFilterChange={(s: string) => loadProjects(s, 1)}
           expenses={expenses}
           isLoadingExpenses={isLoadingExpenses}
           events={events}
@@ -760,7 +775,6 @@ export default function HaviaMobileApp() {
           setNewEvent={setNewEvent}
           handleCreateEvent={handleCreateEvent}
           isSavingEvent={isSavingEvent}
-          onProjectClick={handleProjectClick}
           apiToken={apiToken}
           onUploadImage={handleUploadImage}
           isUploadingImage={isUploadingImage}

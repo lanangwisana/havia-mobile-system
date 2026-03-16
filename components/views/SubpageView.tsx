@@ -48,6 +48,9 @@ interface SubpageViewProps {
   handleCreateEvent: () => void;
   isSavingEvent: boolean;
   onProjectClick: (id: string, name: string) => void;
+  projectPaginationMeta: any;
+  onProjectPageChange: (page: number) => void;
+  onProjectFilterChange: (status: string) => void;
   apiToken: string;
   onUploadImage: (file: File) => void;
   isUploadingImage: boolean;
@@ -72,6 +75,9 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           projects={props.projects} 
           isLoadingProjects={props.isLoadingProjects} 
           onProjectClick={props.onProjectClick} 
+          paginationMeta={props.projectPaginationMeta}
+          onPageChange={props.onProjectPageChange}
+          onFilterChange={props.onProjectFilterChange}
         />;
       case 'All Tasks': 
         return <TaskList 
@@ -172,7 +178,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
 
   return (
     <section className="h-full w-full flex flex-col relative z-40 animate-in slide-in-from-right-4 duration-300 bg-white overflow-hidden">
-      <div style={{ backgroundColor: `${colors.bg}FA` }} className="px-6 py-6 flex items-center justify-between border-b border-neutral-100 backdrop-blur-md sticky top-0 z-[70]">
+      <div style={{ backgroundColor: `${colors.primary}FA` }} className="px-6 py-6 flex items-center justify-between border-b border-neutral-100 backdrop-blur-md sticky top-0 z-[70]">
         <button 
           onClick={() => {
             if (subpageTitle === 'Event Detail') {
