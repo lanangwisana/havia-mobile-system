@@ -62,24 +62,24 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
   return (
     <section className="h-full w-full flex flex-col relative z-40 animate-in slide-in-from-bottom-4 duration-300 overflow-hidden">
       <div className="px-6 py-6 flex items-center justify-between z-20">
-        <button onClick={() => onNav('dashboard')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-10 h-10 rounded-full border flex items-center justify-center hover:bg-neutral-800 transition-colors shadow-lg">
-          <ArrowLeft className="w-5 h-5 text-white" />
+        <button onClick={() => onNav('dashboard')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-10 h-10 rounded-full border-2 flex items-center justify-center hover:bg-neutral-100 transition-colors shadow-md">
+          <ArrowLeft className="w-5 h-5 text-neutral-900" />
         </button>
-        <h2 className="font-bold text-sm uppercase tracking-widest text-white">Presensi Pegawai</h2>
+        <h2 className="font-bold text-sm uppercase tracking-widest text-neutral-900">Attendance</h2>
         <div className="w-10"></div>
       </div>
 
       {/* Radar Background */}
-      <div className={`absolute top-0 left-0 w-full h-1/2 bg-neutral-900 overflow-hidden z-0 border-b border-[#C69C3D]/20 transition-opacity duration-500 ${isExpanded ? 'opacity-30' : 'opacity-100'}`}>
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at center, #C69C3D 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a0a0a]"></div>
+      <div className={`absolute top-0 left-0 w-full h-1/2 bg-white overflow-hidden z-0 border-b border-[#C69C3D]/20 transition-opacity duration-500 ${isExpanded ? 'opacity-30' : 'opacity-100'}`}>
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at center, #C69C3D 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#F5F5F5]"></div>
         
         <div className="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
           <div className="w-40 h-40 border border-[#C69C3D]/30 rounded-full absolute"></div>
           <div className="w-24 h-24 bg-[#C69C3D]/20 rounded-full animate-radar absolute"></div>
-          <div style={{ backgroundColor: colors.gold }} className="w-4 h-4 rounded-full border-2 border-black shadow-[0_0_15px_rgba(212,175,55,0.8)] relative z-10"></div>
-          <div className="absolute top-8 bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-full shadow-xl tracking-wider">
-            LOKASI TERDETEKSI
+          <div style={{ backgroundColor: colors.gold }} className="w-4 h-4 rounded-full border-2 border-white shadow-[0_0_15px_rgba(212,175,55,0.4)] relative z-10"></div>
+          <div className="absolute top-8 bg-neutral-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-xl tracking-wider">
+            LOCATION DETECTED
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
           }} 
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
-          className="rounded-t-[2.5rem] p-8 pb-12 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border-t border-[#C69C3D]/20 relative transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)"
+          className="rounded-t-[2.5rem] p-8 pb-12 shadow-[0_-10px_30px_rgba(0,0,0,0.1)] border-t border-neutral-200 relative transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)"
         >
           {/* Handle bar */}
           <div 
@@ -103,15 +103,15 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
           ></div>
           
           <div className="text-center mb-10 mt-2">
-            <h1 className="text-5xl font-light font-mono tracking-tighter text-white mb-2">{currentTime || '00:00:00'}</h1>
+            <h1 className="text-5xl font-light font-mono tracking-tighter text-neutral-900 mb-2">{currentTime || '00:00:00'}</h1>
             
-            <div className={`mt-5 inline-flex items-center gap-2 px-4 py-1.5 ${isClockedIn ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : 'bg-green-500/10 text-green-400 border-green-500/20'} rounded-full text-[10px] font-bold border tracking-wider`}>
+            <div className={`mt-5 inline-flex items-center gap-2 px-4 py-1.5 ${isClockedIn ? 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20' : 'bg-green-500/10 text-green-600 border-green-500/20'} rounded-full text-[10px] font-bold border tracking-wider`}>
               <MapPin className="w-3 h-3" />
-              <span>{isClockedIn ? 'Waktu Kerja' : 'Belum Absen'}</span>
+              <span>{isClockedIn ? 'Work Time' : 'Not Clocked In'}</span>
             </div>
           </div>
 
-          <div style={{ backgroundColor: isClockedIn ? '#F43F5E15' : 'rgba(34, 197, 94, 0.05)', borderColor: isClockedIn ? '#F43F5E30' : 'rgba(34, 197, 94, 0.2)' }} className="w-full p-4 rounded-2xl border flex items-center justify-between mb-2 shadow-lg">
+          <div style={{ backgroundColor: isClockedIn ? '#F43F5E08' : 'rgba(34, 197, 94, 0.05)', borderColor: isClockedIn ? '#F43F5E40' : 'rgba(34, 197, 94, 0.3)' }} className="w-full p-4 rounded-2xl border-2 flex items-center justify-between mb-2 shadow-sm">
             <div className="flex items-center gap-4">
                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${isClockedIn ? 'bg-rose-500 shadow-rose-500/30' : 'bg-green-500 shadow-green-500/30'}`}>
                  <Clock className="w-6 h-6 text-white" />
@@ -142,7 +142,7 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
                   isClockedIn ? <LogOut className="w-4 h-4 ml-[-2px]" /> : <LogIn className="w-4 h-4 ml-[-2px]" />
                 )}
                 <span className="text-xs font-bold whitespace-nowrap tracking-wide">
-                  {isSubmittingAttendance ? 'PROSES' : (isClockedIn ? 'Clock Out' : 'Clock In')}
+                  {isSubmittingAttendance ? 'PROCESS' : (isClockedIn ? 'Clock Out' : 'Clock In')}
                 </span>
               </button>
             </div>
@@ -150,20 +150,20 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
 
           <div className="grid grid-cols-2 gap-4 mt-8">
             <div style={{ backgroundColor: colors.bg, borderColor: colors.border }} className={`p-4 rounded-xl border ${!isClockedIn && !showFinishedTime && 'opacity-50'}`}>
-              <div className="flex items-center gap-2 mb-3 text-green-400">
+              <div className="flex items-center gap-2 mb-3 text-green-600">
                 <LogIn className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Masuk</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider">In</span>
               </div>
-              <p className="text-xl font-bold text-white">{getClockTime(activeAttendance?.in_time || (showFinishedTime ? lastFinishedAttendance?.in_time : null))}</p>
-              <p className="text-[9px] text-neutral-500 uppercase tracking-widest mt-1">Clock In Time</p>
+              <p className="text-xl font-bold text-neutral-900">{getClockTime(activeAttendance?.in_time || (showFinishedTime ? lastFinishedAttendance?.in_time : null))}</p>
+              <p className="text-[9px] text-neutral-400 uppercase tracking-widest mt-1">Clock In Time</p>
             </div>
             <div style={{ backgroundColor: colors.bg, borderColor: colors.border }} className={`p-4 rounded-xl border ${!showFinishedTime && 'opacity-50'}`}>
-              <div className="flex items-center gap-2 mb-3 text-rose-400">
+              <div className="flex items-center gap-2 mb-3 text-rose-600">
                 <LogOut className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Pulang</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider">Out</span>
               </div>
-              <p className="text-xl font-bold text-white">{showFinishedTime ? getClockTime(lastFinishedAttendance?.out_time) : '--:--'}</p>
-              <p className="text-[9px] text-neutral-500 uppercase tracking-widest mt-1">Clock Out Time</p>
+              <p className="text-xl font-bold text-neutral-900">{showFinishedTime ? getClockTime(lastFinishedAttendance?.out_time) : '--:--'}</p>
+              <p className="text-[9px] text-neutral-400 uppercase tracking-widest mt-1">Clock Out Time</p>
             </div>
           </div>
         </div>

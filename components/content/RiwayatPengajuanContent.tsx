@@ -11,7 +11,7 @@ export const RiwayatPengajuanContent: React.FC<RiwayatPengajuanContentProps> = (
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <div className="w-8 h-8 border-2 border-[#C69C3D] border-t-transparent rounded-full animate-spin" />
-        <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">Memuat Riwayat...</p>
+        <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest">Loading History...</p>
       </div>
     );
   }
@@ -19,8 +19,8 @@ export const RiwayatPengajuanContent: React.FC<RiwayatPengajuanContentProps> = (
   if (!leaves || leaves.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-64 opacity-50 space-y-4">
-        <AlertCircle className="w-12 h-12 text-neutral-700" />
-        <p className="text-center text-neutral-400 text-sm">Belum ada riwayat pengajuan.</p>
+        <AlertCircle className="w-12 h-12 text-neutral-300" />
+        <p className="text-center text-neutral-400 text-sm">No submission history available.</p>
       </div>
     );
   }
@@ -35,7 +35,7 @@ export const RiwayatPengajuanContent: React.FC<RiwayatPengajuanContentProps> = (
         return (
           <div 
             key={idx} 
-            className="group bg-[#111] border border-neutral-800 rounded-[2rem] p-5 hover:border-neutral-700 transition-all shadow-xl"
+            className="group bg-white border border-neutral-100 rounded-[2rem] p-5 hover:border-neutral-200 transition-all shadow-md"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-4">
@@ -49,38 +49,38 @@ export const RiwayatPengajuanContent: React.FC<RiwayatPengajuanContentProps> = (
                    <Clock className="w-6 h-6" />}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs font-black text-white uppercase tracking-widest">{leave.leave_type_title || 'Pengajuan'}</span>
-                  <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-tighter">
-                    {new Date(leave.start_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  <span className="text-xs font-black text-neutral-900 uppercase tracking-widest">{leave.leave_type_title || 'Submission'}</span>
+                  <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tighter">
+                    {new Date(leave.start_date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </span>
                 </div>
               </div>
               <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${
-                isApproved ? 'bg-green-500/10 border-green-500/20 text-green-400' :
-                isRejected ? 'bg-red-500/10 border-red-500/20 text-red-400' :
-                'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                isApproved ? 'bg-green-500/10 border-green-500/20 text-green-600' :
+                isRejected ? 'bg-red-500/10 border-red-500/20 text-red-600' :
+                'bg-amber-500/10 border-amber-500/20 text-amber-600'
               }`}>
-                {leave.status}
+                {leave.status.toUpperCase()}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="bg-neutral-900/50 rounded-2xl p-3 border border-neutral-800/30">
-                <span className="text-[8px] text-neutral-500 font-bold uppercase tracking-widest block mb-1">Durasi</span>
-                <span className="text-xs font-bold text-white uppercase">{leave.total_days || '0'} Hari</span>
+              <div className="bg-neutral-50 rounded-2xl p-3 border border-neutral-100">
+                <span className="text-[8px] text-neutral-400 font-bold uppercase tracking-widest block mb-1">Duration</span>
+                <span className="text-xs font-bold text-neutral-900 uppercase">{leave.total_days || '0'} Days</span>
               </div>
-              <div className="bg-neutral-900/50 rounded-2xl p-3 border border-neutral-800/30">
-                <span className="text-[8px] text-neutral-500 font-bold uppercase tracking-widest block mb-1">Sampai</span>
-                <span className="text-xs font-bold text-white uppercase">
-                  {new Date(leave.end_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+              <div className="bg-neutral-50 rounded-2xl p-3 border border-neutral-100">
+                <span className="text-[8px] text-neutral-400 font-bold uppercase tracking-widest block mb-1">Until</span>
+                <span className="text-xs font-bold text-neutral-900 uppercase">
+                  {new Date(leave.end_date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}
                 </span>
               </div>
             </div>
 
-            <div className="bg-neutral-900/30 rounded-2xl p-4 border border-neutral-800/20">
-              <span className="text-[8px] text-neutral-600 font-black uppercase tracking-[0.2em] block mb-2">Alasan / Keterangan</span>
-              <p className="text-[11px] text-neutral-400 leading-relaxed italic">
-                "{leave.reason || leave.note || 'Tidak ada keterangan'}"
+            <div className="bg-neutral-50 rounded-2xl p-4 border border-neutral-100">
+              <span className="text-[8px] text-neutral-400 font-black uppercase tracking-[0.2em] block mb-2">Reason / Description</span>
+              <p className="text-[11px] text-neutral-500 leading-relaxed italic">
+                "{leave.reason || leave.note || 'No description provided'}"
               </p>
             </div>
           </div>

@@ -21,11 +21,11 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
 
   const handleReset = async () => {
     if (!form.current_password || !form.new_password || !form.confirm_password) {
-      showToast('Semua field wajib diisi.');
+      showToast('All fields are required.');
       return;
     }
     if (form.new_password !== form.confirm_password) {
-      showToast('Password baru tidak cocok.');
+      showToast('New passwords do not match.');
       return;
     }
 
@@ -33,34 +33,34 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
     try {
       const res = await postToApi('haviacms/profile/reset_password', apiToken, form);
       if (res.success) {
-        showToast('Password berhasil diganti! 🔐');
+        showToast('Password successfully changed! 🔐');
         onSuccess();
       } else {
-        showToast(res.error || 'Gagal meriset password.');
+        showToast(res.error || 'Failed to reset password.');
       }
     } catch (e: any) {
-      showToast('Terjadi kesalahan koneksi.');
+      showToast('Connection error occurred.');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const inputClass = "w-full text-white text-sm rounded-xl focus:ring-1 focus:ring-[#C69C3D] focus:border-[#C69C3D] block p-4 placeholder-neutral-600 transition-all border outline-none";
+  const inputClass = "w-full text-neutral-900 text-sm rounded-xl focus:ring-1 focus:ring-[#C69C3D] focus:border-[#C69C3D] block p-4 placeholder-neutral-400 transition-all border outline-none";
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32">
       <div className="flex flex-col items-center mb-6">
-        <div className="w-20 h-20 rounded-full bg-neutral-900 border border-[#C69C3D]/20 flex items-center justify-center mb-4">
+        <div className="w-20 h-20 rounded-full bg-neutral-50 border border-[#C69C3D]/20 flex items-center justify-center mb-4">
           <ShieldCheck className="w-10 h-10 text-[#C69C3D]" />
         </div>
-        <h3 className="text-lg font-bold text-white tracking-wide">Ganti Password</h3>
-        <p className="text-[10px] text-neutral-500 uppercase tracking-widest text-center mt-1 px-10">Amankan akun Anda dengan mengganti kata sandi secara berkala</p>
+        <h3 className="text-lg font-bold text-neutral-900 tracking-wide">Change Password</h3>
+        <p className="text-[10px] text-neutral-400 uppercase tracking-widest text-center mt-1 px-10">Secure your account by changing your password regularly</p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest flex items-center gap-2">
-            <Key className="w-3 h-3" /> Password Saat Ini
+          <label className="text-[10px] font-bold text-neutral-400 ml-1 uppercase tracking-widest flex items-center gap-2">
+            <Key className="w-3 h-3" /> Current Password
           </label>
           <input 
             type="password" 
@@ -72,26 +72,26 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
           />
         </div>
 
-        <div className="pt-4 space-y-4 border-t border-neutral-800/50">
+        <div className="pt-4 space-y-4 border-t border-neutral-100">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Password Baru</label>
+            <label className="text-[10px] font-bold text-neutral-400 ml-1 uppercase tracking-widest">New Password</label>
             <input 
               type="password" 
               value={form.new_password} 
               onChange={(e) => setForm({...form, new_password: e.target.value})} 
-              placeholder="Minimal 6 karakter" 
+              placeholder="Minimum 6 characters" 
               style={{ backgroundColor: colors.card, borderColor: colors.border }} 
               className={inputClass} 
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Konfirmasi Password Baru</label>
+            <label className="text-[10px] font-bold text-neutral-400 ml-1 uppercase tracking-widest">Confirm New Password</label>
             <input 
               type="password" 
               value={form.confirm_password} 
               onChange={(e) => setForm({...form, confirm_password: e.target.value})} 
-              placeholder="Ulangi password baru" 
+              placeholder="Repeat new password" 
               style={{ backgroundColor: colors.card, borderColor: colors.border }} 
               className={inputClass} 
             />
@@ -103,10 +103,10 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
         <button 
           onClick={handleReset} 
           disabled={isSaving}
-          className={`w-full gold-gradient text-black font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all transform active:scale-[0.98] flex justify-center items-center gap-2 ${isSaving ? 'opacity-70 cursor-not-allowed' : ''}`}
+          className={`w-full gold-gradient text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-all transform active:scale-[0.98] flex justify-center items-center gap-2 ${isSaving ? 'opacity-70 cursor-not-allowed' : ''}`}
         >
           <Lock className="w-5 h-5" />
-          <span className="uppercase tracking-widest text-xs">{isSaving ? 'MEMPROSES...' : 'Perbarui Password'}</span>
+          <span className="uppercase tracking-widest text-xs">{isSaving ? 'PROCESSING...' : 'Update Password'}</span>
         </button>
       </div>
     </div>
