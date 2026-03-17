@@ -97,7 +97,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
             {[
               { id: 'All Tasks', label: 'Tasks', icon: ClipboardList },
               { id: 'Project', label: 'Projects', icon: Briefcase, nav: 'project' },
-              { id: 'Schedule', label: 'Events', icon: Calendar, nav: 'jadwal' },
+              { id: 'Events', label: 'Events', icon: Calendar, nav: 'jadwal' },
               { id: 'Team', label: 'Team', icon: Users },
               { id: 'Finance', label: 'Finance', icon: DollarSign }
             ].map((item) => (

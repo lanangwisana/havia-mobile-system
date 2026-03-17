@@ -111,13 +111,21 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
             </div>
           </div>
 
-          <div style={{ backgroundColor: isClockedIn ? '#F43F5E08' : 'rgba(34, 197, 94, 0.05)', borderColor: isClockedIn ? '#F43F5E40' : 'rgba(34, 197, 94, 0.3)' }} className="w-full p-4 rounded-2xl border-2 flex items-center justify-between mb-2 shadow-sm">
+          <div 
+            style={{ 
+              background: isClockedIn 
+                ? 'linear-gradient(180deg, rgba(244, 63, 94, 0.08) 0%, rgba(244, 63, 94, 0.03) 100%)' 
+                : 'linear-gradient(180deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.03) 100%)',
+              borderColor: isClockedIn ? '#F43F5E40' : 'rgba(34, 197, 94, 0.3)' 
+            }} 
+            className="w-full p-4 rounded-2xl border-2 flex items-center justify-between mb-2"
+          >
             <div className="flex items-center gap-4">
-               <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${isClockedIn ? 'bg-rose-500 shadow-rose-500/30' : 'bg-green-500 shadow-green-500/30'}`}>
+               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${isClockedIn ? 'bg-rose-500' : 'bg-green-500'}`}>
                  <Clock className="w-6 h-6 text-white" />
                </div>
                <div className="flex flex-col">
-                 <span className="text-xs text-white font-medium tracking-wide">
+                 <span className="text-xs text-neutral-900 font-medium tracking-wide">
                    {isClockedIn ? 'You are clocked in' : 'You are clocked out'}
                  </span>
                  <span className="text-[10px] text-neutral-500 uppercase tracking-widest mt-0.5">
@@ -134,7 +142,7 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
                   borderColor: isClockedIn ? '#F43F5E' : '#22C55E', 
                   color: isClockedIn ? '#F43F5E' : '#22C55E' 
                 }}
-                className={`flex items-center justify-center gap-2 px-5 py-2.5 bg-transparent border-[1.5px] rounded-lg transition-all active:scale-95 ${isSubmittingAttendance ? 'opacity-70 cursor-not-allowed' : 'hover:bg-opacity-10'}`}
+                className={`flex items-center justify-center gap-2 px-5 py-2.5 bg-white border-[1.5px] rounded-lg transition-all active:scale-95 ${isSubmittingAttendance ? 'opacity-70 cursor-not-allowed' : 'hover:bg-neutral-50'}`}
               >
                 {isSubmittingAttendance ? (
                   <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
@@ -149,7 +157,13 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
           </div>
 
           <div className="grid grid-cols-2 gap-4 mt-8">
-            <div style={{ backgroundColor: colors.bg, borderColor: colors.border }} className={`p-4 rounded-xl border ${!isClockedIn && !showFinishedTime && 'opacity-50'}`}>
+            <div 
+              style={{ 
+                background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FAFB 100%)',
+                borderColor: colors.border 
+              }} 
+              className={`p-4 rounded-xl border ${!isClockedIn && !showFinishedTime && 'opacity-50'}`}
+            >
               <div className="flex items-center gap-2 mb-3 text-green-600">
                 <LogIn className="w-4 h-4" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">In</span>
@@ -157,7 +171,13 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
               <p className="text-xl font-bold text-neutral-900">{getClockTime(activeAttendance?.in_time || (showFinishedTime ? lastFinishedAttendance?.in_time : null))}</p>
               <p className="text-[9px] text-neutral-400 uppercase tracking-widest mt-1">Clock In Time</p>
             </div>
-            <div style={{ backgroundColor: colors.bg, borderColor: colors.border }} className={`p-4 rounded-xl border ${!showFinishedTime && 'opacity-50'}`}>
+            <div 
+              style={{ 
+                background: 'linear-gradient(180deg, #FFFFFF 0%, #F9FAFB 100%)',
+                borderColor: colors.border 
+              }} 
+              className={`p-4 rounded-xl border ${!showFinishedTime && 'opacity-50'}`}
+            >
               <div className="flex items-center gap-2 mb-3 text-rose-600">
                 <LogOut className="w-4 h-4" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">Out</span>
