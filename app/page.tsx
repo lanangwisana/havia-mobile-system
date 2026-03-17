@@ -350,10 +350,10 @@ export default function HaviaMobileApp() {
   };
 
   const loadExpenses = async () => {
-    if (!userData?.id || !apiToken) return;
+    if (!apiToken) return;
     setIsLoadingExpenses(true);
-    // Filter by staff user_id
-    const res = await fetchFromApi(`expenses?user_id=${userData.id}`, apiToken);
+    // Fetch specifically salaries for the logged-in user
+    const res = await fetchFromApi('haviacms/finance/salaries', apiToken);
     if (res.success) setExpenses(Array.isArray(res.data) ? res.data : []);
     setIsLoadingExpenses(false);
   };
