@@ -88,6 +88,8 @@ export default function HaviaMobileApp() {
   // Expenses States
   const [expenses, setExpenses] = useState<any[]>([]);
   const [isLoadingExpenses, setIsLoadingExpenses] = useState(false);
+  const [financeSummary, setFinanceSummary] = useState<any[]>([]);
+  const [isLoadingFinanceSummary, setIsLoadingFinanceSummary] = useState(false);
 
   // Attendances States
   const [attendances, setAttendances] = useState<any[]>([]);
@@ -356,6 +358,14 @@ export default function HaviaMobileApp() {
     setIsLoadingExpenses(false);
   };
 
+  const loadFinanceSummary = async () => {
+    if (!apiToken) return;
+    setIsLoadingFinanceSummary(true);
+    const res = await fetchFromApi('haviacms/finance/summary', apiToken);
+    if (res.success) setFinanceSummary(Array.isArray(res.data) ? res.data : []);
+    setIsLoadingFinanceSummary(false);
+  };
+
   const loadEvents = async (type: string = eventFilterType, label: string = eventFilterLabel) => {
     if (!apiToken || !userData?.id) return;
     setIsLoadingEvents(true);
@@ -481,7 +491,10 @@ export default function HaviaMobileApp() {
     if (currentView === 'subpage' && apiToken) {
       if (subpageTitle === 'Project') loadProjects(currentProjectFilter, currentProjectPage);
       else if (subpageTitle === 'All Tasks') loadTasks();
-      else if (subpageTitle === 'Finance') loadExpenses();
+      else if (subpageTitle === 'Finance') {
+        loadExpenses();
+        loadFinanceSummary();
+      }
       else if (subpageTitle === 'Events') {
         loadEvents(eventFilterType, eventFilterLabel);
         if (eventLabels.length === 0) loadEventLabels();
@@ -801,6 +814,8 @@ export default function HaviaMobileApp() {
           onProjectFilterChange={(s: string) => loadProjects(s, 1)}
           expenses={expenses}
           isLoadingExpenses={isLoadingExpenses}
+          financeSummary={financeSummary}
+          isLoadingFinanceSummary={isLoadingFinanceSummary}
           events={events}
           isLoadingEvents={isLoadingEvents}
           selectedEvent={selectedEvent}

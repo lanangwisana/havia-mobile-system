@@ -67,6 +67,8 @@ interface SubpageViewProps {
   onTaskPageChange?: (page: number) => void;
   onTaskFilterChange?: (status: string) => void;
   activeTaskId?: string | null;
+  financeSummary: any[];
+  isLoadingFinanceSummary: boolean;
 }
 
 export const SubpageView: React.FC<SubpageViewProps> = (props) => {
@@ -107,6 +109,8 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
         return <FinanceContent 
           expenses={props.expenses} 
           isLoadingExpenses={props.isLoadingExpenses} 
+          financeSummary={props.financeSummary}
+          isLoadingFinanceSummary={props.isLoadingFinanceSummary}
         />;
       case 'Events': 
         return <JadwalContent 
