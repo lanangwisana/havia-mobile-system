@@ -117,7 +117,7 @@ export const TaskList: React.FC<{
           const isExpanded = String(expandedTaskId) === taskId;
           
           const proj = projects?.find(p => String(p.id) === String(task.project_id));
-          const projName = projectName || (proj ? proj.title : `Project ${task.project_id}`);
+          const projName = projectName || task.project_title || (proj ? proj.title : `Project ${task.project_id}`);
           const progress = isDone ? 100 : (isInProgress ? 50 : 0);
           
           return (
@@ -147,14 +147,14 @@ export const TaskList: React.FC<{
                       </div>
                       <div className="flex flex-col min-w-0">
                         <h4 className={`font-black text-[15px] leading-tight truncate transition-all duration-500 ${isDone ? 'text-neutral-400' : 'text-[#2C2A29]'}`}>
-                          {task.title}
+                          {projName}
                         </h4>
                         <div className="flex items-center gap-2 mt-1.5 opacity-80">
                           <div className="w-4 h-4 rounded-full bg-[#F4EBD4] flex items-center justify-center border border-[#C69C3D]/10">
-                            <Briefcase className="w-2.5 h-2.5 text-[#C69C3D]" />
+                            <ClipboardList className="w-2.5 h-2.5 text-[#C69C3D]" />
                           </div>
                           <p className="text-[11px] text-[#2C2A29] font-bold tracking-tight truncate max-w-[150px]">
-                            {projName}
+                            {task.title || task.name || `Task ${task.id}`}
                           </p>
                         </div>
                         
