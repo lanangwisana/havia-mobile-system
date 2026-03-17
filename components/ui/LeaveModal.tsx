@@ -90,7 +90,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
                   required
                   value={formData.leave_type_id}
                   onChange={(e) => setFormData({ ...formData, leave_type_id: e.target.value })}
-                  className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl px-4 py-4 text-sm text-neutral-900 focus:outline-none focus:border-[#C69C3D] transition-all"
+                  className="w-full appearance-none bg-neutral-50 border border-neutral-100 rounded-2xl px-4 py-4 text-sm text-neutral-900 focus:outline-none focus:border-[#C69C3D] transition-all"
                 >
                   <option value="" disabled>Select Type</option>
                   {leaveTypes.map((t) => (
@@ -144,7 +144,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
             <div className="flex gap-3 p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl">
               <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
               <p className="text-[10px] text-neutral-500 leading-relaxed font-medium">
-                Submission will be sent to HRD/Admin for review. You will receive a notification if the status changes.
+                Submission will be sent to HRD/Admin for review.
               </p>
             </div>
 

@@ -55,15 +55,15 @@ export const TimContent: React.FC<TimContentProps> = ({
         {/* Small Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white border border-neutral-100 rounded-3xl p-4 flex flex-col items-center justify-center shadow-md">
-            <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-widest mb-1 text-center">Total Days</span>
+            <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-widest mb-1 text-center">Total Work Days</span>
             <span className="text-2xl font-black text-neutral-900 leading-tight">
               {new Set(attendances.map(a => a.date || (a.in_time ? a.in_time.split(' ')[0] : null))).size}
             </span>
           </div>
           <div className="bg-white border border-neutral-100 rounded-3xl p-4 flex flex-col items-center justify-center shadow-md">
-            <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-widest mb-1 text-center">Leave / Vacation</span>
+            <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-widest mb-1 text-center">Leave / Permission</span>
             <div className="flex flex-col items-center">
-              <span className="text-2xl font-black text-purple-600 leading-tight">
+              <span className="text-2xl font-black text-neutral-900 leading-tight">
                 {leaves.filter(l => l.status === 'approved').reduce((acc, l) => acc + parseFloat(l.total_days || 0), 0)}
               </span>
               <span className="text-[8px] text-neutral-400 font-medium uppercase tracking-widest -mt-1">Days</span>
@@ -83,7 +83,7 @@ export const TimContent: React.FC<TimContentProps> = ({
           </div>
           <div className="flex flex-col items-start leading-tight">
             <span className="text-xs font-black text-neutral-900 uppercase tracking-widest">Create Submission</span>
-            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Leave & Vacation</span>
+            <span className="text-[10px] font-bold text-neutral-400 tracking-widest">Leave/ Permission</span>
           </div>
         </div>
         <div className="w-10 h-10 rounded-full bg-neutral-50 flex items-center justify-center group-hover:bg-neutral-100 transition-colors">
@@ -103,20 +103,12 @@ export const TimContent: React.FC<TimContentProps> = ({
                 <History className="w-4 h-4 text-neutral-400" />
               </div>
               <div className="flex flex-col items-start leading-tight">
-                <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest group-hover:text-neutral-900 transition-colors">View Submission History</span>
-                <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-tighter">
-                  {(() => {
-                    const approved = leaves.filter(l => l.status === 'approved').length;
-                    const pending = leaves.filter(l => l.status === 'pending').length;
-                    const rejected = leaves.filter(l => l.status === 'rejected').length;
-                    return `${leaves.length} Total • ${approved} Approved • ${pending} Pending • ${rejected} Rejected`;
-                  })()}
-                </span>
+                <span className="text-[10px] font-black text-neutral-900 uppercase tracking-widest">View History</span>
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-[8px] font-black text-[#C69C3D] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">Detail</span>
-              <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-[#C69C3D] transition-colors" />
+              <span className="text-[8px] font-black text-[#C69C3D] uppercase tracking-widest transition-all">Detail</span>
+              <ChevronRight className="w-4 h-4 text-[#C69C3D]" />
             </div>
           </button>
         </div>
@@ -193,7 +185,7 @@ export const TimContent: React.FC<TimContentProps> = ({
                             {isClockedIn ? 'Working' : 'Work Finished'}
                           </span>
                           {!isClockedIn && durationText && (
-                            <span className="text-[8px] text-[#C69C3D] font-bold uppercase tracking-tighter">Duration: {durationText}</span>
+                            <span className="text-[8px] text-[#C69C3D] font-bold tracking-tight">Durations: {durationText}</span>
                           )}
                         </div>
                         <span className="text-[9px] font-bold text-neutral-400 tabular-nums">

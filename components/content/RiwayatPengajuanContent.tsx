@@ -67,7 +67,23 @@ export const RiwayatPengajuanContent: React.FC<RiwayatPengajuanContentProps> = (
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-neutral-50 rounded-2xl p-3 border border-neutral-100">
                 <span className="text-[8px] text-neutral-400 font-bold uppercase tracking-widest block mb-1">Duration</span>
-                <span className="text-xs font-bold text-neutral-900 uppercase">{leave.total_days || '0'} Days</span>
+                <span className="text-xs font-bold text-neutral-900">
+                  {(() => {
+                    const days = parseFloat(leave.total_days);
+                    if (isNaN(days)) return '0 Days';
+                    if (days >= 1 && days % 1 === 0) return `${days} Days`;
+                    
+                    // Convert to hours (8h workday)
+                    const totalMinutes = Math.round(days * 8 * 60);
+                    const h = Math.floor(totalMinutes / 60);
+                    const m = totalMinutes % 60;
+                    
+                    if (h > 0 && m > 0) return `${h}h ${m}m`;
+                    if (h > 0) return `${h} Hours`;
+                    if (m > 0) return `${m} Minutes`;
+                    return `${days} Days`;
+                  })()}
+                </span>
               </div>
               <div className="bg-neutral-50 rounded-2xl p-3 border border-neutral-100">
                 <span className="text-[8px] text-neutral-400 font-bold uppercase tracking-widest block mb-1">Until</span>
