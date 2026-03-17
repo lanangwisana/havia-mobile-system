@@ -108,7 +108,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           expenses={props.expenses} 
           isLoadingExpenses={props.isLoadingExpenses} 
         />;
-      case 'Schedule': 
+      case 'Events': 
         return <JadwalContent 
           events={props.events} 
           isLoadingEvents={props.isLoadingEvents} 

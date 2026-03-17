@@ -482,7 +482,7 @@ export default function HaviaMobileApp() {
       if (subpageTitle === 'Project') loadProjects(currentProjectFilter, currentProjectPage);
       else if (subpageTitle === 'All Tasks') loadTasks();
       else if (subpageTitle === 'Finance') loadExpenses();
-      else if (subpageTitle === 'Schedule') {
+      else if (subpageTitle === 'Events') {
         loadEvents(eventFilterType, eventFilterLabel);
         if (eventLabels.length === 0) loadEventLabels();
       }
@@ -721,7 +721,7 @@ export default function HaviaMobileApp() {
 
   // Reload events when filters change
   useEffect(() => {
-    if (apiToken && currentView === 'subpage' && subpageTitle === 'Jadwal') {
+    if (apiToken && currentView === 'subpage' && subpageTitle === 'Events') {
       loadEvents();
     }
   }, [eventFilterType, eventFilterLabel]);

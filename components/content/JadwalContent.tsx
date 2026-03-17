@@ -23,8 +23,8 @@ export const JadwalContent: React.FC<JadwalContentProps> = ({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between px-1">
         <div className="flex flex-col">
-          <h3 className="text-base font-extrabold text-neutral-900 tracking-tight">Havia Schedule</h3>
-          <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-bold">Internal Agenda & Events</p>
+          <h3 className="text-base font-extrabold text-neutral-900 tracking-tight">Havia Events</h3>
+          <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-bold">Internal Events</p>
         </div>
         <div className="w-10"></div>
       </div>
@@ -62,7 +62,7 @@ export const JadwalContent: React.FC<JadwalContentProps> = ({
     {isLoadingEvents ? (
       <div className="flex flex-col items-center justify-center py-20">
          <Activity className="w-10 h-10 text-[#C69C3D] animate-pulse mb-4" />
-         <p className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] font-black">Syncing Agenda...</p>
+         <p className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] font-black">Syncing Events...</p>
       </div>
     ) : events.length > 0 ? (
       <div className="space-y-4">
@@ -166,7 +166,7 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({ selected
           
           <div className="flex items-center gap-2">
             <div className="h-0.5 w-6 bg-[#C69C3D] rounded-full"></div>
-            <span className="text-[8px] text-neutral-400 font-bold uppercase tracking-widest">Internal Agenda</span>
+            <span className="text-[8px] text-neutral-400 font-bold uppercase tracking-widest">Internal Events</span>
           </div>
         </div>
       </div>
@@ -206,7 +206,7 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({ selected
 
         {selectedEvent.description && (
           <div className="p-5 rounded-[2rem] bg-neutral-50 border border-neutral-100">
-             <p className="text-[7px] text-neutral-400 uppercase tracking-[0.2em] font-black mb-3">Agenda Description</p>
+             <p className="text-[7px] text-neutral-400 uppercase tracking-[0.2em] font-black mb-3">Event Description</p>
              <div className="text-[13px] text-neutral-500 leading-relaxed font-medium">
                {selectedEvent.description.replace(/(<([^>]+)>)/gi, "")}
              </div>
