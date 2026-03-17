@@ -1,5 +1,6 @@
 export const colors = {
   primary: '#F2F1F0', // Global Background
+  bg: '#F2F1F0',      // Alias for background
   gold: '#C69C3D',    // Secondary Brand
   dark: '#2C2A29',    // Secondary Text/Elements
   cream: '#F4EBD4',   // Third Color (Accents)
