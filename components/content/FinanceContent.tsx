@@ -8,6 +8,8 @@ interface FinanceContentProps {
   financeSummary: any[];
   isLoadingFinanceSummary: boolean;
   userData?: any;
+  onViewAll?: () => void;
+  onHistory?: () => void;
 }
 
 export const FinanceContent: React.FC<FinanceContentProps> = ({ 
@@ -15,7 +17,9 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   isLoadingExpenses, 
   financeSummary, 
   isLoadingFinanceSummary,
-  userData
+  userData,
+  onViewAll,
+  onHistory
 }) => {
   const isAdmin = userData?.is_admin === "1";
   
@@ -124,9 +128,13 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
           <div className="px-1 flex items-center justify-between pt-2">
             <h3 className="text-sm font-bold text-neutral-900 tracking-tight flex items-center gap-2">
               Financial Progress Reports
-              <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[10px] text-neutral-500">{filteredSummary.length}</span>
+              <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[10px] text-neutral-500 font-bold">{filteredSummary.length}</span>
             </h3>
-            <button style={{ color: '#C69C3D' }} className="text-[11px] font-black tracking-[0.2em] hover:opacity-70 transition-opacity">
+            <button 
+              onClick={onViewAll}
+              style={{ color: '#C69C3D' }} 
+              className="text-[11px] font-black tracking-[0.2em] hover:opacity-70 transition-opacity"
+            >
               View All
             </button>
           </div>
@@ -259,8 +267,13 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
             <h3 className="text-sm font-bold text-[#2C2A29] tracking-wide flex items-center gap-2">
               <span className="w-1 h-4 bg-[#C69C3D] rounded-full"></span>
               Salary & Payroll Records
+              <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[10px] text-neutral-500 font-bold">{salaryExpenses.length}</span>
             </h3>
-            <button style={{ color: '#C69C3D' }} className="text-[11px] font-black uppercase tracking-[0.2em] hover:opacity-70 transition-opacity flex items-center gap-1">
+            <button 
+              onClick={onHistory}
+              style={{ color: '#C69C3D' }} 
+              className="text-[11px] font-black uppercase tracking-[0.2em] hover:opacity-70 transition-opacity flex items-center gap-1"
+            >
               History <TrendingDown className="w-3 h-3 rotate-[-90deg]" />
             </button>
           </div>
