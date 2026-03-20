@@ -18,7 +18,19 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   userData
 }) => {
   const isAdmin = userData?.is_admin === "1";
-  const [activeTab, setActiveTab] = useState<'overview' | 'salary'>(isAdmin ? 'overview' : 'salary');
+  
+  // Refined RBAC: Admin OR any project where user is PIC/Leader
+  const isPIC = financeSummary.some(p => p.is_pic === true);
+  const canSeeOverview = isAdmin || isPIC;
+
+  const [activeTab, setActiveTab] = useState<'overview' | 'salary'>(canSeeOverview ? 'overview' : 'salary');
+
+  // If user is not admin, only show projects where they are PIC
+  const filteredSummary = isAdmin ? financeSummary : financeSummary.filter(p => p.is_pic === true);
+
+  // Stats for the active context
+  const totalProjectsBudget = filteredSummary.reduce((sum, p) => sum + (p.project_price || 0), 0);
+  const totalBalance = filteredSummary.reduce((sum, p) => sum + (p.balance || 0), 0);
 
   // Filter salaries specifically
   const salaryExpenses = expenses.filter(exp => {
@@ -34,20 +46,10 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
     return sum + amt + tax + tax2;
   }, 0);
 
-  const totalExpense = expenses.reduce((sum, exp) => {
-    const amt = parseFloat(exp.amount || '0');
-    const tax = parseFloat(exp.tax_amount || exp.tax || '0');
-    const tax2 = parseFloat(exp.second_tax_amount || exp.second_tax || '0');
-    return sum + amt + tax + tax2;
-  }, 0);
-
-  const totalProjectsBudget = financeSummary.reduce((sum, p) => sum + (p.project_price || 0), 0);
-  const totalBalance = financeSummary.reduce((sum, p) => sum + (p.balance || 0), 0);
-
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-32">
-      {/* Tab Switcher - Only visible for Admin */}
-      {isAdmin && (
+      {/* Tab Switcher - Visible for Admin or PIC */}
+      {canSeeOverview && (
         <div className="flex p-1 bg-neutral-100 rounded-2xl mx-1">
           <button 
             onClick={() => setActiveTab('overview')}
@@ -74,19 +76,28 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
         </div>
       )}
 
-      {activeTab === 'overview' && isAdmin ? (
+      {activeTab === 'overview' && canSeeOverview ? (
         <div className="space-y-6">
           {/* Header Stats */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white rounded-3xl border border-neutral-100 p-5 shadow-sm relative overflow-hidden group">
-              <div className="absolute right-0 top-0 w-24 h-24 bg-blue-500/5 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform duration-500"></div>
+              <div className="absolute right-0 top-0 w-24 h-24 bg-[#C69C3D]/5 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform duration-500"></div>
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center">
-                  <Briefcase className="w-4 h-4 text-blue-600" />
+                <div className="w-8 h-8 rounded-xl bg-[#FAF7EF] flex items-center justify-center">
+                  <Briefcase className="w-4 h-4 text-[#C69C3D]" />
                 </div>
                 <span className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Total Budget</span>
               </div>
-              <p className="text-xl font-bold text-neutral-900 font-mono tracking-tighter">{formatCurrency(totalProjectsBudget)}</p>
+              <p className={`font-bold text-neutral-900 font-mono tracking-tighter ${totalProjectsBudget >= 1000000000 ? 'text-xl' : 'text-base'}`}>
+                {totalProjectsBudget >= 1000000000 ? (
+                  <>
+                    {(totalProjectsBudget / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
+                    <span className="text-[10px] lowercase italic ml-1 opacity-70 font-medium">milyar</span>
+                  </>
+                ) : (
+                  formatCurrency(totalProjectsBudget)
+                )}
+              </p>
             </div>
 
             <div className="bg-white rounded-3xl border border-neutral-100 p-5 shadow-sm relative overflow-hidden group">
@@ -97,15 +108,27 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                 </div>
                 <span className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Tot. Balance</span>
               </div>
-              <p className="text-xl font-bold text-[#C69C3D] font-mono tracking-tighter">{formatCurrency(totalBalance)}</p>
+              <p className={`font-bold text-[#C69C3D] font-mono tracking-tighter ${totalBalance >= 1000000000 ? 'text-xl' : 'text-base'}`}>
+                {totalBalance >= 1000000000 ? (
+                  <>
+                    {(totalBalance / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
+                    <span className="text-[10px] lowercase italic ml-1 opacity-70 font-medium">milyar</span>
+                  </>
+                ) : (
+                  formatCurrency(totalBalance)
+                )}
+              </p>
             </div>
           </div>
 
-          <div className="px-1 flex items-center justify-between">
+          <div className="px-1 flex items-center justify-between pt-2">
             <h3 className="text-sm font-bold text-neutral-900 tracking-tight flex items-center gap-2">
               Financial Progress Reports
-              <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[10px] text-neutral-500">{financeSummary.length}</span>
+              <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[10px] text-neutral-500">{filteredSummary.length}</span>
             </h3>
+            <button style={{ color: '#C69C3D' }} className="text-[11px] font-black tracking-[0.2em] hover:opacity-70 transition-opacity">
+              View All
+            </button>
           </div>
 
           {isLoadingFinanceSummary ? (
@@ -113,9 +136,9 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
               <div className="w-10 h-10 border-2 border-[#C69C3D] border-t-transparent rounded-full animate-spin mb-4"></div>
               <p className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] font-bold">Analisis Keuangan...</p>
             </div>
-          ) : financeSummary.length > 0 ? (
+          ) : filteredSummary.length > 0 ? (
             <div className="space-y-4">
-              {financeSummary.map((p) => {
+              {filteredSummary.map((p) => {
                 const ratio = Math.min(100, p.expense_ratio || 0);
                 const isOverBudget = ratio >= 90;
                 
@@ -202,33 +225,44 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
         </div>
       ) : (
         <div className="space-y-5">
-          <div className="grid grid-cols-2 gap-3 px-1">
-            <div className="relative overflow-hidden rounded-2xl border border-neutral-100 p-4" style={{ backgroundColor: colors.card }}>
-              <div className="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-blue-500/10 blur-2xl pointer-events-none"></div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                  <Banknote className="w-4 h-4 text-blue-600" />
+          <div className="px-1">
+            <div className="relative overflow-hidden rounded-3xl border border-neutral-100 p-6 shadow-sm group" style={{ background: 'linear-gradient(135deg, #FFFFFF 0%, #FAF7EF 100%)' }}>
+              <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[#C69C3D]/5 blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
+              <div className="flex items-center justify-between mb-4 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-[#FAF7EF] flex items-center justify-center border border-[#C69C3D]/10">
+                    <Banknote className="w-5 h-5 text-[#C69C3D]" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] font-black block">Total Salary Paid</span>
+                    <span className="text-[9px] text-[#C69C3D] font-bold opacity-60">Cumulative Disbursement</span>
+                  </div>
                 </div>
-                <span className="text-[9px] text-neutral-500 uppercase tracking-widest font-bold">Total Salary Paid</span>
               </div>
-              <p className="text-lg font-bold text-blue-600 font-mono tracking-tight">{formatCurrency(totalSalaryAmount)}</p>
-            </div>
-
-            <div className="relative overflow-hidden rounded-2xl border border-neutral-100 p-4" style={{ backgroundColor: colors.card }}>
-              <div className="absolute -right-4 -top-4 w-16 h-16 rounded-full bg-[#C69C3D]/10 blur-2xl pointer-events-none"></div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-[#C69C3D]/5 flex items-center justify-center">
-                  <Receipt className="w-4 h-4 text-[#C69C3D]" />
-                </div>
-                <span className="text-[9px] text-neutral-500 uppercase tracking-widest font-bold">Count</span>
+              <div className="flex items-baseline gap-2 relative z-10">
+                <span className="text-sm font-black text-[#C69C3D]/40 font-mono italic">IDR</span>
+                <p className="text-3xl font-black text-[#2C2A29] font-mono tracking-tighter">
+                  {totalSalaryAmount >= 1000000000 ? (
+                    <>
+                      {(totalSalaryAmount / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
+                      <span className="text-sm font-medium lowercase italic ml-1 opacity-70">milyar</span>
+                    </>
+                  ) : (
+                    totalSalaryAmount.toLocaleString('id-ID')
+                  )}
+                </p>
               </div>
-              <p className="text-lg font-bold text-[#C69C3D] font-mono tracking-tight">{salaryExpenses.length} <span className="text-xs font-normal text-neutral-400">items</span></p>
             </div>
           </div>
 
-          <div className="flex items-center justify-between px-1 pt-2">
-            <h3 className="text-sm font-bold text-neutral-900 tracking-wide">Salary & Payroll Records</h3>
-            <span style={{ color: colors.gold }} className="text-[10px] font-bold uppercase tracking-widest">{salaryExpenses.length} Items</span>
+          <div className="flex items-center justify-between px-1 pt-4">
+            <h3 className="text-sm font-bold text-[#2C2A29] tracking-wide flex items-center gap-2">
+              <span className="w-1 h-4 bg-[#C69C3D] rounded-full"></span>
+              Salary & Payroll Records
+            </h3>
+            <button style={{ color: '#C69C3D' }} className="text-[11px] font-black uppercase tracking-[0.2em] hover:opacity-70 transition-opacity flex items-center gap-1">
+              History <TrendingDown className="w-3 h-3 rotate-[-90deg]" />
+            </button>
           </div>
 
           {isLoadingExpenses ? (
