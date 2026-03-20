@@ -14,6 +14,8 @@ import { EditProfileContent } from '../content/EditProfileContent';
 import { NotifikasiContent } from '../content/NotifikasiContent';
 import { ResetPasswordContent } from '../content/ResetPasswordContent';
 import { RiwayatPengajuanContent } from '../content/RiwayatPengajuanContent';
+import { FinanceFullSummary } from '../content/FinanceFullSummary';
+import { FinanceSalaryHistory } from '../content/FinanceSalaryHistory';
 
 interface SubpageViewProps {
   subpageTitle: string;
@@ -69,6 +71,9 @@ interface SubpageViewProps {
   activeTaskId?: string | null;
   financeSummary: any[];
   isLoadingFinanceSummary: boolean;
+  onFinanceViewAll: () => void;
+  onFinanceHistory: () => void;
+  onFinanceBack: () => void;
 }
 
 export const SubpageView: React.FC<SubpageViewProps> = (props) => {
@@ -112,6 +117,20 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           financeSummary={props.financeSummary}
           isLoadingFinanceSummary={props.isLoadingFinanceSummary}
           userData={props.userData}
+          onViewAll={props.onFinanceViewAll}
+          onHistory={props.onFinanceHistory}
+        />;
+      case 'Project Summary History':
+        return <FinanceFullSummary 
+          data={props.financeSummary}
+          isLoading={props.isLoadingFinanceSummary}
+          onBack={props.onFinanceBack}
+        />;
+      case 'Payment History':
+        return <FinanceSalaryHistory 
+          data={props.expenses}
+          isLoading={props.isLoadingExpenses}
+          onBack={props.onFinanceBack}
         />;
       case 'Events': 
         return <JadwalContent 
@@ -205,10 +224,10 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
             } else if (subpageTitle === 'Attendance' || subpageTitle === 'Submission History') {
               onNav('subpage', null, 'Team');
             } else if (subpageTitle === 'Tasks') {
-              // Rincian Task dari Project -> Kembali ke List Project
               onNav('subpage', 'project', 'Project');
+            } else if (subpageTitle === 'Project Summary History' || subpageTitle === 'Payment History') {
+              props.onFinanceBack();
             } else if (subpageTitle === 'All Tasks') {
-              // Menu Task dari Dashboard -> Kembali ke Dashboard
               onNav('dashboard');
             } else {
               onNav('dashboard');

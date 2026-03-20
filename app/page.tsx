@@ -90,6 +90,8 @@ export default function HaviaMobileApp() {
   const [isLoadingExpenses, setIsLoadingExpenses] = useState(false);
   const [financeSummary, setFinanceSummary] = useState<any[]>([]);
   const [isLoadingFinanceSummary, setIsLoadingFinanceSummary] = useState(false);
+  const [financeSummaryTotal, setFinanceSummaryTotal] = useState(0);
+  const [expensesTotal, setExpensesTotal] = useState(0);
 
   // Attendances States
   const [attendances, setAttendances] = useState<any[]>([]);
@@ -349,20 +351,26 @@ export default function HaviaMobileApp() {
     setIsLoadingTasks(false);
   };
 
-  const loadExpenses = async () => {
+  const loadExpenses = async (isFull = false) => {
     if (!apiToken) return;
     setIsLoadingExpenses(true);
     // Fetch specifically salaries for the logged-in user
-    const res = await fetchFromApi('haviacms/finance/salaries', apiToken);
-    if (res.success) setExpenses(Array.isArray(res.data) ? res.data : []);
+    const res = await fetchFromApi(`haviacms/finance/salaries${isFull ? '?full=1' : ''}`, apiToken);
+    if (res.success) {
+      setExpenses(Array.isArray(res.data) ? res.data : []);
+      setExpensesTotal(res.total_count || (res.data?.length || 0));
+    }
     setIsLoadingExpenses(false);
   };
 
-  const loadFinanceSummary = async () => {
+  const loadFinanceSummary = async (isFull = false) => {
     if (!apiToken || (userData?.is_admin !== "1" && userData?.user_type !== "staff")) return;
     setIsLoadingFinanceSummary(true);
-    const res = await fetchFromApi('haviacms/finance/summary', apiToken);
-    if (res.success) setFinanceSummary(Array.isArray(res.data) ? res.data : []);
+    const res = await fetchFromApi(`haviacms/finance/summary${isFull ? '?full=1' : ''}`, apiToken);
+    if (res.success) {
+      setFinanceSummary(Array.isArray(res.data) ? res.data : []);
+      setFinanceSummaryTotal(res.total_count || (res.data?.length || 0));
+    }
     setIsLoadingFinanceSummary(false);
   };
 
@@ -829,6 +837,19 @@ export default function HaviaMobileApp() {
           notifications={notifications}
           isLoadingNotif={isLoadingNotif}
           userData={userData}
+          onFinanceViewAll={() => {
+            setSubpageTitle('Project Summary History');
+            loadFinanceSummary(true);
+          }}
+          onFinanceHistory={() => {
+            setSubpageTitle('Payment History');
+            loadExpenses(true);
+          }}
+          onFinanceBack={() => {
+            setSubpageTitle('Finance');
+            loadFinanceSummary(false);
+            loadExpenses(false);
+          }}
           editForm={editForm}
           setEditForm={(form) => setEditForm(form)}
           isSavingProfile={isSavingProfile}
