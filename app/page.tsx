@@ -359,7 +359,7 @@ export default function HaviaMobileApp() {
   };
 
   const loadFinanceSummary = async () => {
-    if (!apiToken) return;
+    if (!apiToken || userData?.is_admin !== "1") return;
     setIsLoadingFinanceSummary(true);
     const res = await fetchFromApi('haviacms/finance/summary', apiToken);
     if (res.success) setFinanceSummary(Array.isArray(res.data) ? res.data : []);
@@ -493,7 +493,9 @@ export default function HaviaMobileApp() {
       else if (subpageTitle === 'All Tasks') loadTasks();
       else if (subpageTitle === 'Finance') {
         loadExpenses();
-        loadFinanceSummary();
+        if (userData?.is_admin === "1") {
+          loadFinanceSummary();
+        }
       }
       else if (subpageTitle === 'Events') {
         loadEvents(eventFilterType, eventFilterLabel);

@@ -111,6 +111,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           isLoadingExpenses={props.isLoadingExpenses} 
           financeSummary={props.financeSummary}
           isLoadingFinanceSummary={props.isLoadingFinanceSummary}
+          userData={props.userData}
         />;
       case 'Events': 
         return <JadwalContent 

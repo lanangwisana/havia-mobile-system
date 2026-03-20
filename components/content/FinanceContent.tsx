@@ -7,15 +7,18 @@ interface FinanceContentProps {
   isLoadingExpenses: boolean;
   financeSummary: any[];
   isLoadingFinanceSummary: boolean;
+  userData?: any;
 }
 
 export const FinanceContent: React.FC<FinanceContentProps> = ({ 
   expenses, 
   isLoadingExpenses, 
   financeSummary, 
-  isLoadingFinanceSummary 
+  isLoadingFinanceSummary,
+  userData
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'salary'>('overview');
+  const isAdmin = userData?.is_admin === "1";
+  const [activeTab, setActiveTab] = useState<'overview' | 'salary'>(isAdmin ? 'overview' : 'salary');
 
   // Filter salaries specifically
   const salaryExpenses = expenses.filter(exp => {
@@ -43,33 +46,35 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-32">
-      {/* Tab Switcher - Premium Style */}
-      <div className="flex p-1 bg-neutral-100 rounded-2xl mx-1">
-        <button 
-          onClick={() => setActiveTab('overview')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'overview' 
-              ? 'bg-white text-[#C69C3D] shadow-sm' 
-              : 'text-neutral-500 hover:text-neutral-700'
-          }`}
-        >
-          <PieChart className="w-3.5 h-3.5" />
-          Project Summary
-        </button>
-        <button 
-          onClick={() => setActiveTab('salary')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'salary' 
-              ? 'bg-white text-[#C69C3D] shadow-sm' 
-              : 'text-neutral-500 hover:text-neutral-700'
-          }`}
-        >
-          <Banknote className="w-3.5 h-3.5" />
-          Salary/Payroll
-        </button>
-      </div>
+      {/* Tab Switcher - Only visible for Admin */}
+      {isAdmin && (
+        <div className="flex p-1 bg-neutral-100 rounded-2xl mx-1">
+          <button 
+            onClick={() => setActiveTab('overview')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'overview' 
+                ? 'bg-white text-[#C69C3D] shadow-sm' 
+                : 'text-neutral-500 hover:text-neutral-700'
+            }`}
+          >
+            <PieChart className="w-3.5 h-3.5" />
+            Project Summary
+          </button>
+          <button 
+            onClick={() => setActiveTab('salary')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'salary' 
+                ? 'bg-white text-[#C69C3D] shadow-sm' 
+                : 'text-neutral-500 hover:text-neutral-700'
+            }`}
+          >
+            <Banknote className="w-3.5 h-3.5" />
+            Salary/Payroll
+          </button>
+        </div>
+      )}
 
-      {activeTab === 'overview' ? (
+      {activeTab === 'overview' && isAdmin ? (
         <div className="space-y-6">
           {/* Header Stats */}
           <div className="grid grid-cols-2 gap-4">
