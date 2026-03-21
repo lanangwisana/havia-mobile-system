@@ -21,16 +21,18 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   onViewAll,
   onHistory
 }) => {
-  const isAdmin = userData?.is_admin === "1";
+  const isAdmin = Number(userData?.is_admin) === 1;
+  const isStaff = userData?.user_type === "staff";
   
   // Refined RBAC: Admin OR any project where user is PIC/Leader
-  const isPIC = financeSummary.some(p => p.is_pic === true);
+  const isPIC = financeSummary.some(p => p.is_pic === true || p.is_pic === 1 || p.is_pic === "1");
   const canSeeOverview = isAdmin || isPIC;
 
+  // Initial tab selection
   const [activeTab, setActiveTab] = useState<'overview' | 'salary'>(canSeeOverview ? 'overview' : 'salary');
 
-  // If user is not admin, only show projects where they are PIC
-  const filteredSummary = isAdmin ? financeSummary : financeSummary.filter(p => p.is_pic === true);
+  // RBAC Filter for summaries
+  const filteredSummary = isAdmin ? financeSummary : financeSummary.filter(p => p.is_pic === true || p.is_pic === 1 || p.is_pic === "1");
 
   // Stats for the active context
   const totalProjectsBudget = filteredSummary.reduce((sum, p) => sum + (p.project_price || 0), 0);
