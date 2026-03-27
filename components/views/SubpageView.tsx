@@ -163,7 +163,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
       case 'Event Detail': 
         return <EventDetailContent 
           selectedEvent={props.selectedEvent} 
-          onBack={() => onNav('subpage', null, 'Schedule')} 
+          onBack={() => onNav('subpage', null, 'Events')} 
         />;
       case 'Account': 
         return <AkunContent 
@@ -220,7 +220,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
         <button 
           onClick={() => {
             if (subpageTitle === 'Event Detail') {
-              onNav('subpage', null, 'Schedule');
+              onNav('subpage', null, 'Events');
             } else if (subpageTitle === 'Attendance' || subpageTitle === 'Submission History') {
               onNav('subpage', null, 'Team');
             } else if (subpageTitle === 'Tasks') {

@@ -69,18 +69,18 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
         <div className="w-10"></div>
       </div>
 
-      {/* Radar Background */}
+      {/* Logo Background */}
       <div className={`absolute top-0 left-0 w-full h-1/2 bg-white overflow-hidden z-0 border-b border-[#C69C3D]/20 transition-opacity duration-500 ${isExpanded ? 'opacity-30' : 'opacity-100'}`}>
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at center, #C69C3D 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#F5F5F5]"></div>
         
         <div className="absolute top-[40%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-          <div className="w-40 h-40 border border-[#C69C3D]/30 rounded-full absolute"></div>
-          <div className="w-24 h-24 bg-[#C69C3D]/20 rounded-full animate-radar absolute"></div>
-          <div style={{ backgroundColor: colors.gold }} className="w-4 h-4 rounded-full border-2 border-white shadow-[0_0_15px_rgba(212,175,55,0.4)] relative z-10"></div>
-          <div className="absolute top-8 bg-neutral-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-xl tracking-wider">
-            LOCATION DETECTED
-          </div>
+          <div className="absolute w-40 h-40 bg-[#C69C3D]/10 rounded-full blur-[30px]"></div>
+          <img 
+            src="/LogoHavia_primary1.png" 
+            alt="Havia Logo" 
+            className="w-40 h-auto object-contain relative z-10 drop-shadow-sm"
+          />
         </div>
       </div>
 
