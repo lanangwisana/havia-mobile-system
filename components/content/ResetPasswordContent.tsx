@@ -27,7 +27,9 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
     if (!form.new_password) newErrors.new_password = 'Required';
     if (!form.confirm_password) newErrors.confirm_password = 'Required';
 
-    if (form.new_password && form.new_password.length < 6) {
+    if (form.current_password && form.new_password && form.current_password === form.new_password) {
+      newErrors.new_password = 'New password cannot be the same as current password.';
+    } else if (form.new_password && form.new_password.length < 6) {
       newErrors.new_password = 'Password must be at least 6 characters long.';
     }
     
