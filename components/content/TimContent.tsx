@@ -22,7 +22,7 @@ export const TimContent: React.FC<TimContentProps> = ({
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32">
       <div className="flex items-center justify-between pl-1">
         <h3 className="text-sm font-bold text-neutral-900 tracking-wide">Team & My Attendance</h3>
-        <button onClick={() => onNav('subpage', null, 'Attendance')} className="text-[10px] font-bold text-[#C69C3D] uppercase tracking-widest flex items-center gap-1 group">
+        <button onClick={() => onNav('subpage', null, 'Attendance')} className="text-[0.625rem] font-bold text-[#C69C3D] uppercase tracking-widest flex items-center gap-1 group">
           <History className="w-3 h-3 transition-transform group-hover:rotate-[-20deg]" /> Full History
         </button>
       </div>
@@ -31,7 +31,7 @@ export const TimContent: React.FC<TimContentProps> = ({
       <div className="space-y-3">
         {/* Full Width Total Hours */}
         <div className="bg-white border border-neutral-100 rounded-3xl p-5 flex flex-col items-center justify-center shadow-md">
-          <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest mb-1 text-center">Total Work Hours</span>
+          <span className="text-[0.625rem] text-neutral-400 font-bold uppercase tracking-widest mb-1 text-center">Total Work Hours</span>
           <span className="text-3xl font-black text-[#C69C3D] tabular-nums">
             {(() => {
               let totalMs = 0;
@@ -55,18 +55,18 @@ export const TimContent: React.FC<TimContentProps> = ({
         {/* Small Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white border border-neutral-100 rounded-3xl p-4 flex flex-col items-center justify-center shadow-md">
-            <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-widest mb-1 text-center">Total Work Days</span>
+            <span className="text-[0.5625rem] text-neutral-400 font-bold uppercase tracking-widest mb-1 text-center">Total Work Days</span>
             <span className="text-2xl font-black text-neutral-900 leading-tight">
               {new Set(attendances.map(a => a.date || (a.in_time ? a.in_time.split(' ')[0] : null))).size}
             </span>
           </div>
           <div className="bg-white border border-neutral-100 rounded-3xl p-4 flex flex-col items-center justify-center shadow-md">
-            <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-widest mb-1 text-center">Leave / Permission</span>
+            <span className="text-[0.5625rem] text-neutral-400 font-bold uppercase tracking-widest mb-1 text-center">Leave / Permission</span>
             <div className="flex flex-col items-center">
               <span className="text-2xl font-black text-neutral-900 leading-tight">
                 {leaves.filter(l => l.status === 'approved').reduce((acc, l) => acc + parseFloat(l.total_days || 0), 0)}
               </span>
-              <span className="text-[8px] text-neutral-400 font-medium uppercase tracking-widest -mt-1">Days</span>
+              <span className="text-[0.5rem] text-neutral-400 font-medium uppercase tracking-widest -mt-1">Days</span>
             </div>
           </div>
         </div>
@@ -83,7 +83,7 @@ export const TimContent: React.FC<TimContentProps> = ({
           </div>
           <div className="flex flex-col items-start leading-tight">
             <span className="text-xs font-black text-neutral-900 uppercase tracking-widest">Create Submission</span>
-            <span className="text-[10px] font-bold text-neutral-400 tracking-widest">Leave/ Permission</span>
+            <span className="text-[0.625rem] font-bold text-neutral-400 tracking-widest">Leave/ Permission</span>
           </div>
         </div>
         <div className="w-10 h-10 rounded-full bg-neutral-50 flex items-center justify-center group-hover:bg-neutral-100 transition-colors">
@@ -103,11 +103,11 @@ export const TimContent: React.FC<TimContentProps> = ({
                 <History className="w-4 h-4 text-neutral-400" />
               </div>
               <div className="flex flex-col items-start leading-tight">
-                <span className="text-[10px] font-black text-neutral-900 uppercase tracking-widest">View History</span>
+                <span className="text-[0.625rem] font-black text-neutral-900 uppercase tracking-widest">View History</span>
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-[8px] font-black text-[#C69C3D] uppercase tracking-widest transition-all">Detail</span>
+              <span className="text-[0.5rem] font-black text-[#C69C3D] uppercase tracking-widest transition-all">Detail</span>
               <ChevronRight className="w-4 h-4 text-[#C69C3D]" />
             </div>
           </button>
@@ -173,7 +173,7 @@ export const TimContent: React.FC<TimContentProps> = ({
                  <div key={att.id || idx} className="flex items-center gap-4 group">
                     {/* Date Bubble */}
                     <div className="flex flex-col items-center justify-center w-10 h-10 rounded-xl bg-neutral-50 border border-neutral-200 shrink-0">
-                      <span className="text-[8px] font-bold text-neutral-400 uppercase leading-none mb-0.5">{dayName}</span>
+                      <span className="text-[0.5rem] font-bold text-neutral-400 uppercase leading-none mb-0.5">{dayName}</span>
                       <span className="text-xs font-black text-neutral-900 leading-none">{dayNum}</span>
                     </div>
 
@@ -181,14 +181,14 @@ export const TimContent: React.FC<TimContentProps> = ({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex flex-col">
-                          <span className="text-[11px] font-bold text-neutral-800">
+                          <span className="text-[0.6875rem] font-bold text-neutral-800">
                             {isClockedIn ? 'Working' : 'Work Finished'}
                           </span>
                           {!isClockedIn && durationText && (
-                            <span className="text-[8px] text-[#C69C3D] font-bold tracking-tight">Durations: {durationText}</span>
+                            <span className="text-[0.5rem] text-[#C69C3D] font-bold tracking-tight">Durations: {durationText}</span>
                           )}
                         </div>
-                        <span className="text-[9px] font-bold text-neutral-400 tabular-nums">
+                        <span className="text-[0.5625rem] font-bold text-neutral-400 tabular-nums">
                           {inTimeLocal || '--:--'} - {outTimeLocal || 'Working'}
                         </span>
                       </div>
@@ -207,7 +207,7 @@ export const TimContent: React.FC<TimContentProps> = ({
            </div>
          ) : (
            <div className="py-10 text-center">
-             <p className="text-[10px] text-neutral-400 uppercase tracking-widest">No time logs yet.</p>
+             <p className="text-[0.625rem] text-neutral-400 uppercase tracking-widest">No time logs yet.</p>
            </div>
          )}
       </div>

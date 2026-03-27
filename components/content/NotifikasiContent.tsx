@@ -29,7 +29,7 @@ export const NotifikasiContent: React.FC<NotifikasiContentProps> = ({
       {isLoadingNotif ? (
         <div className="flex flex-col items-center justify-center py-20">
            <div className="w-10 h-10 rounded-full border-t-2 border-[#C69C3D] animate-spin mb-4"></div>
-           <p className="text-[10px] text-neutral-400 font-black uppercase tracking-widest">Scanning System...</p>
+           <p className="text-[0.625rem] text-neutral-400 font-black uppercase tracking-widest">Scanning System...</p>
         </div>
       ) : notifications.length > 0 ? (
         notifications.map((notif: any, index: number) => {
@@ -53,26 +53,26 @@ export const NotifikasiContent: React.FC<NotifikasiContentProps> = ({
 
               <div className="flex-1 space-y-1">
                 <div className="flex justify-between items-start">
-                  <h4 className={`font-black text-[14px] leading-tight ${isUrgent ? 'text-red-600' : 'text-[#2C2A29]'}`}>
+                  <h4 className={`font-black text-[0.875rem] leading-tight ${isUrgent ? 'text-red-600' : 'text-[#2C2A29]'}`}>
                     {notif.title}
                   </h4>
-                  <span className="text-[9px] text-[#6B6865] font-black uppercase tracking-tighter opacity-60">
+                  <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-tighter opacity-60">
                     {notif.date ? new Date(notif.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : ''}
                   </span>
                 </div>
-                <p className="text-[11px] text-[#6B6865] leading-relaxed font-medium line-clamp-2">
+                <p className="text-[0.6875rem] text-[#6B6865] leading-relaxed font-medium line-clamp-2">
                   {notif.message}
                 </p>
                 
                 <div className="pt-2 flex items-center gap-4">
                    <div className="flex items-center gap-1.5">
                       <div className={`w-1 h-3 rounded-full ${accentColor}`}></div>
-                      <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest ${isUrgent ? 'bg-red-50 text-red-500' : 'bg-gold/10 text-gold'}`}>
+                      <span className={`px-2 py-0.5 rounded-md text-[0.5rem] font-black uppercase tracking-widest ${isUrgent ? 'bg-red-50 text-red-500' : 'bg-gold/10 text-gold'}`}>
                           {notif.module}
                       </span>
                    </div>
                    <div className="h-3 w-[1px] bg-neutral-200"></div>
-                   <span className="text-[10px] text-gold font-black group-hover:translate-x-1 transition-transform">View Details →</span>
+                   <span className="text-[0.625rem] text-gold font-black group-hover:translate-x-1 transition-transform">View Details →</span>
                 </div>
               </div>
             </div>
@@ -83,8 +83,8 @@ export const NotifikasiContent: React.FC<NotifikasiContentProps> = ({
           <div className="w-16 h-16 rounded-[2rem] border border-dashed border-[#6B6865] flex items-center justify-center mb-6">
             <Info className="w-8 h-8 text-[#6B6865]" />
           </div>
-          <p className="text-[10px] text-[#2C2A29] font-black uppercase tracking-[0.3em]">No Active Alerts</p>
-          <p className="text-[9px] text-[#6B6865] font-medium mt-2">Your workspace is all clear</p>
+          <p className="text-[0.625rem] text-[#2C2A29] font-black uppercase tracking-[0.3em]">No Active Alerts</p>
+          <p className="text-[0.5625rem] text-[#6B6865] font-medium mt-2">Your workspace is all clear</p>
         </div>
       )}
     </div>

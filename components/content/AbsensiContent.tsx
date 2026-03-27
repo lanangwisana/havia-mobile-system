@@ -13,7 +13,7 @@ export const AbsensiContent: React.FC<AbsensiContentProps> = ({
   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32">
     <div className="flex items-center justify-between mb-4 pl-1">
       <h3 className="text-sm font-bold text-neutral-900 tracking-wide">Attendance History</h3>
-      <span style={{ color: colors.gold }} className="text-[10px] font-bold uppercase tracking-widest">{attendances.length} Items</span>
+      <span style={{ color: colors.gold }} className="text-[0.625rem] font-bold uppercase tracking-widest">{attendances.length} Items</span>
     </div>
 
     {isLoadingAttendances ? (
@@ -43,13 +43,13 @@ export const AbsensiContent: React.FC<AbsensiContentProps> = ({
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h4 className="font-bold text-neutral-900 text-sm mb-1">{displayDate}</h4>
-                  {att.note && <p className="text-[10px] text-neutral-400 italic">Note: {att.note}</p>}
+                  {att.note && <p className="text-[0.625rem] text-neutral-400 italic">Note: {att.note}</p>}
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-neutral-100">
                 <div className="flex flex-col">
-                  <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-1">
+                  <span className="text-[0.5625rem] text-neutral-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-1">
                     <LogIn className="w-3 h-3 text-green-600" /> In
                   </span>
                   <span className="text-sm font-mono font-bold text-neutral-900 group-hover:text-[#C69C3D] transition-colors">
@@ -57,7 +57,7 @@ export const AbsensiContent: React.FC<AbsensiContentProps> = ({
                   </span>
                 </div>
                 <div className="flex flex-col pl-4 border-l border-neutral-100">
-                  <span className="text-[9px] text-neutral-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-1">
+                  <span className="text-[0.5625rem] text-neutral-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-1">
                     <LogOut className="w-3 h-3 text-rose-600" /> Out
                   </span>
                   <span className="text-sm font-mono font-bold text-neutral-500">

@@ -31,12 +31,12 @@ export const LoginView: React.FC<LoginViewProps> = ({
             className="w-48 h-auto object-contain opacity-90"
           />
           <div style={{ backgroundColor: colors.gold }} className="h-[1px] w-12 mt-4 mb-3"></div>
-          <p className="text-[9px] text-neutral-500 tracking-[0.3em] uppercase">Enterprise App</p>
+          <p className="text-[0.5625rem] text-neutral-500 tracking-[0.3em] uppercase">Enterprise App</p>
         </div>
 
         <form className="space-y-6" onSubmit={handleLogin}>
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Email</label>
+            <label className="text-[0.625rem] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Email</label>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <Mail className="text-neutral-500 w-5 h-5 group-focus-within:text-[#C69C3D] transition-colors" />
@@ -53,7 +53,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Password</label>
+            <label className="text-[0.625rem] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Password</label>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <Lock className="text-neutral-500 w-5 h-5 group-focus-within:text-[#C69C3D] transition-colors" />
@@ -76,7 +76,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
         </form>
       </div>
       <div className="py-8 text-center">
-        <p className="text-[9px] text-neutral-600 uppercase tracking-widest">Havia Studio & GampaWorks v3.5</p>
+        <p className="text-[0.5625rem] text-neutral-600 uppercase tracking-widest">Havia Studio & GampaWorks v3.5</p>
       </div>
     </section>
   );

@@ -52,8 +52,8 @@ export const TaskList: React.FC<{
                 <activeFilterObj.icon className="w-5 h-5 text-[#C69C3D]" />
               </div>
               <div className="flex flex-col items-start text-left">
-                <span className="text-[9px] text-[#6B6865] uppercase tracking-widest font-black">Filter Task</span>
-                <span className="text-[13px] font-bold text-[#2C2A29] tracking-tight uppercase">{activeFilterObj.label}</span>
+                <span className="text-[0.5625rem] text-[#6B6865] uppercase tracking-widest font-black">Filter Task</span>
+                <span className="text-[0.8125rem] font-bold text-[#2C2A29] tracking-tight uppercase">{activeFilterObj.label}</span>
               </div>
             </div>
             <div className="w-8 h-8 rounded-full bg-[#F4EBD4]/50 flex items-center justify-center border border-[#C69C3D]/10">
@@ -79,7 +79,7 @@ export const TaskList: React.FC<{
                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${activeFilter === f.id ? 'bg-white/20' : 'bg-neutral-100'}`}>
                       <f.icon className={`w-4 h-4 ${activeFilter === f.id ? 'text-white' : 'text-[#C69C3D]'}`} />
                     </div>
-                    <span className="text-[11px] font-bold tracking-widest uppercase">{f.label}</span>
+                    <span className="text-[0.6875rem] font-bold tracking-widest uppercase">{f.label}</span>
                     {activeFilter === f.id && <div className="ml-auto w-2 h-2 rounded-full bg-white animate-pulse"></div>}
                   </button>
                 ))}
@@ -96,14 +96,14 @@ export const TaskList: React.FC<{
            <div className="w-20 h-20 rounded-full bg-[#F4EBD4] flex items-center justify-center mb-6 shadow-inner">
                <Activity className="w-10 h-10 text-[#C69C3D] animate-pulse" />
            </div>
-           <p className="text-[10px] text-[#C69C3D] uppercase tracking-[0.3em] font-black">Updating Tasks...</p>
+           <p className="text-[0.625rem] text-[#C69C3D] uppercase tracking-[0.3em] font-black">Updating Tasks...</p>
         </div>
       ) : taskList.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[2.5rem] border border-[#E8E4E1] border-dashed">
           <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4 border border-neutral-100">
              <ClipboardList className="w-8 h-8 text-neutral-300" />
           </div>
-          <p className="text-[10px] text-neutral-400 tracking-[0.2em] uppercase font-black text-center px-12 leading-relaxed">
+          <p className="text-[0.625rem] text-neutral-400 tracking-[0.2em] uppercase font-black text-center px-12 leading-relaxed">
             No tasks with status <br/>
             <span style={{ color: colors.gold }}>{activeFilter}</span>
           </p>
@@ -146,25 +146,25 @@ export const TaskList: React.FC<{
                         {isDone ? <CheckCircle2 className="w-7 h-7" /> : <ClipboardList className="w-7 h-7" />}
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <h4 className={`font-black text-[15px] leading-tight transition-all duration-500 ${isExpanded ? '' : 'truncate'} ${isDone ? 'text-neutral-400' : 'text-[#2C2A29]'}`}>
+                        <h4 className={`font-black text-[0.9375rem] leading-tight transition-all duration-500 ${isExpanded ? '' : 'truncate'} ${isDone ? 'text-neutral-400' : 'text-[#2C2A29]'}`}>
                           {projName}
                         </h4>
                         <div className="flex items-center gap-2 mt-1.5 opacity-80">
                           <div className="w-4 h-4 rounded-full bg-[#F4EBD4] flex items-center justify-center border border-[#C69C3D]/10">
                             <ClipboardList className="w-2.5 h-2.5 text-[#C69C3D]" />
                           </div>
-                          <p className={`text-[11px] text-[#2C2A29] font-bold tracking-tight ${isExpanded ? '' : 'truncate max-w-[150px]'}`}>
+                          <p className={`text-[0.6875rem] text-[#2C2A29] font-bold tracking-tight ${isExpanded ? '' : 'truncate max-w-[150px]'}`}>
                             {task.title || task.name || `Task ${task.id}`}
                           </p>
                         </div>
                         
                         <div className="flex items-center gap-1 mt-3 flex-nowrap overflow-hidden">
                           {task.userRole && (
-                            <span className="text-[7px] px-2.5 py-1 rounded-lg font-black uppercase tracking-tight border shrink-0 bg-[#2C2A29] text-white border-[#2C2A29]">
+                            <span className="text-[0.4375rem] px-2.5 py-1 rounded-lg font-black uppercase tracking-tight border shrink-0 bg-[#2C2A29] text-white border-[#2C2A29]">
                               {task.userRole}
                             </span>
                           )}
-                          <span className={`text-[7px] px-2.5 py-1 rounded-lg font-black uppercase tracking-tight border-2 shrink-0 transition-colors duration-500 ${
+                          <span className={`text-[0.4375rem] px-2.5 py-1 rounded-lg font-black uppercase tracking-tight border-2 shrink-0 transition-colors duration-500 ${
                             isDone ? 'bg-white text-green-600 border-green-500/30' : isInProgress ? 'bg-white text-blue-600 border-blue-500/30' : 'bg-white text-[#C69C3D] border-[#C69C3D]/30'
                           }`}>
                             {statusStr}
@@ -190,10 +190,10 @@ export const TaskList: React.FC<{
                     {/* Inner Card: Dates */}
                     <div className="flex items-center justify-between gap-4 mb-8 p-4 bg-white/60 rounded-2xl border border-[#E8E4E1] shadow-sm backdrop-blur-md">
                       <div className="space-y-1.5">
-                        <p className="text-[9px] text-[#6B6865] uppercase tracking-widest font-black opacity-60">Start Task</p>
+                        <p className="text-[0.5625rem] text-[#6B6865] uppercase tracking-widest font-black opacity-60">Start Task</p>
                         <div className="flex items-center gap-2">
                           <Clock className="w-3.5 h-3.5 text-[#C69C3D]" />
-                          <p className="text-[11px] text-[#2C2A29] font-black tracking-tight">{formatDate(task.start_date)}</p>
+                          <p className="text-[0.6875rem] text-[#2C2A29] font-black tracking-tight">{formatDate(task.start_date)}</p>
                         </div>
                       </div>
                       <div className="flex-1 flex flex-col items-center gap-1 opacity-20 px-2">
@@ -202,18 +202,18 @@ export const TaskList: React.FC<{
                         <div className="w-1.5 h-1.5 rounded-full bg-[#C69C3D]"></div>
                       </div>
                       <div className="space-y-1.5 text-right">
-                        <p className="text-[9px] text-[#6B6865] uppercase tracking-widest font-black opacity-60">Deadline</p>
+                        <p className="text-[0.5625rem] text-[#6B6865] uppercase tracking-widest font-black opacity-60">Deadline</p>
                         <div className="flex items-center gap-2 justify-end">
                           <Clock className="w-3.5 h-3.5 text-[#C69C3D]" />
-                          <p className="text-[11px] text-[#2C2A29] font-black tracking-tight">{formatDate(task.deadline)}</p>
+                          <p className="text-[0.6875rem] text-[#2C2A29] font-black tracking-tight">{formatDate(task.deadline)}</p>
                         </div>
                       </div>
                     </div>
 
                     {/* Description Area */}
                     <div className="mb-8 px-1">
-                      <p className="text-[9px] text-[#6B6865] uppercase tracking-[0.2em] font-black mb-2 opacity-60">Description</p>
-                      <p className="text-[12px] leading-relaxed text-[#2C2A29] italic bg-[#F4EBD4]/20 p-4 rounded-2xl border border-[#E8E4E1] border-dashed">
+                      <p className="text-[0.5625rem] text-[#6B6865] uppercase tracking-[0.2em] font-black mb-2 opacity-60">Description</p>
+                      <p className="text-[0.75rem] leading-relaxed text-[#2C2A29] italic bg-[#F4EBD4]/20 p-4 rounded-2xl border border-[#E8E4E1] border-dashed">
                         "{task.description?.replace(/(<([^>]+)>)/gi, "") || 'No detailed description.'}"
                       </p>
                     </div>
@@ -222,13 +222,13 @@ export const TaskList: React.FC<{
                     <div className="space-y-3 px-1">
                       <div className="flex justify-between items-end">
                         <div>
-                          <p className="text-[9px] text-[#6B6865] uppercase tracking-[0.2em] font-black mb-1">Current Progress</p>
+                          <p className="text-[0.5625rem] text-[#6B6865] uppercase tracking-[0.2em] font-black mb-1">Current Progress</p>
                           <div className="flex items-center gap-2">
                             <Activity className="w-3 h-3 text-[#C69C3D]" />
-                            <span className="text-[12px] font-black text-[#2C2A29]">Task {isDone ? 'Completed' : 'Status'}</span>
+                            <span className="text-[0.75rem] font-black text-[#2C2A29]">Task {isDone ? 'Completed' : 'Status'}</span>
                           </div>
                         </div>
-                        <p className="text-[18px] font-black italic text-[#C69C3D] drop-shadow-sm">{progress}%</p>
+                        <p className="text-[1.125rem] font-black italic text-[#C69C3D] drop-shadow-sm">{progress}%</p>
                       </div>
                       <div className="h-3 w-full bg-[#2C2A29]/5 rounded-full overflow-hidden p-[2.5px] border border-[#E8E4E1]">
                         <div style={{ width: `${progress}%` }} className="h-full rounded-full transition-all duration-1000 bg-[#C69C3D]"></div>
@@ -249,7 +249,7 @@ export const TaskList: React.FC<{
             <button 
               disabled={paginationMeta.current_page <= 1}
               onClick={() => onPageChange?.(paginationMeta.current_page - 1)}
-              className="px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#2C2A29]/5 text-[#2C2A29]"
+              className="px-4 py-2 rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#2C2A29]/5 text-[#2C2A29]"
             >Prev</button>
             <div className="flex items-center gap-1">
               {Array.from({ length: paginationMeta.total_pages }, (_, i) => i + 1).map((p) => {
@@ -257,10 +257,10 @@ export const TaskList: React.FC<{
                 const total = paginationMeta.total_pages;
                 if (p === 1 || p === total || (p >= current - 1 && p <= current + 1)) {
                   return (
-                    <button key={p} onClick={() => onPageChange?.(p)} className={`w-8 h-8 rounded-lg font-black text-[11px] transition-all duration-300 flex items-center justify-center ${current === p ? 'bg-[#C69C3D] text-white shadow-sm' : 'bg-transparent text-[#6B6865]/60 hover:text-[#282524] hover:bg-[#2C2A29]/5'}`}>{p}</button>
+                    <button key={p} onClick={() => onPageChange?.(p)} className={`w-8 h-8 rounded-lg font-black text-[0.6875rem] transition-all duration-300 flex items-center justify-center ${current === p ? 'bg-[#C69C3D] text-white shadow-sm' : 'bg-transparent text-[#6B6865]/60 hover:text-[#282524] hover:bg-[#2C2A29]/5'}`}>{p}</button>
                   );
                 } else if (p === current - 2 || p === current + 2) {
-                  return <span key={p} className="text-[#6B6865]/20 text-[9px]">..</span>;
+                  return <span key={p} className="text-[#6B6865]/20 text-[0.5625rem]">..</span>;
                 }
                 return null;
               })}
@@ -268,13 +268,13 @@ export const TaskList: React.FC<{
             <button 
               disabled={!paginationMeta.has_more}
               onClick={() => onPageChange?.(paginationMeta.current_page + 1)}
-              className="px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#2C2A29]/5 text-[#2C2A29]"
+              className="px-4 py-2 rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#2C2A29]/5 text-[#2C2A29]"
             >Next</button>
           </div>
           <div className="flex items-center gap-3 opacity-40">
-             <span className="text-[9px] text-[#6B6865] font-black uppercase tracking-widest">Page {paginationMeta.current_page} / {paginationMeta.total_pages}</span>
+             <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">Page {paginationMeta.current_page} / {paginationMeta.total_pages}</span>
              <div className="h-1 w-1 rounded-full bg-neutral-300"></div>
-             <span className="text-[9px] text-[#6B6865] font-black uppercase tracking-widest">{paginationMeta.total_records} Tasks</span>
+             <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">{paginationMeta.total_records} Tasks</span>
           </div>
         </div>
       )}

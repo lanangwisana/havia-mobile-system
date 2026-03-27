@@ -58,7 +58,7 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
       return (
         <span className={`flex items-baseline ${justifyAlign} gap-[3px]`}>
           <span className="tracking-tighter">{amount < 0 ? '-' : ''}{(abs / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}</span>
-          <span className="text-[9.5px] lowercase italic opacity-70 font-medium tracking-normal font-sans">milyar</span>
+          <span className="text-[0.5938rem] lowercase italic opacity-70 font-medium tracking-normal font-sans">milyar</span>
         </span>
       );
     }
@@ -105,13 +105,13 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                 <div className="w-8 h-8 rounded-xl bg-[#FAF7EF] flex items-center justify-center">
                   <Briefcase className="w-4 h-4 text-[#C69C3D]" />
                 </div>
-                <span className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Total Budget</span>
+                <span className="text-[0.625rem] text-neutral-400 uppercase tracking-widest font-black">Total Budget</span>
               </div>
               <p className={`font-bold text-neutral-900 font-mono tracking-tighter ${totalProjectsBudget >= 1000000000 ? 'text-xl' : 'text-base'}`}>
                 {totalProjectsBudget >= 1000000000 ? (
                   <>
                     {(totalProjectsBudget / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
-                    <span className="text-[10px] lowercase italic ml-1 opacity-70 font-medium">milyar</span>
+                    <span className="text-[0.625rem] lowercase italic ml-1 opacity-70 font-medium">milyar</span>
                   </>
                 ) : (
                   formatCurrency(totalProjectsBudget)
@@ -125,13 +125,13 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                 <div className="w-8 h-8 rounded-xl bg-[#C69C3D]/5 flex items-center justify-center">
                   <Wallet className="w-4 h-4 text-[#C69C3D]" />
                 </div>
-                <span className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">Tot. Balance</span>
+                <span className="text-[0.625rem] text-neutral-400 uppercase tracking-widest font-black">Tot. Balance</span>
               </div>
               <p className={`font-bold text-[#C69C3D] font-mono tracking-tighter ${totalBalance >= 1000000000 ? 'text-xl' : 'text-base'}`}>
                 {totalBalance >= 1000000000 ? (
                   <>
                     {(totalBalance / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
-                    <span className="text-[10px] lowercase italic ml-1 opacity-70 font-medium">milyar</span>
+                    <span className="text-[0.625rem] lowercase italic ml-1 opacity-70 font-medium">milyar</span>
                   </>
                 ) : (
                   formatCurrency(totalBalance)
@@ -143,12 +143,12 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
           <div className="px-1 flex items-center justify-between pt-2">
             <h3 className="text-sm font-bold text-neutral-900 tracking-tight flex items-center gap-2">
               Financial Progress Reports
-              <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[10px] text-neutral-500 font-bold">{filteredSummary.length}</span>
+              <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[0.625rem] text-neutral-500 font-bold">{filteredSummary.length}</span>
             </h3>
             <button 
               onClick={onViewAll}
               style={{ color: '#C69C3D' }} 
-              className="text-[11px] font-black tracking-[0.2em] hover:opacity-70 transition-opacity"
+              className="text-[0.6875rem] font-black tracking-[0.2em] hover:opacity-70 transition-opacity"
             >
               View All
             </button>
@@ -157,7 +157,7 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
           {isLoadingFinanceSummary ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="w-10 h-10 border-2 border-[#C69C3D] border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] font-bold">Analisis Keuangan...</p>
+              <p className="text-[0.625rem] text-neutral-400 uppercase tracking-[0.2em] font-bold">Analisis Keuangan...</p>
             </div>
           ) : filteredSummary.length > 0 ? (
             <div className="space-y-4">
@@ -169,16 +169,16 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                   <div key={p.project_id} className="bg-white rounded-3xl border border-neutral-100 p-5 shadow-sm hover:border-[#C69C3D]/30 transition-all group">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1 pr-4">
-                        <h4 className="font-bold text-neutral-900 text-[13px] leading-tight group-hover:text-[#C69C3D] transition-colors">{p.project_title}</h4>
+                        <h4 className="font-bold text-neutral-900 text-[0.8125rem] leading-tight group-hover:text-[#C69C3D] transition-colors">{p.project_title}</h4>
                         <div className="flex items-center gap-2 mt-1.5">
-                          <span className="text-[9px] px-2 py-0.5 bg-neutral-50 border border-neutral-200 rounded text-neutral-500 uppercase font-bold tracking-wider">{p.status_title}</span>
-                          <span className="text-[9px] text-neutral-400 flex items-center gap-1 font-medium italic">
+                          <span className="text-[0.5625rem] px-2 py-0.5 bg-neutral-50 border border-neutral-200 rounded text-neutral-500 uppercase font-bold tracking-wider">{p.status_title}</span>
+                          <span className="text-[0.5625rem] text-neutral-400 flex items-center gap-1 font-medium italic">
                             {p.progress}% tasks done
                           </span>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-[10px] text-neutral-400 uppercase font-black tracking-widest mb-0.5">Budget</p>
+                        <p className="text-[0.625rem] text-neutral-400 uppercase font-black tracking-widest mb-0.5">Budget</p>
                         <div className="text-sm font-bold text-neutral-900 font-mono">{renderLargeAmount(p.project_price)}</div>
                       </div>
                     </div>
@@ -189,11 +189,11 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                         {/* Financial Progress Bar */}
                         <div>
                           <div className="flex justify-between items-end mb-1.5">
-                            <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <span className="text-[0.5625rem] font-black text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
                               <TrendingDown className={`w-3 h-3 ${isOverBudget ? 'text-rose-500' : 'text-neutral-400'}`} />
                               Used Budget
                             </span>
-                            <span className={`text-[11px] font-black font-mono ${isOverBudget ? 'text-rose-600' : 'text-[#C69C3D]'}`}>
+                            <span className={`text-[0.6875rem] font-black font-mono ${isOverBudget ? 'text-rose-600' : 'text-[#C69C3D]'}`}>
                               {ratio}%
                             </span>
                           </div>
@@ -210,11 +210,11 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                         {/* Project Progress Bar */}
                         <div>
                           <div className="flex justify-between items-end mb-1.5">
-                            <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <span className="text-[0.5625rem] font-black text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
                               <TrendingUp className="w-3 h-3 text-[#C69C3D]" />
                               Project Progress
                             </span>
-                            <span className="text-[11px] font-black font-mono text-[#C69C3D]">
+                            <span className="text-[0.6875rem] font-black font-mono text-[#C69C3D]">
                               {p.progress}%
                             </span>
                           </div>
@@ -229,12 +229,12 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
 
                       <div className="grid grid-cols-2 gap-3 pt-1">
                         <div className="bg-neutral-50 rounded-2xl p-3 border border-neutral-100">
-                          <p className="text-[8px] text-neutral-400 uppercase font-black tracking-widest mb-1">Expenses</p>
-                          <div className="text-[13px] font-bold text-rose-600 font-mono">{renderLargeAmount(p.total_expense, "justify-start")}</div>
+                          <p className="text-[0.5rem] text-neutral-400 uppercase font-black tracking-widest mb-1">Expenses</p>
+                          <div className="text-[0.8125rem] font-bold text-rose-600 font-mono">{renderLargeAmount(p.total_expense, "justify-start")}</div>
                         </div>
                         <div className={`rounded-2xl p-3 border ${p.balance < 0 ? 'bg-rose-50 border-rose-100' : 'bg-[#C69C3D]/5 border-[#C69C3D]/10'}`}>
-                          <p className="text-[8px] text-neutral-400 uppercase font-black tracking-widest mb-1">Balance</p>
-                          <div className={`text-[13px] font-bold font-mono ${p.balance < 0 ? 'text-rose-600' : 'text-[#C69C3D]'}`}>{renderLargeAmount(p.balance, "justify-start")}</div>
+                          <p className="text-[0.5rem] text-neutral-400 uppercase font-black tracking-widest mb-1">Balance</p>
+                          <div className={`text-[0.8125rem] font-bold font-mono ${p.balance < 0 ? 'text-rose-600' : 'text-[#C69C3D]'}`}>{renderLargeAmount(p.balance, "justify-start")}</div>
                         </div>
                       </div>
                     </div>
@@ -257,8 +257,8 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                     <Banknote className="w-5 h-5 text-[#C69C3D]" />
                   </div>
                   <div>
-                    <span className="text-[10px] text-neutral-400 uppercase tracking-[0.2em] font-black block">Total Salary Paid</span>
-                    <span className="text-[9px] text-[#C69C3D] font-bold opacity-60">Cumulative Disbursement</span>
+                    <span className="text-[0.625rem] text-neutral-400 uppercase tracking-[0.2em] font-black block">Total Salary Paid</span>
+                    <span className="text-[0.5625rem] text-[#C69C3D] font-bold opacity-60">Cumulative Disbursement</span>
                   </div>
                 </div>
               </div>
@@ -282,12 +282,12 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
             <h3 className="text-sm font-bold text-[#2C2A29] tracking-wide flex items-center gap-2">
               <span className="w-1 h-4 bg-[#C69C3D] rounded-full"></span>
               Salary & Payroll Records
-              <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[10px] text-neutral-500 font-bold">{salaryExpenses.length}</span>
+              <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[0.625rem] text-neutral-500 font-bold">{salaryExpenses.length}</span>
             </h3>
             <button 
               onClick={onHistory}
               style={{ color: '#C69C3D' }} 
-              className="text-[11px] font-black uppercase tracking-[0.2em] hover:opacity-70 transition-opacity flex items-center gap-1"
+              className="text-[0.6875rem] font-black uppercase tracking-[0.2em] hover:opacity-70 transition-opacity flex items-center gap-1"
             >
               History <TrendingDown className="w-3 h-3 rotate-[-90deg]" />
             </button>
@@ -329,24 +329,24 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                           </div>
                           <div>
                             <h4 className="font-bold text-neutral-900 text-sm leading-tight">{title}</h4>
-                            <p className="text-[10px] text-neutral-400 mt-0.5">
+                            <p className="text-[0.625rem] text-neutral-400 mt-0.5">
                               {expDate ? new Date(expDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-bold text-blue-600 font-mono">{formatCurrency(total)}</p>
-                          <p className="text-[9px] text-neutral-400 mt-0.5 uppercase tracking-widest font-bold">Disbursed</p>
+                          <p className="text-[0.5625rem] text-neutral-400 mt-0.5 uppercase tracking-widest font-bold">Disbursed</p>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2 flex-wrap mb-3">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-100 rounded-lg text-[9px] font-bold uppercase tracking-widest text-blue-600">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-100 rounded-lg text-[0.5625rem] font-bold uppercase tracking-widest text-blue-600">
                           <Tag className="w-3 h-3" /> {category}
                         </span>
                         
                         {recipient && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-100 rounded-lg text-[9px] font-bold uppercase tracking-widest text-amber-600">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-100 rounded-lg text-[0.5625rem] font-bold uppercase tracking-widest text-amber-600">
                             <Briefcase className="w-3 h-3" /> To: {recipient}
                           </span>
                         )}
@@ -358,7 +358,7 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                             // Don't repeat the Team member line if we already show it as a badge
                             if (line.toLowerCase().includes('team member:')) return null;
                             return (
-                              <p key={lineIdx} className="text-[11px] text-neutral-500 leading-relaxed italic">
+                              <p key={lineIdx} className="text-[0.6875rem] text-neutral-500 leading-relaxed italic">
                                 "{line.trim()}"
                               </p>
                             );
@@ -382,21 +382,21 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
 const LoadingState = ({ msg }: { msg: string }) => (
   <div className="flex flex-col items-center justify-center py-20">
     <div className="w-8 h-8 border-2 border-[#C69C3D] border-t-transparent rounded-full animate-spin mb-4"></div>
-    <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-black">{msg}</p>
+    <p className="text-[0.625rem] text-neutral-400 uppercase tracking-widest font-black">{msg}</p>
   </div>
 );
 
 const NoDataState = () => (
   <div className="flex flex-col items-center justify-center py-20 bg-neutral-50 rounded-3xl border border-neutral-200 border-dashed mx-1">
     <TrendingDown className="w-12 h-12 text-neutral-200 mb-4" />
-    <p className="text-[10px] text-neutral-400 tracking-widest uppercase font-black text-center px-8 leading-loose">No expense data<br/>available at the moment</p>
+    <p className="text-[0.625rem] text-neutral-400 tracking-widest uppercase font-black text-center px-8 leading-loose">No expense data<br/>available at the moment</p>
   </div>
 );
 
 const NoSalaryDataState = () => (
   <div className="flex flex-col items-center justify-center py-20 bg-neutral-50 rounded-3xl border border-neutral-200 border-dashed mx-1">
     <Banknote className="w-12 h-12 text-neutral-200 mb-4" />
-    <p className="text-[10px] text-neutral-400 tracking-widest uppercase font-black text-center px-8 leading-loose">No salary records found<br/>for your account</p>
+    <p className="text-[0.625rem] text-neutral-400 tracking-widest uppercase font-black text-center px-8 leading-loose">No salary records found<br/>for your account</p>
   </div>
 );
 
@@ -405,7 +405,7 @@ const ProjectEmptyState = () => (
     <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4">
       <Briefcase className="w-8 h-8 text-neutral-200" />
     </div>
-    <p className="text-[11px] text-neutral-400 tracking-widest uppercase font-black text-center px-8 leading-loose">No active projects<br/>with financial records</p>
+    <p className="text-[0.6875rem] text-neutral-400 tracking-widest uppercase font-black text-center px-8 leading-loose">No active projects<br/>with financial records</p>
   </div>
 );
 
