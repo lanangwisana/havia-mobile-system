@@ -105,7 +105,7 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
           <div className="text-center mb-10 mt-2">
             <h1 className="text-5xl font-light font-mono tracking-tighter text-neutral-900 mb-2">{currentTime || '00:00:00'}</h1>
             
-            <div className={`mt-5 inline-flex items-center gap-2 px-4 py-1.5 ${isClockedIn ? 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20' : 'bg-green-500/10 text-green-600 border-green-500/20'} rounded-full text-[10px] font-bold border tracking-wider`}>
+            <div className={`mt-5 inline-flex items-center gap-2 px-4 py-1.5 ${isClockedIn ? 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20' : 'bg-green-500/10 text-green-600 border-green-500/20'} rounded-full text-[0.625rem] font-bold border tracking-wider`}>
               <MapPin className="w-3 h-3" />
               <span>{isClockedIn ? 'Work Time' : 'Not Clocked In'}</span>
             </div>
@@ -128,7 +128,7 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
                  <span className="text-xs text-neutral-900 font-medium tracking-wide">
                    {isClockedIn ? 'You are clocked in' : 'You are clocked out'}
                  </span>
-                 <span className="text-[10px] text-neutral-500 uppercase tracking-widest mt-0.5">
+                 <span className="text-[0.625rem] text-neutral-500 uppercase tracking-widest mt-0.5">
                    {isClockedIn ? 'Silahkan Clock Out' : 'Silahkan Clock In'}
                  </span>
                </div>
@@ -166,10 +166,10 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
             >
               <div className="flex items-center gap-2 mb-3 text-green-600">
                 <LogIn className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">In</span>
+                <span className="text-[0.625rem] font-bold uppercase tracking-wider">In</span>
               </div>
               <p className="text-xl font-bold text-neutral-900">{getClockTime(activeAttendance?.in_time || (showFinishedTime ? lastFinishedAttendance?.in_time : null))}</p>
-              <p className="text-[9px] text-neutral-400 uppercase tracking-widest mt-1">Clock In Time</p>
+              <p className="text-[0.5625rem] text-neutral-400 uppercase tracking-widest mt-1">Clock In Time</p>
             </div>
             <div 
               style={{ 
@@ -180,10 +180,10 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
             >
               <div className="flex items-center gap-2 mb-3 text-rose-600">
                 <LogOut className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Out</span>
+                <span className="text-[0.625rem] font-bold uppercase tracking-wider">Out</span>
               </div>
               <p className="text-xl font-bold text-neutral-900">{showFinishedTime ? getClockTime(lastFinishedAttendance?.out_time) : '--:--'}</p>
-              <p className="text-[9px] text-neutral-400 uppercase tracking-widest mt-1">Clock Out Time</p>
+              <p className="text-[0.5625rem] text-neutral-400 uppercase tracking-widest mt-1">Clock Out Time</p>
             </div>
           </div>
         </div>

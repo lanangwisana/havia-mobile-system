@@ -19,14 +19,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
           <img src="/LogoHavia_primary1.png" className="h-5 w-auto object-contain" alt="Havia Logo" />
           <div className="h-8 w-[1px] bg-neutral-200"></div>
           <div>
-            <p style={{ color: colors.gold }} className="text-[10px] uppercase tracking-[0.2em] mb-0.5 font-black">{getGreeting()}</p>
-            <h2 className="text-[16px] font-black text-neutral-900 tracking-tight leading-none">Enjoy your work!</h2>
+            <p style={{ color: colors.gold }} className="text-[0.625rem] uppercase tracking-[0.2em] mb-0.5 font-black">{getGreeting()}</p>
+            <h2 className="text-[1rem] font-black text-neutral-900 tracking-tight leading-none">Enjoy your work!</h2>
           </div>
         </div>
         <button onClick={() => onNav('subpage', null, 'Notifications')} style={{ backgroundColor: colors.card }} className="w-10 h-10 rounded-full border border-[#E8E4E1] flex items-center justify-center relative hover:bg-neutral-50 active:scale-95 transition-all">
           <Bell className="w-5 h-5 text-[#6B6865]" />
           {notifications && notifications.length > 0 && (
-            <span style={{ backgroundColor: colors.gold }} className="absolute -top-1 -right-1 w-5 h-5 rounded-full ring-2 ring-white flex items-center justify-center text-[10px] font-black text-white">
+            <span style={{ backgroundColor: colors.gold }} className="absolute -top-1 -right-1 w-5 h-5 rounded-full ring-2 ring-white flex items-center justify-center text-[0.625rem] font-black text-white">
               {notifications.length > 9 ? '9+' : notifications.length}
             </span>
           )}
@@ -46,10 +46,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
                 <img src={getUserImage(userData)} className="w-full h-full rounded-full object-cover" alt="Profile" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-black text-[17px] text-[#2C2A29] leading-tight">
+                <h3 className="font-black text-[1.0625rem] text-[#2C2A29] leading-tight">
                   {userData?.first_name ? `${userData.first_name} ${userData.last_name || ''}` : (userData?.name || 'User')}
                 </h3>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#C69C3D]">{userData?.job_title || 'TEAM MEMBER'}</p>
+                <p className="text-[0.5625rem] font-black uppercase tracking-[0.2em] text-[#C69C3D]">{userData?.job_title || 'TEAM MEMBER'}</p>
               </div>
             </div>
             <div className="bg-white p-2.5 rounded-2xl border border-[#E8E4E1] shadow-sm">
@@ -59,8 +59,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
 
           <div className="mt-8 flex justify-between items-end relative z-10">
             <div>
-              <p className="text-[8px] text-[#6B6865] uppercase tracking-[0.2em] mb-1 font-black">Company</p>
-              <p className="text-[10px] font-black text-[#6B6865] tracking-wide">HAVIA STUDIO & GAMPAWORKS</p>
+              <p className="text-[0.5rem] text-[#6B6865] uppercase tracking-[0.2em] mb-1 font-black">Company</p>
+              <p className="text-[0.625rem] font-black text-[#6B6865] tracking-wide">HAVIA STUDIO & GAMPAWORKS</p>
             </div>
           </div>
         </div>
@@ -71,10 +71,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
           className="bg-gradient-to-tr from-white to-[#F4EBD4]/5 rounded-[2.5rem] p-6 flex justify-between items-center border border-[#E8E4E1] hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 cursor-pointer overflow-hidden relative"
           style={{ boxShadow: '0 10px 30px -10px rgba(0,0,0,0.03)' }}>
           <div className="relative z-10">
-            <p className="text-[9px] text-[#6B6865] uppercase font-black tracking-[0.2em] mb-1.5 opacity-60">Live Current Time</p>
+            <p className="text-[0.5625rem] text-[#6B6865] uppercase font-black tracking-[0.2em] mb-1.5 opacity-60">Live Current Time</p>
             <div className="flex items-baseline gap-2">
-               <h2 className="text-[34px] font-black text-[#2C2A29] tracking-tighter leading-none">{currentTime || '14:20:25'}</h2>
-               <span className="text-[10px] font-black text-[#C69C3D] bg-[#F4EBD4]/40 px-2 py-0.5 rounded-md">WIB</span>
+               <h2 className="text-[2.125rem] font-black text-[#2C2A29] tracking-tighter leading-none">{currentTime || '14:20:25'}</h2>
+               <span className="text-[0.625rem] font-black text-[#C69C3D] bg-[#F4EBD4]/40 px-2 py-0.5 rounded-md">WIB</span>
             </div>
           </div>
           <div className="relative z-10 text-right flex flex-col items-end gap-3 translate-y-1">
@@ -82,7 +82,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
               <Clock className="w-6 h-6 text-[#C69C3D]" />
             </div>
             {activeAttendance && (
-              <span className="flex items-center gap-1.5 px-3 py-1 bg-green-500/10 text-green-600 rounded-full text-[8px] font-black border border-green-500/20 uppercase tracking-widest">
+              <span className="flex items-center gap-1.5 px-3 py-1 bg-green-500/10 text-green-600 rounded-full text-[0.5rem] font-black border border-green-500/20 uppercase tracking-widest">
                 <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                 ACTIVE
               </span>
@@ -92,7 +92,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
 
         {/* Quick Access Menu - 5 Columns with Abstract 3D Icons & Transparency Fix */}
         <div className="pt-2 pb-6 px-1">
-          <p className="text-[10px] text-neutral-900 uppercase tracking-[0.3em] font-black mb-6 px-1">Quick Access</p>
+          <p className="text-[0.625rem] text-neutral-900 uppercase tracking-[0.3em] font-black mb-6 px-1">Quick Access</p>
           <div className="grid grid-cols-5 gap-3 h-24">
             {[
               { id: 'All Tasks', label: 'Tasks', icon: ClipboardList },
@@ -112,7 +112,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
                   <div className="absolute inset-0 bg-gradient-to-br from-white to-[#F4EBD4]/20 opacity-50"></div>
                   <item.icon className="w-6 h-6 text-[#C69C3D] relative z-10" />
                 </div>
-                <span className="text-[8px] font-black tracking-widest text-neutral-900 uppercase truncate w-full text-center">{item.label}</span>
+                <span className="text-[0.5rem] font-black tracking-widest text-neutral-900 uppercase truncate w-full text-center">{item.label}</span>
               </button>
             ))}
           </div>

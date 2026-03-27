@@ -74,12 +74,12 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
           <ShieldCheck className="w-10 h-10 text-[#C69C3D]" />
         </div>
         <h3 className="text-lg font-bold text-neutral-900 tracking-wide">Change Password</h3>
-        <p className="text-[10px] text-neutral-400 uppercase tracking-widest text-center mt-1 px-10">Secure your account by changing your password regularly</p>
+        <p className="text-[0.625rem] text-neutral-400 uppercase tracking-widest text-center mt-1 px-10">Secure your account by changing your password regularly</p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-neutral-400 ml-1 uppercase tracking-widest flex items-center gap-2">
+          <label className="text-[0.625rem] font-bold text-neutral-400 ml-1 uppercase tracking-widest flex items-center gap-2">
             <Key className="w-3 h-3" /> Current Password
           </label>
           <input 
@@ -98,7 +98,7 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
 
         <div className="pt-4 space-y-4 border-t border-neutral-100">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-neutral-400 ml-1 uppercase tracking-widest">New Password</label>
+            <label className="text-[0.625rem] font-bold text-neutral-400 ml-1 uppercase tracking-widest">New Password</label>
             <input 
               type="password" 
               value={form.new_password} 
@@ -114,7 +114,7 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-neutral-400 ml-1 uppercase tracking-widest">Confirm New Password</label>
+            <label className="text-[0.625rem] font-bold text-neutral-400 ml-1 uppercase tracking-widest">Confirm New Password</label>
             <input 
               type="password" 
               value={form.confirm_password} 

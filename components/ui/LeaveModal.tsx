@@ -69,7 +69,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
               <h3 className="text-lg font-black text-neutral-900 uppercase tracking-wider truncate">
                 Submission
               </h3>
-              <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest truncate">Complete the data below</p>
+              <p className="text-[0.625rem] text-neutral-400 font-bold uppercase tracking-widest truncate">Complete the data below</p>
             </div>
           </div>
           <button 
@@ -82,7 +82,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Leave Type */}
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Submission Type</label>
+              <label className="text-[0.625rem] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Submission Type</label>
               <div className="relative">
                 <select
                   required
@@ -104,7 +104,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
             {/* Date Range */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Start Date</label>
+                <label className="text-[0.625rem] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Start Date</label>
                 <input
                   type="date"
                   required
@@ -114,7 +114,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">End Date</label>
+                <label className="text-[0.625rem] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">End Date</label>
                 <input
                   type="date"
                   required
@@ -127,7 +127,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
 
             {/* Reason */}
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Reason / Description</label>
+              <label className="text-[0.625rem] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Reason / Description</label>
               <textarea
                 required
                 rows={3}
@@ -141,7 +141,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
             {/* Info Box */}
             <div className="flex gap-3 p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl">
               <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
-              <p className="text-[10px] text-neutral-500 leading-relaxed font-medium">
+              <p className="text-[0.625rem] text-neutral-500 leading-relaxed font-medium">
                 Submission will be sent to HRD/Admin for review.
               </p>
             </div>

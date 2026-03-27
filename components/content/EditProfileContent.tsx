@@ -92,7 +92,7 @@ export const EditProfileContent: React.FC<EditProfileContentProps> = ({
                 className="flex items-center gap-3 w-full p-3 hover:bg-neutral-50 rounded-xl transition-colors text-left text-rose-600"
               >
                 <User className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Use Initials</span>
+                <span className="text-[0.625rem] font-bold uppercase tracking-widest">Use Initials</span>
               </button>
 
               <div className="pt-1 border-t border-neutral-100">
@@ -101,7 +101,7 @@ export const EditProfileContent: React.FC<EditProfileContentProps> = ({
                   className="flex items-center gap-3 w-full p-2 hover:bg-neutral-50 rounded-xl transition-colors text-left opacity-50"
                 >
                   <X className="w-4 h-4" />
-                  <span className="text-[9px] font-bold uppercase tracking-widest">Cancel</span>
+                  <span className="text-[0.5625rem] font-bold uppercase tracking-widest">Cancel</span>
                 </button>
               </div>
             </div>
@@ -111,22 +111,22 @@ export const EditProfileContent: React.FC<EditProfileContentProps> = ({
           </div>
         )}
 
-        <p className="text-[10px] text-neutral-400 uppercase tracking-widest leading-relaxed">Click photo for options</p>
+        <p className="text-[0.625rem] text-neutral-400 uppercase tracking-widest leading-relaxed">Click photo for options</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">First Name</label>
+          <label className="text-[0.625rem] font-bold text-neutral-500 ml-1 uppercase tracking-widest">First Name</label>
           <input type="text" value={editForm.first_name || ''} onChange={(e) => setEditForm({...editForm, first_name: e.target.value})} placeholder="First Name" style={{ backgroundColor: colors.card, borderColor: colors.border }} className={inputClass} />
         </div>
         <div className="space-y-1.5">
-          <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Last Name</label>
+          <label className="text-[0.625rem] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Last Name</label>
           <input type="text" value={editForm.last_name || ''} onChange={(e) => setEditForm({...editForm, last_name: e.target.value})} placeholder="Last Name" style={{ backgroundColor: colors.card, borderColor: colors.border }} className={inputClass} />
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-[10px] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Job Title</label>
+        <label className="text-[0.625rem] font-bold text-neutral-500 ml-1 uppercase tracking-widest">Job Title</label>
         <input type="text" value={editForm.job_title || ''} onChange={(e) => setEditForm({...editForm, job_title: e.target.value})} placeholder="Job Title" style={{ backgroundColor: colors.card, borderColor: colors.border }} className={inputClass} />
       </div>
 

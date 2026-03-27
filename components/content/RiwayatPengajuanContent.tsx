@@ -11,7 +11,7 @@ export const RiwayatPengajuanContent: React.FC<RiwayatPengajuanContentProps> = (
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <div className="w-8 h-8 border-2 border-[#C69C3D] border-t-transparent rounded-full animate-spin" />
-        <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest">Loading History...</p>
+        <p className="text-[0.625rem] text-neutral-400 font-bold uppercase tracking-widest">Loading History...</p>
       </div>
     );
   }
@@ -50,12 +50,12 @@ export const RiwayatPengajuanContent: React.FC<RiwayatPengajuanContentProps> = (
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-black text-neutral-900 uppercase tracking-widest">{leave.leave_type_title || 'Submission'}</span>
-                  <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-tighter">
+                  <span className="text-[0.625rem] text-neutral-400 font-bold uppercase tracking-tighter">
                     {new Date(leave.start_date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </span>
                 </div>
               </div>
-              <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+              <div className={`px-3 py-1 rounded-full text-[0.5625rem] font-black uppercase tracking-widest border ${
                 isApproved ? 'bg-green-500/10 border-green-500/20 text-green-600' :
                 isRejected ? 'bg-red-500/10 border-red-500/20 text-red-600' :
                 'bg-amber-500/10 border-amber-500/20 text-amber-600'
@@ -66,7 +66,7 @@ export const RiwayatPengajuanContent: React.FC<RiwayatPengajuanContentProps> = (
 
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-neutral-50 rounded-2xl p-3 border border-neutral-100">
-                <span className="text-[8px] text-neutral-400 font-bold uppercase tracking-widest block mb-1">Duration</span>
+                <span className="text-[0.5rem] text-neutral-400 font-bold uppercase tracking-widest block mb-1">Duration</span>
                 <span className="text-xs font-bold text-neutral-900">
                   {(() => {
                     const days = parseFloat(leave.total_days);
@@ -86,7 +86,7 @@ export const RiwayatPengajuanContent: React.FC<RiwayatPengajuanContentProps> = (
                 </span>
               </div>
               <div className="bg-neutral-50 rounded-2xl p-3 border border-neutral-100">
-                <span className="text-[8px] text-neutral-400 font-bold uppercase tracking-widest block mb-1">Until</span>
+                <span className="text-[0.5rem] text-neutral-400 font-bold uppercase tracking-widest block mb-1">Until</span>
                 <span className="text-xs font-bold text-neutral-900 uppercase">
                   {new Date(leave.end_date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}
                 </span>
@@ -94,8 +94,8 @@ export const RiwayatPengajuanContent: React.FC<RiwayatPengajuanContentProps> = (
             </div>
 
             <div className="bg-neutral-50 rounded-2xl p-4 border border-neutral-100">
-              <span className="text-[8px] text-neutral-400 font-black uppercase tracking-[0.2em] block mb-2">Reason / Description</span>
-              <p className="text-[11px] text-neutral-500 leading-relaxed italic">
+              <span className="text-[0.5rem] text-neutral-400 font-black uppercase tracking-[0.2em] block mb-2">Reason / Description</span>
+              <p className="text-[0.6875rem] text-neutral-500 leading-relaxed italic">
                 "{leave.reason || leave.note || 'No description provided'}"
               </p>
             </div>

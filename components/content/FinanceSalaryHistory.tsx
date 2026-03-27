@@ -37,22 +37,22 @@ export const FinanceSalaryHistory: React.FC<Props> = ({ data, isLoading, onBack 
                       <h4 className="font-bold text-neutral-900 text-sm leading-tight group-hover:text-[#C69C3D] transition-colors">{expense.title || 'Salary Expense'}</h4>
                       <div className="flex items-center gap-1.5 mt-1.5 opacity-60">
                         <Calendar className="w-3 h-3 text-neutral-400" />
-                        <p className="text-[10px] text-neutral-500 font-medium">{expDate}</p>
+                        <p className="text-[0.625rem] text-neutral-500 font-medium">{expDate}</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-black text-[#C69C3D] font-mono tracking-tighter">{formatCurrency(total)}</p>
-                      <span className="text-[9px] text-neutral-400 uppercase font-black tracking-widest opacity-50">Disbursed</span>
+                      <span className="text-[0.5625rem] text-neutral-400 uppercase font-black tracking-widest opacity-50">Disbursed</span>
                     </div>
                   </div>
                   
                   {description && (
                     <div className="bg-neutral-50 rounded-2xl p-4 border border-neutral-100 group-hover:bg-[#FAF7EF] group-hover:border-[#C69C3D]/10 transition-all duration-300">
-                        <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <p className="text-[0.625rem] text-neutral-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
                             <TrendingDown className="w-3 h-3 text-neutral-300" />
                             Note
                         </p>
-                        <p className="text-[11px] text-neutral-600 leading-relaxed font-medium italic overflow-hidden line-clamp-2">
+                        <p className="text-[0.6875rem] text-neutral-600 leading-relaxed font-medium italic overflow-hidden line-clamp-2">
                           {description}
                         </p>
                     </div>
