@@ -58,28 +58,26 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
       />
       
       {/* Modal Content */}
-      <div className="relative w-full max-w-lg bg-white border-t sm:border border-neutral-100 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full duration-500">
-        <div className="p-6 pb-20 sm:pb-8">
+      <div className="relative w-full max-w-lg max-h-[90vh] flex flex-col bg-white border-t sm:border border-neutral-100 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full duration-500">
+        <div className="p-6 pb-20 sm:pb-8 relative overflow-y-auto flex-1 scrollbar-hide">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center border bg-[#C69C3D]/10 border-[#C69C3D]/20 text-[#C69C3D]">
-                <FileText className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-lg font-black text-neutral-900 uppercase tracking-wider">
-                  Submission
-                </h3>
-                <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest">Complete the data below</p>
-              </div>
+          <div className="flex items-center gap-3 mb-8 pr-12">
+            <div className="w-10 h-10 shrink-0 rounded-2xl flex items-center justify-center border bg-[#C69C3D]/10 border-[#C69C3D]/20 text-[#C69C3D]">
+              <FileText className="w-5 h-5" />
             </div>
-            <button 
-              onClick={onClose}
-              className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-400 hover:text-neutral-600 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex flex-col min-w-0">
+              <h3 className="text-lg font-black text-neutral-900 uppercase tracking-wider truncate">
+                Submission
+              </h3>
+              <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest truncate">Complete the data below</p>
+            </div>
           </div>
+          <button 
+            onClick={onClose}
+            className="absolute top-6 right-6 w-10 h-10 shrink-0 rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-400 hover:text-neutral-600 transition-colors z-10"
+          >
+            <X className="w-5 h-5" />
+          </button>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Leave Type */}
