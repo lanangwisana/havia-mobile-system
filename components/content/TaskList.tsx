@@ -146,14 +146,14 @@ export const TaskList: React.FC<{
                         {isDone ? <CheckCircle2 className="w-7 h-7" /> : <ClipboardList className="w-7 h-7" />}
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <h4 className={`font-black text-[15px] leading-tight truncate transition-all duration-500 ${isDone ? 'text-neutral-400' : 'text-[#2C2A29]'}`}>
+                        <h4 className={`font-black text-[15px] leading-tight transition-all duration-500 ${isExpanded ? '' : 'truncate'} ${isDone ? 'text-neutral-400' : 'text-[#2C2A29]'}`}>
                           {projName}
                         </h4>
                         <div className="flex items-center gap-2 mt-1.5 opacity-80">
                           <div className="w-4 h-4 rounded-full bg-[#F4EBD4] flex items-center justify-center border border-[#C69C3D]/10">
                             <ClipboardList className="w-2.5 h-2.5 text-[#C69C3D]" />
                           </div>
-                          <p className="text-[11px] text-[#2C2A29] font-bold tracking-tight truncate max-w-[150px]">
+                          <p className={`text-[11px] text-[#2C2A29] font-bold tracking-tight ${isExpanded ? '' : 'truncate max-w-[150px]'}`}>
                             {task.title || task.name || `Task ${task.id}`}
                           </p>
                         </div>
