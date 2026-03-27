@@ -17,15 +17,27 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
     new_password: '',
     confirm_password: ''
   });
+  const [errors, setErrors] = useState<{current_password?: string, new_password?: string, confirm_password?: string}>({});
   const [isSaving, setIsSaving] = useState(false);
 
   const handleReset = async () => {
-    if (!form.current_password || !form.new_password || !form.confirm_password) {
-      showToast('All fields are required.');
-      return;
+    const newErrors: typeof errors = {};
+    
+    if (!form.current_password) newErrors.current_password = 'Required';
+    if (!form.new_password) newErrors.new_password = 'Required';
+    if (!form.confirm_password) newErrors.confirm_password = 'Required';
+
+    if (form.new_password && form.new_password.length < 6) {
+      newErrors.new_password = 'Password must be at least 6 characters long.';
     }
-    if (form.new_password !== form.confirm_password) {
-      showToast('New passwords do not match.');
+    
+    if (form.new_password && form.confirm_password && form.new_password !== form.confirm_password) {
+      newErrors.confirm_password = 'New passwords do not match.';
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
       return;
     }
 
@@ -33,10 +45,16 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
     try {
       const res = await postToApi('haviacms/profile/reset_password', apiToken, form);
       if (res.success) {
+        setErrors({});
         showToast('Password successfully changed! 🔐');
         onSuccess();
       } else {
-        showToast(res.error || 'Failed to reset password.');
+        const errStr = String(res.error || (res as any).message || '').toLowerCase();
+        if (errStr.includes('current') || errStr.includes('incorrect')) {
+          setErrors({ current_password: 'Current password is incorrect.' });
+        } else {
+          showToast(res.error || (res as any).message || 'Failed to reset password.');
+        }
       }
     } catch (e: any) {
       showToast('Connection error occurred.');
@@ -65,11 +83,15 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
           <input 
             type="password" 
             value={form.current_password} 
-            onChange={(e) => setForm({...form, current_password: e.target.value})} 
+            onChange={(e) => {
+              setForm({...form, current_password: e.target.value});
+              if (errors.current_password) setErrors({...errors, current_password: undefined});
+            }} 
             placeholder="••••••••" 
-            style={{ backgroundColor: colors.card, borderColor: colors.border }} 
-            className={inputClass} 
+            style={{ backgroundColor: colors.card, borderColor: errors.current_password ? '#ef4444' : colors.border }} 
+            className={`${inputClass} ${errors.current_password ? 'focus:ring-red-500 focus:border-red-500' : ''}`} 
           />
+          {errors.current_password && <p className="text-xs text-red-500 font-medium ml-1 mt-1 animate-in fade-in">{errors.current_password}</p>}
         </div>
 
         <div className="pt-4 space-y-4 border-t border-neutral-100">
@@ -78,11 +100,15 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
             <input 
               type="password" 
               value={form.new_password} 
-              onChange={(e) => setForm({...form, new_password: e.target.value})} 
+              onChange={(e) => {
+                setForm({...form, new_password: e.target.value});
+                if (errors.new_password) setErrors({...errors, new_password: undefined});
+              }} 
               placeholder="Minimum 6 characters" 
-              style={{ backgroundColor: colors.card, borderColor: colors.border }} 
-              className={inputClass} 
+              style={{ backgroundColor: colors.card, borderColor: errors.new_password ? '#ef4444' : colors.border }} 
+              className={`${inputClass} ${errors.new_password ? 'focus:ring-red-500 focus:border-red-500' : ''}`} 
             />
+            {errors.new_password && <p className="text-xs text-red-500 font-medium ml-1 mt-1 animate-in fade-in">{errors.new_password}</p>}
           </div>
 
           <div className="space-y-1.5">
@@ -90,11 +116,15 @@ export const ResetPasswordContent: React.FC<ResetPasswordContentProps> = ({
             <input 
               type="password" 
               value={form.confirm_password} 
-              onChange={(e) => setForm({...form, confirm_password: e.target.value})} 
+              onChange={(e) => {
+                setForm({...form, confirm_password: e.target.value});
+                if (errors.confirm_password) setErrors({...errors, confirm_password: undefined});
+              }} 
               placeholder="Repeat new password" 
-              style={{ backgroundColor: colors.card, borderColor: colors.border }} 
-              className={inputClass} 
+              style={{ backgroundColor: colors.card, borderColor: errors.confirm_password ? '#ef4444' : colors.border }} 
+              className={`${inputClass} ${errors.confirm_password ? 'focus:ring-red-500 focus:border-red-500' : ''}`} 
             />
+            {errors.confirm_password && <p className="text-xs text-red-500 font-medium ml-1 mt-1 animate-in fade-in">{errors.confirm_password}</p>}
           </div>
         </div>
       </div>
