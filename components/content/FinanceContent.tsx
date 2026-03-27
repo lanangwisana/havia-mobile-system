@@ -52,6 +52,19 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
     return sum + amt + tax + tax2;
   }, 0);
 
+  const renderLargeAmount = (amount: number, justifyAlign: string = "justify-end") => {
+    const abs = Math.abs(amount || 0);
+    if (abs >= 1000000000) {
+      return (
+        <span className={`flex items-baseline ${justifyAlign} gap-[3px]`}>
+          <span className="tracking-tighter">{amount < 0 ? '-' : ''}{(abs / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}</span>
+          <span className="text-[9.5px] lowercase italic opacity-70 font-medium tracking-normal font-sans">milyar</span>
+        </span>
+      );
+    }
+    return formatCurrency(amount);
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-32">
       {/* Tab Switcher - Visible for Admin or PIC */}
@@ -166,7 +179,7 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] text-neutral-400 uppercase font-black tracking-widest mb-0.5">Budget</p>
-                        <p className="text-sm font-bold text-neutral-900 font-mono">{formatCurrency(p.project_price)}</p>
+                        <div className="text-sm font-bold text-neutral-900 font-mono">{renderLargeAmount(p.project_price)}</div>
                       </div>
                     </div>
 
@@ -217,11 +230,11 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                       <div className="grid grid-cols-2 gap-3 pt-1">
                         <div className="bg-neutral-50 rounded-2xl p-3 border border-neutral-100">
                           <p className="text-[8px] text-neutral-400 uppercase font-black tracking-widest mb-1">Expenses</p>
-                          <p className="text-[13px] font-bold text-rose-600 font-mono">{formatCurrency(p.total_expense)}</p>
+                          <div className="text-[13px] font-bold text-rose-600 font-mono">{renderLargeAmount(p.total_expense, "justify-start")}</div>
                         </div>
                         <div className={`rounded-2xl p-3 border ${p.balance < 0 ? 'bg-rose-50 border-rose-100' : 'bg-[#C69C3D]/5 border-[#C69C3D]/10'}`}>
                           <p className="text-[8px] text-neutral-400 uppercase font-black tracking-widest mb-1">Balance</p>
-                          <p className={`text-[13px] font-bold font-mono ${p.balance < 0 ? 'text-rose-600' : 'text-[#C69C3D]'}`}>{formatCurrency(p.balance)}</p>
+                          <div className={`text-[13px] font-bold font-mono ${p.balance < 0 ? 'text-rose-600' : 'text-[#C69C3D]'}`}>{renderLargeAmount(p.balance, "justify-start")}</div>
                         </div>
                       </div>
                     </div>
