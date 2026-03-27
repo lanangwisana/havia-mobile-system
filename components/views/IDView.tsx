@@ -42,7 +42,7 @@ export const IDView: React.FC<IDViewProps> = ({ userData, onNav }) => {
             <div className="relative w-36 h-36 mb-6">
               <div className="absolute inset-0 rounded-full avatar-glow"></div>
               <div className="absolute inset-[3px] rounded-full bg-white z-10 flex items-center justify-center overflow-hidden">
-                <img src={getUserImage(userData)} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" alt={userData?.first_name || "User"} />
+                <img src={getUserImage(userData)} className="w-full h-full object-cover" alt={userData?.first_name || "User"} />
               </div>
             </div>
             <h2 className="text-2xl font-bold text-neutral-900 mb-2 tracking-wide text-center">{userData?.first_name} {userData?.last_name}</h2>
