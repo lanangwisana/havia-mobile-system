@@ -29,12 +29,12 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, onBack })
                   <div className="flex-1 pr-4">
                     <h4 className="font-bold text-neutral-900 text-sm leading-tight group-hover:text-[#C69C3D] transition-colors">{p.project_title}</h4>
                     <div className="flex items-center gap-2 mt-2">
-                       <span className="text-[9px] px-2 py-0.5 bg-neutral-50 border border-neutral-200 rounded-md text-neutral-500 uppercase font-bold tracking-wider">{p.status_title}</span>
-                       <span className="text-[9px] text-neutral-400 font-medium italic">{p.progress}% tasks done</span>
+                       <span className="text-[0.5625rem] px-2 py-0.5 bg-neutral-50 border border-neutral-200 rounded-md text-neutral-500 uppercase font-bold tracking-wider">{p.status_title}</span>
+                       <span className="text-[0.5625rem] text-neutral-400 font-medium italic">{p.progress}% tasks done</span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-[9px] text-neutral-400 uppercase font-black tracking-widest mb-0.5">Budget</p>
+                    <p className="text-[0.5625rem] text-neutral-400 uppercase font-black tracking-widest mb-0.5">Budget</p>
                     <p className="text-sm font-bold text-neutral-900 font-mono tracking-tighter">{formatCurrency(p.project_price)}</p>
                   </div>
                 </div>
@@ -43,11 +43,11 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, onBack })
                   <div className="grid grid-cols-1 gap-5">
                     <div>
                       <div className="flex justify-between items-end mb-2">
-                        <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <span className="text-[0.5625rem] font-black text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
                           <TrendingDown className={`w-3 h-3 ${isOverBudget ? 'text-rose-500' : 'text-neutral-400'}`} />
                           Used Budget
                         </span>
-                        <span className={`text-[11px] font-black font-mono ${isOverBudget ? 'text-rose-600' : 'text-[#C69C3D]'}`}>{ratio}%</span>
+                        <span className={`text-[0.6875rem] font-black font-mono ${isOverBudget ? 'text-rose-600' : 'text-[#C69C3D]'}`}>{ratio}%</span>
                       </div>
                       <div className="h-2 bg-neutral-100 rounded-full overflow-hidden flex p-0.5">
                         <div 
@@ -59,11 +59,11 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, onBack })
 
                     <div>
                       <div className="flex justify-between items-end mb-2">
-                        <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <span className="text-[0.5625rem] font-black text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
                           <TrendingUp className="w-3 h-3 text-[#C69C3D]" />
                           Project Progress
                         </span>
-                        <span className="text-[11px] font-black font-mono text-[#C69C3D]">{p.progress}%</span>
+                        <span className="text-[0.6875rem] font-black font-mono text-[#C69C3D]">{p.progress}%</span>
                       </div>
                       <div className="h-2 bg-neutral-100 rounded-full overflow-hidden flex p-0.5">
                         <div 
@@ -76,11 +76,11 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, onBack })
 
                   <div className="grid grid-cols-2 gap-4 pt-2">
                     <div className="bg-neutral-50 rounded-2xl p-4 border border-neutral-100">
-                      <p className="text-[8px] text-neutral-400 uppercase font-black tracking-widest mb-1">Expenses</p>
+                      <p className="text-[0.5rem] text-neutral-400 uppercase font-black tracking-widest mb-1">Expenses</p>
                       <p className="text-sm font-bold text-rose-600 font-mono">{formatCurrency(p.total_expense)}</p>
                     </div>
                     <div className={`rounded-2xl p-4 border ${p.balance < 0 ? 'bg-rose-50 border-rose-100' : 'bg-[#C69C3D]/5 border-[#C69C3D]/10'}`}>
-                      <p className="text-[8px] text-neutral-400 uppercase font-black tracking-widest mb-1">Balance</p>
+                      <p className="text-[0.5rem] text-neutral-400 uppercase font-black tracking-widest mb-1">Balance</p>
                       <p className={`text-sm font-bold font-mono ${p.balance < 0 ? 'text-rose-600' : 'text-[#C69C3D]'}`}>{formatCurrency(p.balance)}</p>
                     </div>
                   </div>

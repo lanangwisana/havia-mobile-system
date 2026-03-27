@@ -754,7 +754,7 @@ export default function HaviaMobileApp() {
     return (
       <div style={{ backgroundColor: colors.primary }} className="h-screen w-full flex flex-col items-center justify-center">
         <div className="w-16 h-16 rounded-full border-t-2 border-[#C69C3D] animate-spin mb-4"></div>
-        <p className="text-[#C69C3D] text-[10px] font-bold uppercase tracking-widest animate-pulse">Autentikasi Havia...</p>
+        <p className="text-[#C69C3D] text-[0.625rem] font-bold uppercase tracking-widest animate-pulse">Autentikasi Havia...</p>
       </div>
     );
   }

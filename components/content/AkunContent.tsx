@@ -22,7 +22,7 @@ export const AkunContent: React.FC<AkunContentProps> = ({
         </div>
       </div>
       <h2 className="text-2xl font-bold text-neutral-900 tracking-wide">{userData?.first_name} {userData?.last_name || ''}</h2>
-      <span style={{ color: colors.gold }} className="text-[10px] font-bold uppercase tracking-[0.2em] mt-1">{userData?.job_title || 'USER'}</span>
+      <span style={{ color: colors.gold }} className="text-[0.625rem] font-bold uppercase tracking-[0.2em] mt-1">{userData?.job_title || 'USER'}</span>
       <div className="mt-4 px-4 py-1.5 bg-neutral-100 border border-neutral-300/50 rounded-full flex items-center gap-2">
         <Mail className="w-3 h-3 text-neutral-600" />
         <span className="text-xs text-neutral-600 font-medium">{userData?.email || 'email@haviastudio.com'}</span>
@@ -33,7 +33,7 @@ export const AkunContent: React.FC<AkunContentProps> = ({
 
     {/* Account Settings Section */}
     <div className="space-y-3 pt-6">
-      <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-black mb-3 pl-1">Account Settings</p>
+      <p className="text-[0.625rem] uppercase tracking-widest text-neutral-500 font-black mb-3 pl-1">Account Settings</p>
       
       {/* Edit Profile Button */}
       <button onClick={onEditProfile} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-full text-left flex items-center justify-between p-4 rounded-2xl border-2 active:scale-[0.98] transition-all group hover:border-[#C69C3D]">
@@ -43,7 +43,7 @@ export const AkunContent: React.FC<AkunContentProps> = ({
           </div>
           <div>
             <h4 className="font-bold text-neutral-900 text-sm">Edit Profile</h4>
-            <p className="text-[10px] text-neutral-500 font-medium tracking-wider">Update your personal information</p>
+            <p className="text-[0.625rem] text-neutral-500 font-medium tracking-wider">Update your personal information</p>
           </div>
         </div>
         <ChevronRight className="w-5 h-5 text-neutral-400 group-hover:text-[#C69C3D] transition-colors" />
@@ -57,7 +57,7 @@ export const AkunContent: React.FC<AkunContentProps> = ({
           </div>
           <div>
             <h4 className="font-bold text-neutral-900 text-sm">Reset Password</h4>
-            <p className="text-[10px] text-neutral-500 font-medium tracking-wider">Change your security password</p>
+            <p className="text-[0.625rem] text-neutral-500 font-medium tracking-wider">Change your security password</p>
           </div>
         </div>
         <ChevronRight className="w-5 h-5 text-neutral-400 group-hover:text-[#C69C3D] transition-colors" />
