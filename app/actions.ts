@@ -72,33 +72,44 @@ const sanitizeToken = (token: string) => {
   return token.trim().replace(/^["']|["']$/g, '').trim();
 };
 
-// Fungsi Generic untuk fetch endpoint API apa saja dari RISE CRM (CORS safe)
+// In-memory global cache for backup/fallback (persists across hot-reloads in Next.js dev and lambda warm starts)
+const globalCache = (globalThis as any).apiBackupCache || new Map();
+if (!(globalThis as any).apiBackupCache) {
+  (globalThis as any).apiBackupCache = globalCache;
+}
+
+// Fungsi Generic untuk fetch endpoint API apa saja dari RISE CRM (CORS safe) dengan Resilience 
 export async function fetchFromApi(endpoint: string, token: string, retryCount = 0): Promise<any> {
+  const cleanToken = sanitizeToken(token);
+  const cacheKey = `${cleanToken.substring(0, 10)}_${endpoint}`;
+  
   try {
-    let cleanToken = sanitizeToken(token);
-    
-    // STRATEGI RETRY KHUSUS: 
-    // Jika ini retry ke-1, coba tambahkan spasi di depan (beberapa server PHP butuh ini karena bug str_replace)
+    let activeToken = cleanToken;
+    // STRATEGI RETRY KHUSUS
     if (retryCount === 1) {
-      cleanToken = " " + cleanToken;
+      activeToken = " " + activeToken;
     }
 
     const url = `${API_BASE_URL}/${endpoint}`;
-    
-    // Log diagnostik singkat
-    console.log(`[API] ${endpoint} | Retry: ${retryCount} | TokenHead: ${cleanToken.substring(0, 15)}...`);
+    console.log(`[API] ${endpoint} | Retry: ${retryCount} | TokenHead: ${activeToken.substring(0, 15)}...`);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 detik timeout toleransi
 
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'authtoken': cleanToken,
+        'authtoken': activeToken,
         'Accept': 'application/json',
         'Cache-Control': 'no-cache'
       },
       cache: 'no-store',
+      signal: controller.signal
     });
     
-    // 404 = Data Kosong
+    clearTimeout(timeoutId);
+
+    // 404 = Data Kosong (sah dari backend)
     if (response.status === 404) {
       return { success: true, data: [], isEmpty: true };
     }
@@ -108,38 +119,51 @@ export async function fetchFromApi(endpoint: string, token: string, retryCount =
     try {
       parsedRes = JSON.parse(textRes);
     } catch (e) {
-      return { success: false, error: `JSON Error (${response.status})` };
+      throw new Error(`JSON Error (${response.status})`);
     }
     
     if (!response.ok) {
-      const errorDetail = parsedRes?.messages?.error || parsedRes?.message || parsedRes?.error || 'Server Error';
+      const errorDetail = parsedRes?.messages?.error || parsedRes?.message || parsedRes?.error || `Server Error ${response.status}`;
       
-      // AUTO-RETRY UNTUK ERROR 401
-      if (response.status === 401 && retryCount < 2) {
-        await new Promise(resolve => setTimeout(resolve, 300));
+      // AUTO-RETRY KHUSUS UNTUK 401 ATAU INTERNAL ERROR (sebelum fallback cache)
+      if ((response.status === 401 || response.status >= 500) && retryCount < 2) {
+        await new Promise(resolve => setTimeout(resolve, 800));
         return fetchFromApi(endpoint, token, retryCount + 1);
       }
-
-      // FALLBACK DARURAT JIKA API MATI TOTAL/SIGNATURE FAILED
-      // Kita kembalikan data minimal agar UI tidak kosong melompong (khusus demo/troubleshooting)
-      if (response.status === 401 || response.status >= 500) {
-        if (endpoint.includes('projects/search')) {
-           return { success: true, data: [{ id: '35', title: 'Desain Rumah Modern 2 Lantai (RK House)', status: 'open' }], isFallback: true, serverErrorMessage: errorDetail };
-        }
-        if (endpoint.includes('tasks/search')) {
-           return { success: true, data: [{ id: '31', title: 'Pembuatan Konsep Desain Arsitektur', project_id: '35', project_title: 'RK House', collaborators: 'asep_id' }], isFallback: true, serverErrorMessage: errorDetail };
-        }
-        if (endpoint.includes('events')) {
-           return { success: true, data: [{ id: 'e1', title: 'Rapat RK House', start_date: new Date().toISOString().split('T')[0], color: '#f1c40f' }], isFallback: true, serverErrorMessage: errorDetail };
-        }
-      }
-
-      return { success: false, error: errorDetail, status: response.status };
+      
+      throw new Error(errorDetail);
     }
     
-    return { success: true, data: parsedRes.data || parsedRes, meta: parsedRes.meta };
+    // Sukses mereload data asli! Simpan ke cache sebagai backup
+    const finalData = parsedRes.data || parsedRes;
+    globalCache.set(cacheKey, { data: finalData, meta: parsedRes.meta, timestamp: Date.now() });
+    
+    return { success: true, data: finalData, meta: parsedRes.meta };
+    
   } catch (error: any) {
-    return { success: false, error: error.message || 'Kesalahan koneksi.' };
+    const isNetworkIssue = error.name === 'AbortError' || error.message.toLowerCase().includes('fetch');
+    
+    // 1. AUTO RETRY jika masalah jaringan lambat atau terputus
+    if (retryCount < 2 && isNetworkIssue) {
+       console.log(`[API] Timeout/Jaringan lambat pada ${endpoint}, mencoba retry... (${retryCount+1})`);
+       await new Promise(resolve => setTimeout(resolve, 1500));
+       return fetchFromApi(endpoint, token, retryCount + 1);
+    }
+
+    // 2. FALLBACK KE CACHE DATA ASLI (REAL DATA)
+    // Jika server down atau internet nge-lag parah, keluarkan data autentik terakhir yang kita miliki!
+    if (globalCache.has(cacheKey)) {
+       console.log(`[API] RESILIENCE ACTIVATED: Served BACKUP DATA for ${endpoint}`);
+       const cached = globalCache.get(cacheKey);
+       return { success: true, data: cached.data, meta: cached.meta, isBackup: true };
+    }
+
+    // 3. FALLBACK ERROR GRACEFUL (Bukan 'failed to fetch')
+    return { 
+      success: false, 
+      error: 'Peladen (Server) sedang sibuk atau jaringan Anda tidak stabil. Data akan dimuat ulang otomatis.', 
+      isOffline: true 
+    };
   }
 }
 
