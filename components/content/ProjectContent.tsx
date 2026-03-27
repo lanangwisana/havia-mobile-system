@@ -169,7 +169,7 @@ interface ProjectContentProps {
                          {isDone ? <CheckCircle2 className="w-7 h-7" /> : isCanceled ? <XCircle className="w-7 h-7" /> : isHold ? <Clock className="w-7 h-7" /> : <Briefcase className="w-7 h-7" />}
                        </div>
                        <div className="flex flex-col min-w-0">
-                         <h4 className={`font-black text-[15px] leading-tight truncate transition-all duration-500 ${isDone ? 'text-neutral-400' : 'text-[#2C2A29]'}`}>
+                         <h4 className={`font-black text-[15px] leading-tight transition-all duration-500 ${isExpanded ? 'whitespace-normal' : 'truncate'} ${isDone ? 'text-neutral-400' : 'text-[#2C2A29]'}`}>
                            {project.title || `Project ${project.id}`}
                          </h4>
                          <div className="flex items-center gap-2 mt-1.5 opacity-80">
