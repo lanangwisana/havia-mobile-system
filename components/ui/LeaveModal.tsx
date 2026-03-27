@@ -104,7 +104,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
             </div>
 
             {/* Date Range */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Start Date</label>
                 <input
