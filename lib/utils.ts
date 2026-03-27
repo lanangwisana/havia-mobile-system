@@ -13,7 +13,7 @@ export const colors = {
 
 
 export const getUserImage = (user: any) => {
-  if (!user) return "https://ui-avatars.com/api/?name=User&background=D4AF37&color=111";
+  if (!user) return "https://ui-avatars.com/api/?name=User&background=C69C3D&color=2C2A29";
   
   const imgUrl = user.image || user.avatar || "";
   
@@ -24,7 +24,7 @@ export const getUserImage = (user: any) => {
 
   if (imgUrl.trim() === "" || imgUrl.includes("avatar.jpg") || imgUrl.includes("default") || imgUrl === "null") {
     const name = user.name || (user.first_name ? `${user.first_name} ${user.last_name || ''}` : "U");
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name.trim())}&background=D4AF37&color=111&bold=true`;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name.trim())}&background=C69C3D&color=2C2A29&bold=true`;
   }
   
   return imgUrl;
