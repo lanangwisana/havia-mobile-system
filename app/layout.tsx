@@ -46,7 +46,7 @@ export default function RootLayout({
                     .catch(err => console.log('SW registration failed:', err));
                 });
               }
-              // Scaler for Favicon
+              // Scaler for Favicon with Aspect Ratio Support
               (function() {
                 const img = new Image();
                 img.src = '/LogoHavia_primary2.png';
@@ -54,8 +54,25 @@ export default function RootLayout({
                   const canvas = document.createElement('canvas');
                   canvas.width = 64; canvas.height = 64;
                   const ctx = canvas.getContext('2d');
+                  
                   const padding = 12; // padding scale
-                  ctx.drawImage(img, padding, padding, canvas.width - padding*2, canvas.height - padding*2);
+                  const maxWidth = canvas.width - padding * 2;
+                  const maxHeight = canvas.height - padding * 2;
+                  
+                  // Calculate proportions
+                  const ratio = img.width / img.height;
+                  let drawWidth = maxWidth;
+                  let drawHeight = maxWidth / ratio;
+                  
+                  if (drawHeight > maxHeight) {
+                    drawHeight = maxHeight;
+                    drawWidth = maxHeight * ratio;
+                  }
+                  
+                  const x = (canvas.width - drawWidth) / 2;
+                  const y = (canvas.height - drawHeight) / 2;
+                  
+                  ctx.drawImage(img, x, y, drawWidth, drawHeight);
                   const fav = document.getElementById('dynamic-favicon');
                   if (fav) fav.href = canvas.toDataURL('image/png');
                 };
