@@ -9,13 +9,13 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/LogoHavia_primary1.png",
+      "src": "/Vector.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/LogoHavia_primary1.png",
+      "src": "/Vector.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
