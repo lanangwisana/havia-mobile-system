@@ -32,7 +32,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
         <link rel="apple-touch-icon" href="/Vector.png" />
-        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><image href='/LogoHavia_primary2.png' x='15' y='15' width='70' height='70'/></svg>" />
+        <link id="dynamic-favicon" rel="icon" type="image/png" href="/LogoHavia_primary2.png" />
       </head>
       <body className="antialiased">
         {children}
@@ -46,6 +46,20 @@ export default function RootLayout({
                     .catch(err => console.log('SW registration failed:', err));
                 });
               }
+              // Scaler for Favicon
+              (function() {
+                const img = new Image();
+                img.src = '/LogoHavia_primary2.png';
+                img.onload = function() {
+                  const canvas = document.createElement('canvas');
+                  canvas.width = 64; canvas.height = 64;
+                  const ctx = canvas.getContext('2d');
+                  const padding = 12; // padding scale
+                  ctx.drawImage(img, padding, padding, canvas.width - padding*2, canvas.height - padding*2);
+                  const fav = document.getElementById('dynamic-favicon');
+                  if (fav) fav.href = canvas.toDataURL('image/png');
+                };
+              })();
             `,
           }}
         />
