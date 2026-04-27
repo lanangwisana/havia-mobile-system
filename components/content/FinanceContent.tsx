@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TrendingDown, Receipt, DollarSign, Tag, Briefcase, Wallet, PieChart, TrendingUp, Banknote } from 'lucide-react';
 import { colors, formatCurrency } from '@/lib/utils';
+import { canSeeProjectSummary } from '@/lib/permissions';
 
 interface FinanceContentProps {
   expenses: any[];
@@ -21,18 +22,16 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   onViewAll,
   onHistory
 }) => {
-  const isAdmin = Number(userData?.is_admin) === 1;
-  const isStaff = userData?.user_type === "staff";
+  const isUserAdmin = Number(userData?.is_admin) === 1;
   
-  // Refined RBAC: Admin OR any project where user is PIC/Leader
-  const isPIC = financeSummary.some(p => p.is_pic === true || p.is_pic === 1 || p.is_pic === "1");
-  const canSeeOverview = isAdmin || isPIC;
+  // RBAC dari Lanang: Super Admin = semua, PM = Project Summary + Salary, sisanya = Salary saja
+  const canSeeOverview = canSeeProjectSummary(userData);
 
   // Initial tab selection
   const [activeTab, setActiveTab] = useState<'overview' | 'salary'>(canSeeOverview ? 'overview' : 'salary');
 
-  // RBAC Filter for summaries
-  const filteredSummary = isAdmin ? financeSummary : financeSummary.filter(p => p.is_pic === true || p.is_pic === 1 || p.is_pic === "1");
+  // RBAC Filter: Admin & PM see all projects, others don't see project summary at all
+  const filteredSummary = canSeeOverview ? financeSummary : [];
 
   // Stats for the active context
   const totalProjectsBudget = filteredSummary.reduce((sum, p) => sum + (p.project_price || 0), 0);

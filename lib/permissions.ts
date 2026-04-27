@@ -2,17 +2,23 @@
 // PERMISSION HELPER
 // Menerjemahkan raw permissions dari Brain ke boolean per modul
 // =============================================================
+// Aturan dari Lanang:
+// - Semua role KECUALI OB → bisa akses semua menu
+// - OB → hanya Events + Presensi
+// - Finance tab-level: Super Admin = semua, PM = Project Summary + Salary, sisanya = Salary saja
+// =============================================================
 
 interface UserData {
   is_admin?: string | number;
   user_type?: string;
   permissions?: Record<string, any>;
+  job_title?: string;
 }
 
 /**
  * Cek apakah user adalah admin (bypass semua permission)
  */
-function isAdmin(user: UserData | null): boolean {
+export function isAdmin(user: UserData | null): boolean {
   if (!user) return false;
   return (
     String(user.is_admin) === "1" ||
@@ -30,58 +36,71 @@ function getPerm(user: UserData | null, key: string): string {
   return String(val);
 }
 
+/**
+ * Cek apakah role user adalah OB (satu-satunya yang di-restrict)
+ * OB dideteksi via permission `do_not_show_projects` == "1"
+ */
+function isOBRole(user: UserData | null): boolean {
+  if (!user) return false;
+  if (isAdmin(user)) return false;
+  return getPerm(user, "do_not_show_projects") === "1";
+}
+
 // =============================================================
 // MODULE ACCESS CHECKERS
 // =============================================================
 
 /**
- * Projects & Tasks — hide jika `do_not_show_projects` == "1"
+ * Projects & Tasks — semua role kecuali OB
  */
 export function canAccessProjects(user: UserData | null): boolean {
   if (!user) return false;
-  if (isAdmin(user)) return true;
-  return getPerm(user, "do_not_show_projects") !== "1";
+  return !isOBRole(user);
 }
 
 /**
- * Finance — hide jika permission `expense` kosong
- * (Hanya role dengan akses expense yang bisa lihat Finance)
+ * Finance — semua role kecuali OB
+ * (Tab-level access dikontrol di FinanceContent)
  */
 export function canAccessFinance(user: UserData | null): boolean {
   if (!user) return false;
-  if (isAdmin(user)) return true;
-  return getPerm(user, "expense") !== "";
+  return !isOBRole(user);
 }
 
 /**
- * Team (Attendance management, Leave management) — hide jika
- * kedua permission `attendance` DAN `leave` kosong
+ * Team — semua role kecuali OB
  */
 export function canAccessTeam(user: UserData | null): boolean {
   if (!user) return false;
-  if (isAdmin(user)) return true;
-  const hasAttendance = getPerm(user, "attendance") !== "";
-  const hasLeave = getPerm(user, "leave") !== "";
-  return hasAttendance || hasLeave;
+  return !isOBRole(user);
 }
 
 /**
- * Events/Schedule — selalu tampil untuk semua user
- * (Setiap orang bisa melihat event yang di-share kepadanya)
+ * Events/Schedule — selalu tampil untuk semua user termasuk OB
  */
 export function canAccessEvents(user: UserData | null): boolean {
   if (!user) return false;
-  // Events always accessible for all logged-in users
   return true;
 }
 
+// =============================================================
+// FINANCE TAB-LEVEL ACCESS
+// =============================================================
+
 /**
- * Clients — hide jika permission `client` kosong
+ * Cek apakah user bisa lihat Project Summary di Finance
+ * - Super Admin: YES
+ * - Projek Manager (PM): YES (semua project)
+ * - Role lain: NO (hanya salary)
  */
-export function canAccessClients(user: UserData | null): boolean {
+export function canSeeProjectSummary(user: UserData | null): boolean {
   if (!user) return false;
   if (isAdmin(user)) return true;
-  return getPerm(user, "client") !== "";
+  // PM dideteksi via permission `expense` yang bernilai "all"
+  // ATAU melalui role yang punya expense permission non-kosong + can_manage_all_projects
+  const expensePerm = getPerm(user, "expense");
+  const canManageAllProjects = getPerm(user, "can_manage_all_projects");
+  return expensePerm === "all" || canManageAllProjects === "1";
 }
 
 // =============================================================
@@ -97,13 +116,13 @@ interface QuickMenuItem {
 
 /**
  * Filter menu Quick Access di Dashboard berdasarkan permission user
+ * Aturan: Semua role bisa semua menu, KECUALI OB hanya Events
  */
 export function getVisibleMenuItems(user: UserData | null, allItems: QuickMenuItem[]): QuickMenuItem[] {
   if (!user) return [];
 
-  // Mapping: Quick Access ID -> permission checker
   const accessMap: Record<string, (u: UserData | null) => boolean> = {
-    'All Tasks': canAccessProjects,  // Tasks terkait projects
+    'All Tasks': canAccessProjects,
     'Project': canAccessProjects,
     'Events': canAccessEvents,
     'Team': canAccessTeam,
@@ -112,7 +131,7 @@ export function getVisibleMenuItems(user: UserData | null, allItems: QuickMenuIt
 
   return allItems.filter(item => {
     const checker = accessMap[item.id];
-    if (!checker) return true; // Jika tidak ada rule, tampilkan
+    if (!checker) return true;
     return checker(user);
   });
 }
