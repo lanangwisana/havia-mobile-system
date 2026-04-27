@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bell, QrCode, ClipboardList, Users, DollarSign, Calendar, Briefcase, Clock } from 'lucide-react';
 import { colors, getGreeting, getUserImage, getAttendanceStatus } from '@/lib/utils';
+import { getVisibleMenuItems } from '@/lib/permissions';
 
 interface DashboardViewProps {
   userData: any;
@@ -90,31 +91,34 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
           </div>
         </div>
 
-        {/* Quick Access Menu - 5 Columns with Abstract 3D Icons & Transparency Fix */}
+        {/* Quick Access Menu - Permission-Filtered */}
         <div className="pt-2 pb-6 px-1">
           <p className="text-[0.625rem] text-neutral-900 uppercase tracking-[0.3em] font-black mb-6 px-1">Quick Access</p>
           <div className="grid grid-cols-5 gap-3 h-24">
-            {[
-              { id: 'All Tasks', label: 'Tasks', icon: ClipboardList },
-              { id: 'Project', label: 'Projects', icon: Briefcase, nav: 'project' },
-              { id: 'Events', label: 'Events', icon: Calendar, nav: 'jadwal' },
-              { id: 'Team', label: 'Team', icon: Users },
-              { id: 'Finance', label: 'Finance', icon: DollarSign }
-            ].map((item) => (
-              <button 
-                key={item.id} 
-                onClick={() => onNav('subpage', item.nav || null, item.id)} 
-                className="flex flex-col items-center gap-3 active:scale-95 transition-all duration-300 w-full"
-              >
-                <div 
-                   className="w-full aspect-square rounded-[1.8rem] border border-[#E8E4E1] flex items-center justify-center relative bg-white overflow-hidden shadow-sm"
+            {(() => {
+              const allItems = [
+                { id: 'All Tasks', label: 'Tasks', icon: ClipboardList },
+                { id: 'Project', label: 'Projects', icon: Briefcase, nav: 'project' },
+                { id: 'Events', label: 'Events', icon: Calendar, nav: 'jadwal' },
+                { id: 'Team', label: 'Team', icon: Users },
+                { id: 'Finance', label: 'Finance', icon: DollarSign }
+              ];
+              return getVisibleMenuItems(userData, allItems).map((item) => (
+                <button 
+                  key={item.id} 
+                  onClick={() => onNav('subpage', item.nav || null, item.id)} 
+                  className="flex flex-col items-center gap-3 active:scale-95 transition-all duration-300 w-full"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white to-[#F4EBD4]/20 opacity-50"></div>
-                  <item.icon className="w-6 h-6 text-[#C69C3D] relative z-10" />
-                </div>
-                <span className="text-[0.5rem] font-black tracking-widest text-neutral-900 uppercase truncate w-full text-center">{item.label}</span>
-              </button>
-            ))}
+                  <div 
+                     className="w-full aspect-square rounded-[1.8rem] border border-[#E8E4E1] flex items-center justify-center relative bg-white overflow-hidden shadow-sm"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-white to-[#F4EBD4]/20 opacity-50"></div>
+                    <item.icon className="w-6 h-6 text-[#C69C3D] relative z-10" />
+                  </div>
+                  <span className="text-[0.5rem] font-black tracking-widest text-neutral-900 uppercase truncate w-full text-center">{item.label}</span>
+                </button>
+              ));
+            })()}
           </div>
         </div>
       </div>

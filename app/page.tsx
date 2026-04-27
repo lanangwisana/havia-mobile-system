@@ -15,6 +15,7 @@ import {
 
 // Import Lib & Utils
 import { colors } from '@/lib/utils';
+import { canAccessProjects, canAccessFinance, canAccessTeam } from '@/lib/permissions';
 
 // Import UI Components
 import { Toast } from '@/components/ui/Toast';
@@ -122,14 +123,38 @@ export default function HaviaMobileApp() {
   };
 
   const handleNav = (view: string, nav?: string | null, title: string = '', taskId: string | null = null) => {
-    // SECURITY GUARD: Check status on every navigation if logged in
+    // SECURITY GUARD: Check status + sync permissions on every navigation
     if (apiToken && view !== 'login') {
       verifyUserStatus(apiToken).then(statusCheck => {
         if (!statusCheck.success && statusCheck.status === 'blocked') {
           showToast(statusCheck.message || 'Account disabled');
           handleLogout();
+        } else if (statusCheck.success && (statusCheck as any).user?.permissions) {
+          // Sync permissions from server (in case admin changed role)
+          const syncedPerms = (statusCheck as any).user.permissions;
+          setUserData((prev: any) => {
+            if (!prev) return prev;
+            const updated = { ...prev, permissions: syncedPerms };
+            localStorage.setItem('havia_user', JSON.stringify(updated));
+            return updated;
+          });
         }
       });
+    }
+
+    // PERMISSION GUARD: Block navigation to modules without permission
+    if (view === 'subpage' && title) {
+      const guardMap: Record<string, (u: any) => boolean> = {
+        'Project': canAccessProjects,
+        'All Tasks': canAccessProjects,
+        'Finance': canAccessFinance,
+        'Team': canAccessTeam,
+      };
+      const checker = guardMap[title];
+      if (checker && !checker(userData)) {
+        showToast('You do not have permission to access this module.');
+        return; // Block navigation
+      }
     }
 
     setCurrentView(view);
@@ -198,11 +223,20 @@ export default function HaviaMobileApp() {
                   localStorage.setItem('havia_user', JSON.stringify(latestUser));
                 }
 
-                // Verify status in background to catch "Disable login" or "Inactive"
+                // Verify status + sync permissions in background
                 verifyUserStatus(savedToken).then(statusCheck => {
                   if (!statusCheck.success && statusCheck.status === 'blocked') {
                     showToast(statusCheck.message || 'Account disabled');
                     handleLogout();
+                  } else if (statusCheck.success && (statusCheck as any).user?.permissions) {
+                    // Sync latest permissions from server
+                    const syncedPerms = (statusCheck as any).user.permissions;
+                    setUserData((prev: any) => {
+                      if (!prev) return prev;
+                      const updated = { ...prev, permissions: syncedPerms };
+                      localStorage.setItem('havia_user', JSON.stringify(updated));
+                      return updated;
+                    });
                   }
                 });
               } else {
