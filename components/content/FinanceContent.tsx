@@ -27,8 +27,15 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   // RBAC dari Lanang: Super Admin = semua, PM = Project Summary + Salary, sisanya = Salary saja
   const canSeeOverview = canSeeProjectSummary(userData);
 
-  // Initial tab selection
+  // Initial tab selection: Default ke overview jika punya akses (Admin/PM)
   const [activeTab, setActiveTab] = useState<'overview' | 'salary'>(canSeeOverview ? 'overview' : 'salary');
+
+  // Sync tab selection if permissions change after initial load
+  React.useEffect(() => {
+    if (canSeeOverview && activeTab === 'salary' && expenses.length === 0) {
+      setActiveTab('overview');
+    }
+  }, [canSeeOverview]);
 
   // RBAC Filter: Admin & PM see all projects, others don't see project summary at all
   const filteredSummary = canSeeOverview ? financeSummary : [];
