@@ -59,12 +59,12 @@ export function canAccessProjects(user: UserData | null): boolean {
 }
 
 /**
- * Finance — semua role kecuali OB
- * (Tab-level access dikontrol di FinanceContent)
+ * Finance — semua user bisa akses (termasuk OB untuk lihat gaji sendiri)
+ * (Tab-level access dikontrol di FinanceContent: OB & role biasa hanya lihat Salary)
  */
 export function canAccessFinance(user: UserData | null): boolean {
   if (!user) return false;
-  return !isOBRole(user);
+  return true;
 }
 
 /**
@@ -96,11 +96,13 @@ export function canAccessEvents(user: UserData | null): boolean {
 export function canSeeProjectSummary(user: UserData | null): boolean {
   if (!user) return false;
   if (isAdmin(user)) return true;
-  // PM dideteksi via permission `expense` yang bernilai "all"
-  // ATAU melalui role yang punya expense permission non-kosong + can_manage_all_projects
+  
   const expensePerm = getPerm(user, "expense");
   const canManageAllProjects = getPerm(user, "can_manage_all_projects");
-  return expensePerm === "all" || canManageAllProjects === "1";
+  
+  // PM detected if they have 'all' access to expenses OR can_manage_all_projects
+  // Or if they have ANY expense permission (usually PM/Admin only)
+  return expensePerm === "all" || expensePerm === "1" || canManageAllProjects === "1";
 }
 
 // =============================================================
