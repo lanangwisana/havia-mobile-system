@@ -93,8 +93,13 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
                     <h4 className="font-bold text-neutral-900 text-sm leading-tight group-hover:text-[#C69C3D] transition-colors">{p.project_title}</h4>
                     <div className="flex items-center gap-2 mt-2">
                        <span className="text-[0.5625rem] px-2 py-0.5 bg-neutral-50 border border-neutral-200 rounded-md text-neutral-500 uppercase font-bold tracking-wider">{p.status_title}</span>
-                       <span className="text-[0.5625rem] text-neutral-400 font-medium italic">{p.progress}% tasks done</span>
+                       <span className="text-[0.5625rem] text-neutral-400 font-medium italic">{p.progress}% tasks done • {p.expense_count || 0} items</span>
                     </div>
+                    {p.expense_titles && (
+                      <p className="text-[0.5rem] text-neutral-400 mt-1 leading-tight line-clamp-2 italic">
+                        Incl: {p.expense_titles}
+                      </p>
+                    )}
                   </div>
                   <div className="text-right">
                     <p className="text-[0.5625rem] text-neutral-400 uppercase font-black tracking-widest mb-0.5">Budget</p>

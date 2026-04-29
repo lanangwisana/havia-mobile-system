@@ -103,32 +103,14 @@ export function canSeeProjectSummary(user: UserData | null): boolean {
   const roleTitle = (user.role_title || user.permissions?.role_title || '').toLowerCase();
   const roleId = String(user.role_id || user.permissions?.role_id || '').toLowerCase();
 
-  // Explicitly hide for Drafter, Estimator, and OB
-  // We use multiple variations to be safe
-  const restrictedKeywords = ['drafter', 'estimator', 'household', 'ob', 'office boy'];
+  // Role-role ini (termasuk variasinya seperti Arsitektur Manager) HANYA boleh melihat Salary, bukan Project Summary
+  const restrictedKeywords = ['household', 'ob', 'office boy', 'drafter', 'estimator', 'arsitektur'];
   if (restrictedKeywords.some(kw => jobTitle.includes(kw) || roleTitle.includes(kw) || roleId.includes(kw))) {
     return false;
   }
   
-  const expensePerm = getPerm(user, "expense");
-  const canManageAllProjects = getPerm(user, "can_manage_all_projects");
-  
-  // HR, Marketing, PM, QA roles can see project summary
-  if (
-    jobTitle.includes('hr') || 
-    jobTitle.includes('marketing') || 
-    jobTitle.includes('projek') ||
-    jobTitle.includes('qa') ||
-    roleTitle.includes('hr') || 
-    roleTitle.includes('marketing') ||
-    roleTitle.includes('qa') ||
-    roleId.includes('hr') ||
-    roleId.includes('marketing') ||
-    roleId.includes('qa')
-  ) return true;
-
-  // PM detected if they have 'all' access to expenses OR can_manage_all_projects
-  return expensePerm === "all" || expensePerm === "1" || canManageAllProjects === "1";
+  // Everyone else is allowed to see the Project Summary tab
+  return true;
 }
 
 // =============================================================
