@@ -49,16 +49,12 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   const isRestrictedRole = !isUserAdmin && canSeeOverview;
 
   // Filter salaries specifically (ONLY for non-admin and non-restricted roles)
-  const salaryExpenses = (isUserAdmin || isRestrictedRole) 
+  const salaryExpenses = isUserAdmin
     ? expenses.filter(exp => {
         const category = (exp.category_title || exp.category_name || exp.category || '').toLowerCase();
         return !category.includes('project expense');
       })
-    : expenses.filter(exp => {
-        const category = (exp.category_title || exp.category_name || exp.category || '').toLowerCase();
-        const title = (exp.title || '').toLowerCase();
-        return category.includes('salary') || title.includes('gaji') || title.includes('salary');
-      });
+    : expenses; // Staff see all items returned from the server (filtered by user_id in backend)
 
   const totalSalaryAmount = salaryExpenses.reduce((sum, exp) => {
     const amt = parseFloat(exp.amount || '0');
@@ -188,9 +184,14 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                         <div className="flex items-center gap-2 mt-1.5">
                           <span className="text-[0.5625rem] px-2 py-0.5 bg-neutral-50 border border-neutral-200 rounded text-neutral-500 uppercase font-bold tracking-wider">{p.status_title}</span>
                           <span className="text-[0.5625rem] text-neutral-400 flex items-center gap-1 font-medium italic">
-                            {p.progress}% tasks done
+                            {p.progress}% tasks done • {p.expense_count || 0} items
                           </span>
                         </div>
+                        {p.expense_titles && (
+                          <p className="text-[0.5rem] text-neutral-400 mt-1 leading-tight line-clamp-1 italic">
+                            Incl: {p.expense_titles}
+                          </p>
+                        )}
                       </div>
                       <div className="text-right">
                         <p className="text-[0.625rem] text-neutral-400 uppercase font-black tracking-widest mb-0.5">Budget</p>
@@ -328,10 +329,13 @@ const SalarySection = ({ salaryExpenses, totalSalaryAmount, isLoadingExpenses, o
       ) : salaryExpenses.length > 0 ? (
         <div className="space-y-3">
           {salaryExpenses.map((expense: any, idx: number) => {
+            const total = parseFloat(expense.total_amount || '0');
             const amount = parseFloat(expense.amount || '0');
-            const taxAmt = parseFloat(expense.tax_amount || expense.tax || '0');
-            const tax2Amt = parseFloat(expense.second_tax_amount || expense.second_tax || '0');
-            const total = amount + taxAmt + tax2Amt;
+            const taxAmt = parseFloat(expense.tax_amount || '0');
+            const tax2Amt = parseFloat(expense.second_tax_amount || '0');
+            
+            // Fallback for manual calculation if total_amount is missing
+            const finalTotal = total > 0 ? total : (amount + taxAmt + tax2Amt);
             const expDate = expense.expense_date || expense.date || '';
             const description = expense.description || '';
             const descParts = description.split('\n').filter((s: string) => s.trim());
@@ -364,7 +368,7 @@ const SalarySection = ({ salaryExpenses, totalSalaryAmount, isLoadingExpenses, o
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-blue-600 font-mono">{formatCurrency(total)}</p>
+                      <p className="text-sm font-bold text-blue-600 font-mono">{formatCurrency(finalTotal)}</p>
                       <p className="text-[0.5625rem] text-neutral-400 mt-0.5 uppercase tracking-widest font-bold">Disbursed</p>
                     </div>
                   </div>
