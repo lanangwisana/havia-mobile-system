@@ -13,6 +13,8 @@ interface UserData {
   user_type?: string;
   permissions?: Record<string, any>;
   job_title?: string;
+  role_title?: string;
+  role_id?: string | number;
 }
 
 /**
