@@ -91,6 +91,8 @@ export default function HaviaMobileApp() {
   const [isLoadingExpenses, setIsLoadingExpenses] = useState(false);
   const [financeSummary, setFinanceSummary] = useState<any[]>([]);
   const [isLoadingFinanceSummary, setIsLoadingFinanceSummary] = useState(false);
+  const [financeSummaryMeta, setFinanceSummaryMeta] = useState<any>(null);
+  const [currentFinanceSummaryPage, setCurrentFinanceSummaryPage] = useState(1);
   const [financeSummaryTotal, setFinanceSummaryTotal] = useState(0);
   const [expensesTotal, setExpensesTotal] = useState(0);
 
@@ -223,17 +225,16 @@ export default function HaviaMobileApp() {
                   localStorage.setItem('havia_user', JSON.stringify(latestUser));
                 }
 
-                // Verify status + sync permissions in background
+                // Verify status + sync permissions and role info in background
                 verifyUserStatus(savedToken).then(statusCheck => {
                   if (!statusCheck.success && statusCheck.status === 'blocked') {
                     showToast(statusCheck.message || 'Account disabled');
                     handleLogout();
-                  } else if (statusCheck.success && (statusCheck as any).user?.permissions) {
-                    // Sync latest permissions from server
-                    const syncedPerms = (statusCheck as any).user.permissions;
+                  } else if (statusCheck.success && (statusCheck as any).user) {
+                    // Sync latest user info, job title, and permissions from server
+                    const serverUser = (statusCheck as any).user;
                     setUserData((prev: any) => {
-                      if (!prev) return prev;
-                      const updated = { ...prev, permissions: syncedPerms };
+                      const updated = { ...prev, ...serverUser };
                       localStorage.setItem('havia_user', JSON.stringify(updated));
                       return updated;
                     });
@@ -397,13 +398,20 @@ export default function HaviaMobileApp() {
     setIsLoadingExpenses(false);
   };
 
-  const loadFinanceSummary = async (isFull = false) => {
+  const loadFinanceSummary = async (page: number = 1) => {
     if (!apiToken || (userData?.is_admin !== "1" && userData?.user_type !== "staff")) return;
     setIsLoadingFinanceSummary(true);
-    const res = await fetchFromApi(`haviacms/finance/summary${isFull ? '?full=1' : ''}`, apiToken);
+    setCurrentFinanceSummaryPage(page);
+    
+    const res = await fetchFromApi(`haviacms/finance/summary?page=${page}`, apiToken);
     if (res.success) {
       setFinanceSummary(Array.isArray(res.data) ? res.data : []);
-      setFinanceSummaryTotal(res.total_count || (res.data?.length || 0));
+      if (res.meta) {
+        setFinanceSummaryMeta(res.meta);
+        setFinanceSummaryTotal(res.meta.total_items || 0);
+      } else {
+        setFinanceSummaryTotal(res.data?.length || 0);
+      }
     }
     setIsLoadingFinanceSummary(false);
   };
@@ -536,7 +544,7 @@ export default function HaviaMobileApp() {
       else if (subpageTitle === 'Finance') {
         loadExpenses();
         if (userData?.is_admin === "1" || userData?.user_type === "staff") {
-          loadFinanceSummary();
+          loadFinanceSummary(1);
         }
       }
       else if (subpageTitle === 'Events') {
@@ -860,6 +868,8 @@ export default function HaviaMobileApp() {
           isLoadingExpenses={isLoadingExpenses}
           financeSummary={financeSummary}
           isLoadingFinanceSummary={isLoadingFinanceSummary}
+          financeSummaryPaginationMeta={financeSummaryMeta}
+          onFinanceSummaryPageChange={(p: number) => loadFinanceSummary(p)}
           events={events}
           isLoadingEvents={isLoadingEvents}
           selectedEvent={selectedEvent}
@@ -873,7 +883,7 @@ export default function HaviaMobileApp() {
           userData={userData}
           onFinanceViewAll={() => {
             setSubpageTitle('Project Summary History');
-            loadFinanceSummary(true);
+            loadFinanceSummary(1);
           }}
           onFinanceHistory={() => {
             setSubpageTitle('Payment History');
@@ -881,7 +891,7 @@ export default function HaviaMobileApp() {
           }}
           onFinanceBack={() => {
             setSubpageTitle('Finance');
-            loadFinanceSummary(false);
+            loadFinanceSummary(1);
             loadExpenses(false);
           }}
           editForm={editForm}
