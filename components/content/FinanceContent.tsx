@@ -44,12 +44,21 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   const totalProjectsBudget = filteredSummary.reduce((sum, p) => sum + (p.project_price || 0), 0);
   const totalBalance = filteredSummary.reduce((sum, p) => sum + (p.balance || 0), 0);
 
-  // Filter salaries specifically
-  const salaryExpenses = expenses.filter(exp => {
-    const category = (exp.category_title || exp.category_name || exp.category || '').toLowerCase();
-    const title = (exp.title || '').toLowerCase();
-    return category.includes('salary') || title.includes('gaji') || title.includes('salary');
-  });
+  // Detect if user is in a restricted role (HR, Marketing, QA)
+  // Admin/PM are not restricted as they can see all.
+  const isRestrictedRole = !isUserAdmin && canSeeOverview;
+
+  // Filter salaries specifically (ONLY for non-admin and non-restricted roles)
+  const salaryExpenses = (isUserAdmin || isRestrictedRole) 
+    ? expenses.filter(exp => {
+        const category = (exp.category_title || exp.category_name || exp.category || '').toLowerCase();
+        return !category.includes('project expense');
+      })
+    : expenses.filter(exp => {
+        const category = (exp.category_title || exp.category_name || exp.category || '').toLowerCase();
+        const title = (exp.title || '').toLowerCase();
+        return category.includes('salary') || title.includes('gaji') || title.includes('salary');
+      });
 
   const totalSalaryAmount = salaryExpenses.reduce((sum, exp) => {
     const amt = parseFloat(exp.amount || '0');
@@ -73,7 +82,7 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-32">
-      {/* Tab Switcher - Visible for Admin or PIC */}
+      {/* Tab Switcher - Visible for Admin, PM, HR, and Marketing */}
       {canSeeOverview && (
         <div className="flex p-1 bg-neutral-100 rounded-2xl mx-1">
           <button 
@@ -96,7 +105,7 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
             }`}
           >
             <Banknote className="w-3.5 h-3.5" />
-            Salary/Payroll
+            {isRestrictedRole || isUserAdmin ? 'Expenses / Payroll' : 'Salary/Payroll'}
           </button>
         </div>
       )}
@@ -253,133 +262,144 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
           )}
         </div>
       ) : (
-        <div className="space-y-5">
-          <div className="px-1">
-            <div className="relative overflow-hidden rounded-3xl border border-neutral-100 p-6 shadow-sm group" style={{ background: 'linear-gradient(135deg, #FFFFFF 0%, #FAF7EF 100%)' }}>
-              <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[#C69C3D]/5 blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
-              <div className="flex items-center justify-between mb-4 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#FAF7EF] flex items-center justify-center border border-[#C69C3D]/10">
-                    <Banknote className="w-5 h-5 text-[#C69C3D]" />
-                  </div>
-                  <div>
-                    <span className="text-[0.625rem] text-neutral-400 uppercase tracking-[0.2em] font-black block">Total Salary Paid</span>
-                    <span className="text-[0.5625rem] text-[#C69C3D] font-bold opacity-60">Cumulative Disbursement</span>
-                  </div>
-                </div>
+        <SalarySection 
+          salaryExpenses={salaryExpenses} 
+          totalSalaryAmount={totalSalaryAmount} 
+          isLoadingExpenses={isLoadingExpenses} 
+          onHistory={onHistory}
+          title={isRestrictedRole || isUserAdmin ? 'Total Expenses' : 'Total Salary Paid'}
+          label={isRestrictedRole || isUserAdmin ? 'Cumulative Expenditure' : 'Cumulative Disbursement'}
+        />
+      )}
+    </div>
+  );
+};
+
+const SalarySection = ({ salaryExpenses, totalSalaryAmount, isLoadingExpenses, onHistory, title, label }: any) => {
+  return (
+    <div className="space-y-5">
+      <div className="px-1">
+        <div className="relative overflow-hidden rounded-3xl border border-neutral-100 p-6 shadow-sm group" style={{ background: 'linear-gradient(135deg, #FFFFFF 0%, #FAF7EF 100%)' }}>
+          <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[#C69C3D]/5 blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
+          <div className="flex items-center justify-between mb-4 relative z-10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-[#FAF7EF] flex items-center justify-center border border-[#C69C3D]/10">
+                <Banknote className="w-5 h-5 text-[#C69C3D]" />
               </div>
-              <div className="flex items-baseline gap-2 relative z-10">
-                <span className="text-sm font-black text-[#C69C3D]/40 font-mono italic">IDR</span>
-                <p className="text-3xl font-black text-[#2C2A29] font-mono tracking-tighter">
-                  {totalSalaryAmount >= 1000000000 ? (
-                    <>
-                      {(totalSalaryAmount / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
-                      <span className="text-sm font-medium lowercase italic ml-1 opacity-70">milyar</span>
-                    </>
-                  ) : (
-                    totalSalaryAmount.toLocaleString('id-ID')
-                  )}
-                </p>
+              <div>
+                <span className="text-[0.625rem] text-neutral-400 uppercase tracking-[0.2em] font-black block">{title || 'Total Salary Paid'}</span>
+                <span className="text-[0.5625rem] text-[#C69C3D] font-bold opacity-60">{label || 'Cumulative Disbursement'}</span>
               </div>
             </div>
           </div>
-
-          <div className="flex items-center justify-between px-1 pt-4">
-            <h3 className="text-sm font-bold text-[#2C2A29] tracking-wide flex items-center gap-2">
-              <span className="w-1 h-4 bg-[#C69C3D] rounded-full"></span>
-              Salary & Payroll Records
-              <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[0.625rem] text-neutral-500 font-bold">{salaryExpenses.length}</span>
-            </h3>
-            <button 
-              onClick={onHistory}
-              style={{ color: '#C69C3D' }} 
-              className="text-[0.6875rem] font-black uppercase tracking-[0.2em] hover:opacity-70 transition-opacity flex items-center gap-1"
-            >
-              History <TrendingDown className="w-3 h-3 rotate-[-90deg]" />
-            </button>
+          <div className="flex items-baseline gap-2 relative z-10">
+            <span className="text-sm font-black text-[#C69C3D]/40 font-mono italic">IDR</span>
+            <p className="text-3xl font-black text-[#2C2A29] font-mono tracking-tighter">
+              {totalSalaryAmount >= 1000000000 ? (
+                <>
+                  {(totalSalaryAmount / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
+                  <span className="text-sm font-medium lowercase italic ml-1 opacity-70">milyar</span>
+                </>
+              ) : (
+                totalSalaryAmount.toLocaleString('id-ID')
+              )}
+            </p>
           </div>
+        </div>
+      </div>
 
-          {isLoadingExpenses ? (
-            <LoadingState msg="Loading Records..." />
-          ) : salaryExpenses.length > 0 ? (
-            <div className="space-y-3">
-              {salaryExpenses.map((expense: any, idx: number) => {
-                const amount = parseFloat(expense.amount || '0');
-                const taxAmt = parseFloat(expense.tax_amount || expense.tax || '0');
-                const tax2Amt = parseFloat(expense.second_tax_amount || expense.second_tax || '0');
-                const total = amount + taxAmt + tax2Amt;
-                const expDate = expense.expense_date || expense.date || '';
-                const description = expense.description || '';
-                const descParts = description.split('\n').filter((s: string) => s.trim());
-                
-                // Extract recipient (Team Member) - Priority to linked_user_name, then description fallback
-                let recipient = expense.linked_user_name || '';
-                if (!recipient && description.toLowerCase().includes('team member:')) {
-                  const match = description.match(/team member:\s*([^(\n]+)/i);
-                  if (match && match[1]) {
-                    recipient = match[1].trim();
-                  }
-                }
-                
-                const title = expense.title || 'Salary Expense';
-                const category = expense.category_name || expense.category || 'Salary';
+      <div className="flex items-center justify-between px-1 pt-4">
+        <h3 className="text-sm font-bold text-[#2C2A29] tracking-wide flex items-center gap-2">
+          <span className="w-1 h-4 bg-[#C69C3D] rounded-full"></span>
+          Salary & Payroll Records
+          <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[0.625rem] text-neutral-500 font-bold">{salaryExpenses.length}</span>
+        </h3>
+        <button 
+          onClick={onHistory}
+          style={{ color: '#C69C3D' }} 
+          className="text-[0.6875rem] font-black uppercase tracking-[0.2em] hover:opacity-70 transition-opacity flex items-center gap-1"
+        >
+          History <TrendingDown className="w-3 h-3 rotate-[-90deg]" />
+        </button>
+      </div>
 
-                return (
-                  <div key={expense.id || idx} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="rounded-2xl border relative overflow-hidden group hover:border-[#C69C3D]/30 transition-all shadow-lg">
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-[#C69C3D]"></div>
-                    <div className="p-4 pl-5">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                            <Banknote className="w-4 h-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-neutral-900 text-sm leading-tight">{title}</h4>
-                            <p className="text-[0.625rem] text-neutral-400 mt-0.5">
-                              {expDate ? new Date(expDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-bold text-blue-600 font-mono">{formatCurrency(total)}</p>
-                          <p className="text-[0.5625rem] text-neutral-400 mt-0.5 uppercase tracking-widest font-bold">Disbursed</p>
-                        </div>
+      {isLoadingExpenses ? (
+        <LoadingState msg="Loading Records..." />
+      ) : salaryExpenses.length > 0 ? (
+        <div className="space-y-3">
+          {salaryExpenses.map((expense: any, idx: number) => {
+            const amount = parseFloat(expense.amount || '0');
+            const taxAmt = parseFloat(expense.tax_amount || expense.tax || '0');
+            const tax2Amt = parseFloat(expense.second_tax_amount || expense.second_tax || '0');
+            const total = amount + taxAmt + tax2Amt;
+            const expDate = expense.expense_date || expense.date || '';
+            const description = expense.description || '';
+            const descParts = description.split('\n').filter((s: string) => s.trim());
+            
+            let recipient = expense.linked_user_name || '';
+            if (!recipient && description.toLowerCase().includes('team member:')) {
+              const match = description.match(/team member:\s*([^(\n]+)/i);
+              if (match && match[1]) {
+                recipient = match[1].trim();
+              }
+            }
+            
+            const title = expense.title || 'Salary';
+            const category = expense.category_name || expense.category || 'Salary';
+
+            return (
+              <div key={expense.id || idx} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="rounded-2xl border relative overflow-hidden group hover:border-[#C69C3D]/30 transition-all shadow-lg">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-[#C69C3D]"></div>
+                <div className="p-4 pl-5">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                        <Banknote className="w-4 h-4 text-blue-600" />
                       </div>
-
-                      <div className="flex items-center gap-2 flex-wrap mb-3">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-100 rounded-lg text-[0.5625rem] font-bold uppercase tracking-widest text-blue-600">
-                          <Tag className="w-3 h-3" /> {category}
-                        </span>
-                        
-                        {recipient && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-100 rounded-lg text-[0.5625rem] font-bold uppercase tracking-widest text-amber-600">
-                            <Briefcase className="w-3 h-3" /> To: {recipient}
-                          </span>
-                        )}
+                      <div>
+                        <h4 className="font-bold text-neutral-900 text-sm leading-tight">{title}</h4>
+                        <p className="text-[0.625rem] text-neutral-400 mt-0.5">
+                          {expDate ? new Date(expDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                        </p>
                       </div>
-
-                      {descParts.length > 0 && (
-                        <div className="bg-neutral-50 rounded-xl p-3 border border-neutral-100 space-y-1">
-                          {descParts.map((line: string, lineIdx: number) => {
-                            // Don't repeat the Team member line if we already show it as a badge
-                            if (line.toLowerCase().includes('team member:')) return null;
-                            return (
-                              <p key={lineIdx} className="text-[0.6875rem] text-neutral-500 leading-relaxed italic">
-                                "{line.trim()}"
-                              </p>
-                            );
-                          })}
-                        </div>
-                      )}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-blue-600 font-mono">{formatCurrency(total)}</p>
+                      <p className="text-[0.5625rem] text-neutral-400 mt-0.5 uppercase tracking-widest font-bold">Disbursed</p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <NoSalaryDataState />
-          )}
+
+                  <div className="flex items-center gap-2 flex-wrap mb-3">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-100 rounded-lg text-[0.5625rem] font-bold uppercase tracking-widest text-blue-600">
+                      <Tag className="w-3 h-3" /> {category}
+                    </span>
+                    
+                    {recipient && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 border border-amber-100 rounded-lg text-[0.5625rem] font-bold uppercase tracking-widest text-amber-600">
+                        <Briefcase className="w-3 h-3" /> To: {recipient}
+                      </span>
+                    )}
+                  </div>
+
+                  {descParts.length > 0 && (
+                    <div className="bg-neutral-50 rounded-xl p-3 border border-neutral-100 space-y-1">
+                      {descParts.map((line: string, lineIdx: number) => {
+                        if (line.toLowerCase().includes('team member:')) return null;
+                        return (
+                          <p key={lineIdx} className="text-[0.6875rem] text-neutral-500 leading-relaxed italic">
+                            "{line.trim()}"
+                          </p>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
+      ) : (
+        <NoSalaryDataState />
       )}
     </div>
   );
@@ -414,4 +434,3 @@ const ProjectEmptyState = () => (
     <p className="text-[0.6875rem] text-neutral-400 tracking-widest uppercase font-black text-center px-8 leading-loose">No active projects<br/>with financial records</p>
   </div>
 );
-
