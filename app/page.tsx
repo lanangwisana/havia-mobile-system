@@ -94,6 +94,8 @@ export default function HaviaMobileApp() {
   const [financeSummaryMeta, setFinanceSummaryMeta] = useState<any>(null);
   const [currentFinanceSummaryPage, setCurrentFinanceSummaryPage] = useState(1);
   const [financeSummaryTotal, setFinanceSummaryTotal] = useState(0);
+  const [expensesMeta, setExpensesMeta] = useState<any>(null);
+  const [currentExpensesPage, setCurrentExpensesPage] = useState(1);
   const [expensesTotal, setExpensesTotal] = useState(0);
 
   // Attendances States
@@ -386,14 +388,20 @@ export default function HaviaMobileApp() {
     setIsLoadingTasks(false);
   };
 
-  const loadExpenses = async (isFull = false) => {
+  const loadExpenses = async (page: number = 1) => {
     if (!apiToken) return;
     setIsLoadingExpenses(true);
+    setCurrentExpensesPage(page);
     // Fetch specifically salaries for the logged-in user
-    const res = await fetchFromApi(`haviacms/finance/salaries${isFull ? '?full=1' : ''}`, apiToken);
+    const res = await fetchFromApi(`haviacms/finance/salaries?page=${page}`, apiToken);
     if (res.success) {
       setExpenses(Array.isArray(res.data) ? res.data : []);
-      setExpensesTotal(res.total_count || (res.data?.length || 0));
+      if (res.meta) {
+        setExpensesMeta(res.meta);
+        setExpensesTotal(res.meta.total_items || 0);
+      } else {
+        setExpensesTotal(res.data?.length || 0);
+      }
     }
     setIsLoadingExpenses(false);
   };
@@ -866,6 +874,8 @@ export default function HaviaMobileApp() {
           onProjectFilterChange={(s: string) => loadProjects(s, 1)}
           expenses={expenses}
           isLoadingExpenses={isLoadingExpenses}
+          expensesPaginationMeta={expensesMeta}
+          onExpensesPageChange={(p: number) => loadExpenses(p)}
           financeSummary={financeSummary}
           isLoadingFinanceSummary={isLoadingFinanceSummary}
           financeSummaryPaginationMeta={financeSummaryMeta}
@@ -887,12 +897,12 @@ export default function HaviaMobileApp() {
           }}
           onFinanceHistory={() => {
             setSubpageTitle('Payment History');
-            loadExpenses(true);
+            loadExpenses(1);
           }}
           onFinanceBack={() => {
             setSubpageTitle('Finance');
             loadFinanceSummary(1);
-            loadExpenses(false);
+            loadExpenses(1);
           }}
           editForm={editForm}
           setEditForm={(form) => setEditForm(form)}

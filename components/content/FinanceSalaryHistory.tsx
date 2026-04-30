@@ -5,10 +5,12 @@ import { formatCurrency } from '@/lib/utils';
 interface Props {
   data: any[];
   isLoading: boolean;
+  paginationMeta?: any;
+  onPageChange?: (page: number) => void;
   onBack: () => void;
 }
 
-export const FinanceSalaryHistory: React.FC<Props> = ({ data, isLoading, onBack }) => {
+export const FinanceSalaryHistory: React.FC<Props> = ({ data, isLoading, paginationMeta, onPageChange, onBack }) => {
   return (
     <div className="space-y-6 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {isLoading ? (
@@ -61,6 +63,65 @@ export const FinanceSalaryHistory: React.FC<Props> = ({ data, isLoading, onBack 
               );
             })}
           </div>
+
+          {/* Pagination UI */}
+          {paginationMeta && paginationMeta.total_pages > 1 && (
+            <div className="flex flex-col items-center gap-4 mt-8 pb-10">
+              <div className="flex items-center justify-between w-full max-w-[280px] p-1.5 bg-white rounded-2xl border border-[#E8E4E1] shadow-sm">
+                <button 
+                  disabled={paginationMeta.current_page <= 1}
+                  onClick={() => onPageChange?.(paginationMeta.current_page - 1)}
+                  className="px-4 py-2 rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#2C2A29]/5 text-[#2C2A29]"
+                >
+                  Prev
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: paginationMeta.total_pages }, (_, i) => i + 1).map((p) => {
+                    const current = paginationMeta.current_page;
+                    const total = paginationMeta.total_pages;
+                    
+                    if (p === 1 || p === total || (p >= current - 1 && p <= current + 1)) {
+                       return (
+                        <button
+                          key={p}
+                          onClick={() => onPageChange?.(p)}
+                          className={`w-8 h-8 rounded-lg font-black text-[0.6875rem] transition-all duration-300 flex items-center justify-center ${
+                            current === p 
+                              ? 'bg-[#C69C3D] text-white shadow-sm' 
+                              : 'bg-transparent text-[#6B6865]/60 hover:text-[#282524] hover:bg-[#2C2A29]/5'
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      );
+                    } else if (p === current - 2 || p === current + 2) {
+                      return <span key={p} className="text-[#6B6865]/20 text-[0.5625rem]">..</span>;
+                    }
+                    return null;
+                  })}
+                </div>
+
+                <button 
+                  disabled={paginationMeta.current_page >= paginationMeta.total_pages}
+                  onClick={() => onPageChange?.(paginationMeta.current_page + 1)}
+                  className="px-4 py-2 rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#2C2A29]/5 text-[#2C2A29]"
+                >
+                  Next
+                </button>
+              </div>
+              
+              <div className="flex items-center gap-3 opacity-40">
+                 <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">
+                   Page {paginationMeta.current_page} / {paginationMeta.total_pages}
+                 </span>
+                 <div className="h-1 w-1 rounded-full bg-neutral-300"></div>
+                 <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">
+                   {paginationMeta.total_items} Records
+                 </span>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-40 px-10 text-center space-y-4 text-neutral-300">
