@@ -27,7 +27,7 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
       );
     }
 
-    return <span className="text-[0.75rem] font-bold tracking-tighter leading-none">{formatCurrency(amount).replace('IDR', 'Rp')}</span>;
+    return <span className="font-bold tracking-tighter leading-none">{formatCurrency(amount).replace('IDR', 'Rp')}</span>;
   };
 
   const globalTotalBudget = financeTotals ? (financeTotals.total_budget || 0) : (paginationMeta?.global_total_budget || 0);
