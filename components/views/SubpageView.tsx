@@ -131,6 +131,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           data={props.financeSummary}
           isLoading={props.isLoadingFinanceSummary}
           paginationMeta={props.financeSummaryPaginationMeta}
+          financeTotals={props.financeTotals}
           onPageChange={props.onFinanceSummaryPageChange}
           onBack={props.onFinanceBack}
         />;
@@ -248,8 +249,10 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
         >
           <ArrowLeft className="w-5 h-5 text-neutral-900" />
         </button>
-        <h2 style={{ color: colors.gold }} className="font-bold text-sm uppercase tracking-widest">{subpageTitle}</h2>
-        <div className="w-10"></div>
+        <h2 style={{ color: colors.gold }} className="font-bold text-xs sm:text-sm uppercase tracking-widest text-center flex-1 px-4 line-clamp-2">
+          {subpageTitle}
+        </h2>
+        <div className="w-10 h-10"></div>
       </div>
       
       <div className="flex-1 px-6 pt-6 pb-40 overflow-y-auto scrollbar-hide relative z-10">
