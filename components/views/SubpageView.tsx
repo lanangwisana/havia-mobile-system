@@ -78,6 +78,7 @@ interface SubpageViewProps {
   onFinanceViewAll: () => void;
   onFinanceHistory: () => void;
   onFinanceBack: () => void;
+  financeTotals?: any;
 }
 
 export const SubpageView: React.FC<SubpageViewProps> = (props) => {
@@ -119,6 +120,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           expenses={props.expenses} 
           isLoadingExpenses={props.isLoadingExpenses} 
           financeSummary={props.financeSummary}
+          financeTotals={props.financeTotals}
           isLoadingFinanceSummary={props.isLoadingFinanceSummary}
           userData={props.userData}
           onViewAll={props.onFinanceViewAll}
