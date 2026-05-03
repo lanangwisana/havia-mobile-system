@@ -69,11 +69,11 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   const renderLargeAmount = (amount: number, justifyAlign: string = "justify-end") => {
     const abs = Math.abs(amount || 0);
     
-    // Format Milyar
+    // Format Milyar (Sesuai gaya Gambar 1)
     if (abs >= 1000000000) {
       return (
         <span className={`flex items-baseline ${justifyAlign} gap-[2px]`}>
-          <span className="tracking-tighter">
+          <span className="tracking-tighter font-bold text-neutral-900">
             {amount < 0 ? '-' : ''}{(abs / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
           </span>
           <span className="text-[0.5rem] lowercase italic opacity-70 font-medium tracking-normal font-sans ml-0.5">milyar</span>
@@ -81,18 +81,17 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
       );
     }
 
-    // Format Jutaan (Auto-resize font for hundreds of millions)
+    // Format Jutaan & Ratusan Juta (Identik dengan Gambar 1)
     const formatted = formatCurrency(amount).replace('IDR', 'Rp');
-    let fontSize = "text-[0.75rem]"; // default
+    let fontSize = "text-[0.75rem]"; // Ukuran standar Gambar 1
     
-    if (abs >= 100000000) { // 100jt+
-      fontSize = "text-[0.5625rem]"; 
-    } else if (abs >= 1000000) { // 1jt+
-      fontSize = "text-[0.6875rem]";
+    // Sedikit penyesuaian hanya jika sangat panjang agar tidak 'offside'
+    if (abs >= 1000000000) {
+      fontSize = "text-[0.625rem]";
     }
 
     return (
-      <span className={`${fontSize} font-bold tracking-[-0.05em] leading-none whitespace-nowrap`}>
+      <span className={`${fontSize} font-bold tracking-tighter leading-none whitespace-nowrap`}>
         {formatted}
       </span>
     );
