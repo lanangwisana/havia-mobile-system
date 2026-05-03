@@ -68,15 +68,34 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
 
   const renderLargeAmount = (amount: number, justifyAlign: string = "justify-end") => {
     const abs = Math.abs(amount || 0);
+    
+    // Format Milyar
     if (abs >= 1000000000) {
       return (
-        <span className={`flex items-baseline ${justifyAlign} gap-[3px]`}>
-          <span className="tracking-tighter">{amount < 0 ? '-' : ''}{(abs / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}</span>
-          <span className="text-[0.5938rem] lowercase italic opacity-70 font-medium tracking-normal font-sans">milyar</span>
+        <span className={`flex items-baseline ${justifyAlign} gap-[2px]`}>
+          <span className="tracking-tighter">
+            {amount < 0 ? '-' : ''}{(abs / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
+          </span>
+          <span className="text-[0.5rem] lowercase italic opacity-70 font-medium tracking-normal font-sans ml-0.5">milyar</span>
         </span>
       );
     }
-    return formatCurrency(amount);
+
+    // Format Jutaan (Auto-resize font for hundreds of millions)
+    const formatted = formatCurrency(amount).replace('IDR', 'Rp');
+    let fontSize = "text-[0.75rem]"; // default
+    
+    if (abs >= 100000000) { // 100jt+
+      fontSize = "text-[0.5625rem]"; 
+    } else if (abs >= 1000000) { // 1jt+
+      fontSize = "text-[0.6875rem]";
+    }
+
+    return (
+      <span className={`${fontSize} font-bold tracking-[-0.05em] leading-none whitespace-nowrap`}>
+        {formatted}
+      </span>
+    );
   };
 
   return (
