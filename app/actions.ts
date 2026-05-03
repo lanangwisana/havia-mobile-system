@@ -136,9 +136,21 @@ export async function fetchFromApi(endpoint: string, token: string, retryCount =
     
     // Sukses mereload data asli! Simpan ke cache sebagai backup
     const finalData = parsedRes.data || parsedRes;
-    globalCache.set(cacheKey, { data: finalData, meta: parsedRes.meta, timestamp: Date.now() });
+    globalCache.set(cacheKey, { 
+      data: finalData, 
+      meta: parsedRes.meta, 
+      totals: parsedRes.totals, 
+      debug: parsedRes.debug,
+      timestamp: Date.now() 
+    });
     
-    return { success: true, data: finalData, meta: parsedRes.meta };
+    return { 
+      success: true, 
+      data: finalData, 
+      meta: parsedRes.meta,
+      totals: parsedRes.totals,
+      debug: parsedRes.debug
+    };
     
   } catch (error: any) {
     const isNetworkIssue = error.name === 'AbortError' || error.message.toLowerCase().includes('fetch');
@@ -155,7 +167,14 @@ export async function fetchFromApi(endpoint: string, token: string, retryCount =
     if (globalCache.has(cacheKey)) {
        console.log(`[API] RESILIENCE ACTIVATED: Served BACKUP DATA for ${endpoint}`);
        const cached = globalCache.get(cacheKey);
-       return { success: true, data: cached.data, meta: cached.meta, isBackup: true };
+       return { 
+         success: true, 
+         data: cached.data, 
+         meta: cached.meta, 
+         totals: cached.totals,
+         debug: cached.debug,
+         isBackup: true 
+       };
     }
 
     // 3. FALLBACK ERROR GRACEFUL (Bukan 'failed to fetch')

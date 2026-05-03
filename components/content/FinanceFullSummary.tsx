@@ -8,9 +8,10 @@ interface Props {
   paginationMeta?: any;
   onPageChange?: (page: number) => void;
   onBack: () => void;
+  financeTotals?: any;
 }
 
-export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginationMeta, onPageChange, onBack }) => {
+export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginationMeta, onPageChange, onBack, financeTotals }) => {
   const renderLargeAmount = (amount: number, justifyAlign: string = "justify-end") => {
     const abs = Math.abs(amount || 0);
     if (abs >= 1000000000) {
@@ -24,8 +25,8 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
     return <span className="text-[0.75rem] font-bold tracking-tighter leading-none">{formatCurrency(amount).replace('IDR', 'Rp')}</span>;
   };
 
-  const globalTotalBudget = paginationMeta?.global_total_budget || 0;
-  const globalTotalBalance = paginationMeta?.global_total_balance || 0;
+  const globalTotalBudget = financeTotals ? (financeTotals.total_budget || 0) : (paginationMeta?.global_total_budget || 0);
+  const globalTotalBalance = financeTotals ? (financeTotals.total_balance || 0) : (paginationMeta?.global_total_balance || 0);
 
   return (
     <div className="space-y-6 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -157,39 +158,46 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
             );
           })}
 
-          {/* Pagination UI */}
+          {/* Pagination UI - Redesigned for premium look and better spacing */}
           {paginationMeta && paginationMeta.total_pages > 1 && (
-            <div className="flex flex-col items-center gap-4 mt-8 pb-10">
-              <div className="flex items-center justify-between w-full max-w-[280px] p-1.5 bg-white rounded-2xl border border-[#E8E4E1] shadow-sm">
+            <div className="flex flex-col items-center gap-5 mt-10 pb-16">
+              <div className="flex items-center justify-between w-full max-w-[320px] p-1.5 bg-white/80 backdrop-blur-md rounded-2xl border border-neutral-200 shadow-sm">
                 <button 
                   disabled={paginationMeta.current_page <= 1}
                   onClick={() => onPageChange?.(paginationMeta.current_page - 1)}
-                  className="px-4 py-2 rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#2C2A29]/5 text-[#2C2A29]"
+                  className="w-10 h-10 flex items-center justify-center rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
                 >
                   Prev
                 </button>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   {Array.from({ length: paginationMeta.total_pages }, (_, i) => i + 1).map((p) => {
                     const current = paginationMeta.current_page;
                     const total = paginationMeta.total_pages;
                     
-                    if (p === 1 || p === total || (p >= current - 1 && p <= current + 1)) {
+                    // Logic: Show [Current-1], [Current], and [Total]
+                    const isCurrent = p === current;
+                    const isPrev = p === current - 1 && p > 0;
+                    const isLast = p === total;
+                    
+                    if (isCurrent || isPrev || isLast) {
                        return (
-                        <button
-                          key={p}
-                          onClick={() => onPageChange?.(p)}
-                          className={`w-8 h-8 rounded-lg font-black text-[0.6875rem] transition-all duration-300 flex items-center justify-center ${
-                            current === p 
-                              ? 'bg-[#C69C3D] text-white shadow-sm' 
-                              : 'bg-transparent text-[#6B6865]/60 hover:text-[#282524] hover:bg-[#2C2A29]/5'
-                          }`}
-                        >
-                          {p}
-                        </button>
+                        <React.Fragment key={p}>
+                          {isLast && p > current + 1 && (
+                            <span className="w-4 text-center text-neutral-300 text-[0.625rem] font-bold">..</span>
+                          )}
+                          <button
+                            onClick={() => onPageChange?.(p)}
+                            className={`w-9 h-9 rounded-xl font-black text-[0.75rem] transition-all duration-300 flex items-center justify-center ${
+                              isCurrent 
+                                ? 'bg-[#C69C3D] text-white shadow-md shadow-[#C69C3D]/20 scale-110 z-10' 
+                                : 'bg-transparent text-neutral-400 hover:text-neutral-900 hover:bg-neutral-50'
+                            }`}
+                          >
+                            {p}
+                          </button>
+                        </React.Fragment>
                       );
-                    } else if (p === current - 2 || p === current + 2) {
-                      return <span key={p} className="text-[#6B6865]/20 text-[0.5625rem]">..</span>;
                     }
                     return null;
                   })}
@@ -198,19 +206,19 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
                 <button 
                   disabled={paginationMeta.current_page >= paginationMeta.total_pages}
                   onClick={() => onPageChange?.(paginationMeta.current_page + 1)}
-                  className="px-4 py-2 rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#2C2A29]/5 text-[#2C2A29]"
+                  className="w-10 h-10 flex items-center justify-center rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
                 >
                   Next
                 </button>
               </div>
               
-              <div className="flex items-center gap-3 opacity-40">
-                 <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">
+              <div className="flex items-center gap-3 py-1 px-4 bg-neutral-50 rounded-full border border-neutral-100 shadow-inner">
+                 <span className="text-[0.5625rem] text-neutral-500 font-bold uppercase tracking-[0.15em]">
                    Page {paginationMeta.current_page} / {paginationMeta.total_pages}
                  </span>
-                 <div className="h-1 w-1 rounded-full bg-neutral-300"></div>
-                 <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">
-                   {paginationMeta.total_items} Reports
+                 <div className="h-1 w-1 rounded-full bg-[#C69C3D]/30"></div>
+                 <span className="text-[0.5625rem] text-neutral-500 font-bold uppercase tracking-[0.15em]">
+                   {paginationMeta.total_items} Projects
                  </span>
               </div>
             </div>

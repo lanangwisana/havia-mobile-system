@@ -50,7 +50,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
                 <h3 className="font-black text-[1.0625rem] text-[#2C2A29] leading-tight">
                   {userData?.first_name ? `${userData.first_name} ${userData.last_name || ''}` : (userData?.name || 'User')}
                 </h3>
-                <p className="text-[0.5625rem] font-black uppercase tracking-[0.2em] text-[#C69C3D]">{userData?.job_title || 'TEAM MEMBER'}</p>
+                <p className="text-[0.5625rem] font-black uppercase tracking-[0.2em] text-[#C69C3D]">{userData?.role_title || userData?.job_title || 'TEAM MEMBER'}</p>
               </div>
             </div>
             <div className="bg-white p-2.5 rounded-2xl border border-[#E8E4E1] shadow-sm">

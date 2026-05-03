@@ -11,16 +11,18 @@ interface FinanceContentProps {
   userData?: any;
   onViewAll?: () => void;
   onHistory?: () => void;
+  financeTotals?: any;
 }
 
 export const FinanceContent: React.FC<FinanceContentProps> = ({ 
   expenses, 
-  isLoadingExpenses, 
+  isLoadingExpenses,  
   financeSummary, 
   isLoadingFinanceSummary,
   userData,
   onViewAll,
-  onHistory
+  onHistory,
+  financeTotals
 }) => {
   const isUserAdmin = Number(userData?.is_admin) === 1;
   
@@ -41,8 +43,9 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   const filteredSummary = canSeeOverview ? financeSummary : [];
 
   // Stats for the active context
-  const totalProjectsBudget = filteredSummary.reduce((sum, p) => sum + (p.project_price || 0), 0);
-  const totalBalance = filteredSummary.reduce((sum, p) => sum + (p.balance || 0), 0);
+  // Use global totals from API if available, otherwise fallback to local reduction
+  const totalProjectsBudget = financeTotals ? (financeTotals.total_budget || 0) : filteredSummary.reduce((sum, p) => sum + (p.project_price || 0), 0);
+  const totalBalance = financeTotals ? (financeTotals.total_balance || 0) : filteredSummary.reduce((sum, p) => sum + (p.balance || 0), 0);
 
   // Detect if user is in a restricted role (HR, Marketing, QA)
   // Admin/PM are not restricted as they can see all.
