@@ -81,17 +81,11 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
       );
     }
 
-    // Format Jutaan & Ratusan Juta (Identik dengan Gambar 1)
+    // Format Jutaan & Ratusan Juta (Identik dengan Gambar 2)
     const formatted = formatCurrency(amount).replace('IDR', 'Rp');
-    let fontSize = "text-[0.75rem]"; // Ukuran standar Gambar 1
-    
-    // Sedikit penyesuaian hanya jika sangat panjang agar tidak 'offside'
-    if (abs >= 1000000000) {
-      fontSize = "text-[0.625rem]";
-    }
 
     return (
-      <span className={`${fontSize} font-bold tracking-tighter leading-none whitespace-nowrap`}>
+      <span className="font-bold tracking-tighter leading-none whitespace-nowrap">
         {formatted}
       </span>
     );
