@@ -27,21 +27,7 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
       );
     }
 
-    // Format Jutaan (Auto-resize font for hundreds of millions)
-    const formatted = formatCurrency(amount).replace('IDR', 'Rp');
-    let fontSize = "text-[0.75rem]"; // default
-    
-    if (abs >= 100000000) { // 100jt+
-      fontSize = "text-[0.6rem]"; 
-    } else if (abs >= 10000000) { // 10jt+
-      fontSize = "text-[0.6875rem]";
-    }
-
-    return (
-      <span className={`${fontSize} font-bold tracking-tighter leading-none whitespace-nowrap`}>
-        {formatted}
-      </span>
-    );
+    return <span className="text-[0.75rem] font-bold tracking-tighter leading-none">{formatCurrency(amount).replace('IDR', 'Rp')}</span>;
   };
 
   const globalTotalBudget = financeTotals ? (financeTotals.total_budget || 0) : (paginationMeta?.global_total_budget || 0);
