@@ -22,7 +22,7 @@ export const AkunContent: React.FC<AkunContentProps> = ({
         </div>
       </div>
       <h2 className="text-2xl font-bold text-neutral-900 tracking-wide">{userData?.first_name} {userData?.last_name || ''}</h2>
-      <span style={{ color: colors.gold }} className="text-[0.625rem] font-bold uppercase tracking-[0.2em] mt-1">{userData?.job_title || 'USER'}</span>
+      <span style={{ color: colors.gold }} className="text-[0.625rem] font-bold uppercase tracking-[0.2em] mt-1">{userData?.role_title || userData?.job_title || 'USER'}</span>
       <div className="mt-4 px-4 py-1.5 bg-neutral-100 border border-neutral-300/50 rounded-full flex items-center gap-2">
         <Mail className="w-3 h-3 text-neutral-600" />
         <span className="text-xs text-neutral-600 font-medium">{userData?.email || 'email@haviastudio.com'}</span>
