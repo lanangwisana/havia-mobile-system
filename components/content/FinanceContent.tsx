@@ -133,7 +133,11 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                 </div>
                 <span className="text-[0.625rem] text-neutral-400 uppercase tracking-widest font-black">Total Budget</span>
               </div>
-              <p className={`font-bold text-neutral-900 font-mono tracking-tighter ${totalProjectsBudget >= 1000000000 ? 'text-xl' : 'text-base'}`}>
+              <p className={`font-bold text-neutral-900 font-mono tracking-tighter ${
+                totalProjectsBudget >= 1000000000 ? 'text-xl' : 
+                totalProjectsBudget >= 100000000 ? 'text-[0.85rem]' :
+                totalProjectsBudget >= 10000000 ? 'text-sm' : 'text-base'
+              }`}>
                 {totalProjectsBudget >= 1000000000 ? (
                   <>
                     {(totalProjectsBudget / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
@@ -153,7 +157,11 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                 </div>
                 <span className="text-[0.625rem] text-neutral-400 uppercase tracking-widest font-black">Tot. Balance</span>
               </div>
-              <p className={`font-bold text-[#C69C3D] font-mono tracking-tighter ${totalBalance >= 1000000000 ? 'text-xl' : 'text-base'}`}>
+              <p className={`font-bold text-[#C69C3D] font-mono tracking-tighter ${
+                totalBalance >= 1000000000 ? 'text-xl' : 
+                totalBalance >= 100000000 ? 'text-[0.85rem]' :
+                totalBalance >= 10000000 ? 'text-sm' : 'text-base'
+              }`}>
                 {totalBalance >= 1000000000 ? (
                   <>
                     {(totalBalance / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
