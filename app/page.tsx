@@ -94,6 +94,7 @@ export default function HaviaMobileApp() {
   const [financeSummaryMeta, setFinanceSummaryMeta] = useState<any>(null);
   const [currentFinanceSummaryPage, setCurrentFinanceSummaryPage] = useState(1);
   const [financeSummaryTotal, setFinanceSummaryTotal] = useState(0);
+  const [financeTotals, setFinanceTotals] = useState<any>(null);
   const [expensesMeta, setExpensesMeta] = useState<any>(null);
   const [currentExpensesPage, setCurrentExpensesPage] = useState(1);
   const [expensesTotal, setExpensesTotal] = useState(0);
@@ -414,6 +415,9 @@ export default function HaviaMobileApp() {
     const res = await fetchFromApi(`haviacms/finance/summary?page=${page}`, apiToken);
     if (res.success) {
       setFinanceSummary(Array.isArray(res.data) ? res.data : []);
+      if (res.totals) {
+        setFinanceTotals(res.totals);
+      }
       if (res.meta) {
         setFinanceSummaryMeta(res.meta);
         setFinanceSummaryTotal(res.meta.total_items || 0);
@@ -877,6 +881,7 @@ export default function HaviaMobileApp() {
           expensesPaginationMeta={expensesMeta}
           onExpensesPageChange={(p: number) => loadExpenses(p)}
           financeSummary={financeSummary}
+          financeTotals={financeTotals}
           isLoadingFinanceSummary={isLoadingFinanceSummary}
           financeSummaryPaginationMeta={financeSummaryMeta}
           onFinanceSummaryPageChange={(p: number) => loadFinanceSummary(p)}
