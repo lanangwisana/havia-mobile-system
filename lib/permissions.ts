@@ -105,11 +105,14 @@ export function canSeeProjectSummary(user: UserData | null): boolean {
   // Role HR & Admin Projek harus bisa lihat
   if (jobTitle.includes('hr & admin') || roleTitle.includes('hr & admin')) return true;
 
-  // Role Manager (Projek Manager, Arsitek Manager) harus bisa lihat
-  if (jobTitle.includes('manager') || roleTitle.includes('manager')) return true;
+  // Role Manager (Projek Manager, Arsitek Manager) & Marketing harus bisa lihat
+  const isManager = jobTitle.includes('manager') || roleTitle.includes('manager');
+  const isMarketing = jobTitle.includes('marketing') || roleTitle.includes('marketing');
+  
+  if (isManager || isMarketing) return true;
 
   // Role-role ini HANYA boleh melihat Salary, bukan Project Summary
-  const restrictedKeywords = ['household', 'ob', 'office boy', 'drafter', 'estimator', 'arsitek', 'marketing'];
+  const restrictedKeywords = ['household', 'ob', 'office boy', 'drafter', 'estimator', 'arsitek'];
   
   if (restrictedKeywords.some(kw => jobTitle.includes(kw) || roleTitle.includes(kw))) {
     return false;
