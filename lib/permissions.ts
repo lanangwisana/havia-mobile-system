@@ -101,15 +101,21 @@ export function canSeeProjectSummary(user: UserData | null): boolean {
   
   const jobTitle = (user.job_title || '').toLowerCase();
   const roleTitle = (user.role_title || user.permissions?.role_title || '').toLowerCase();
-  const roleId = String(user.role_id || user.permissions?.role_id || '').toLowerCase();
 
-  // Role-role ini (termasuk variasinya seperti Arsitektur Manager) HANYA boleh melihat Salary, bukan Project Summary
-  const restrictedKeywords = ['household', 'ob', 'office boy', 'drafter', 'estimator', 'arsitektur'];
-  if (restrictedKeywords.some(kw => jobTitle.includes(kw) || roleTitle.includes(kw) || roleId.includes(kw))) {
+  // Role HR & Admin Projek harus bisa lihat
+  if (jobTitle.includes('hr & admin') || roleTitle.includes('hr & admin')) return true;
+
+  // Role Manager (Projek Manager, Arsitek Manager) harus bisa lihat
+  if (jobTitle.includes('manager') || roleTitle.includes('manager')) return true;
+
+  // Role-role ini HANYA boleh melihat Salary, bukan Project Summary
+  const restrictedKeywords = ['household', 'ob', 'office boy', 'drafter', 'estimator', 'arsitek', 'marketing'];
+  
+  if (restrictedKeywords.some(kw => jobTitle.includes(kw) || roleTitle.includes(kw))) {
     return false;
   }
   
-  // Everyone else is allowed to see the Project Summary tab
+  // Default: Sisanya boleh lihat
   return true;
 }
 
