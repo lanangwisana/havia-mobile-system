@@ -19,15 +19,21 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
     if (abs >= 1000000000) {
       return (
         <span className={`flex items-baseline ${justifyAlign} gap-[2px]`}>
-          <span className="tracking-tighter">
+          <span className="tracking-tighter text-[min(3.5vw,1.1rem)]">
             {amount < 0 ? '-' : ''}{(abs / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
           </span>
           <span className="text-[0.5rem] lowercase italic opacity-70 font-medium tracking-normal font-sans ml-0.5">milyar</span>
         </span>
       );
     }
-
-    return <span className="font-bold tracking-tighter leading-none">{formatCurrency(amount).replace('IDR', 'Rp')}</span>;
+    
+    const formatted = formatCurrency(amount).replace('IDR', 'Rp');
+    
+    return (
+      <span className="font-bold tracking-tighter leading-none whitespace-nowrap">
+        {formatted}
+      </span>
+    );
   };
 
   const globalTotalBudget = financeTotals ? (financeTotals.total_budget || 0) : (paginationMeta?.global_total_budget || 0);
@@ -51,7 +57,11 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
                 </div>
                 <span className="text-[0.625rem] text-neutral-400 uppercase tracking-widest font-black">Total Budget</span>
               </div>
-              <p className={`font-bold text-neutral-900 font-mono tracking-tighter ${globalTotalBudget >= 1000000000 ? 'text-xl' : 'text-base'}`}>
+              <p className={`font-bold text-neutral-900 font-mono tracking-tighter ${
+                globalTotalBudget >= 1000000000 ? 'text-xl' : 
+                globalTotalBudget >= 100000000 ? 'text-[0.85rem]' :
+                globalTotalBudget >= 10000000 ? 'text-sm' : 'text-base'
+              }`}>
                 {globalTotalBudget >= 1000000000 ? (
                   <>
                     {(globalTotalBudget / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
@@ -71,7 +81,11 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
                 </div>
                 <span className="text-[0.625rem] text-neutral-400 uppercase tracking-widest font-black">Tot. Balance</span>
               </div>
-              <p className={`font-bold text-[#C69C3D] font-mono tracking-tighter ${globalTotalBalance >= 1000000000 ? 'text-xl' : 'text-base'}`}>
+              <p className={`font-bold text-[#C69C3D] font-mono tracking-tighter ${
+                globalTotalBalance >= 1000000000 ? 'text-xl' : 
+                globalTotalBalance >= 100000000 ? 'text-[0.85rem]' :
+                globalTotalBalance >= 10000000 ? 'text-sm' : 'text-base'
+              }`}>
                 {globalTotalBalance >= 1000000000 ? (
                   <>
                     {(globalTotalBalance / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 })}
@@ -91,7 +105,7 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
             const isOverBudget = ratio >= 90;
             
             return (
-              <div key={p.project_id} className="bg-white rounded-[2rem] border border-neutral-100 p-6 shadow-sm hover:border-[#C69C3D]/30 transition-all group overflow-hidden relative">
+              <div key={p.project_id} className="bg-white rounded-[2rem] border border-neutral-100 p-5 shadow-sm hover:border-[#C69C3D]/30 transition-all group overflow-hidden relative">
                 <div className="absolute right-0 top-0 w-24 h-24 bg-[#C69C3D]/5 rounded-full -mr-12 -mt-12"></div>
                 
                 <div className="flex justify-between items-start mb-6 relative z-10">
@@ -151,11 +165,11 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     <div className="bg-neutral-50 rounded-2xl p-3 border border-neutral-100 flex flex-col justify-center min-w-0">
                       <p className="text-[0.5rem] text-neutral-400 uppercase font-black tracking-widest mb-1">Expenses</p>
-                      <div className="text-sm font-bold text-rose-600 font-mono truncate">{renderLargeAmount(p.total_expense, "justify-start")}</div>
+                      <div className="text-[0.8125rem] font-bold text-rose-600 font-mono truncate">{renderLargeAmount(p.total_expense, "justify-start")}</div>
                     </div>
                     <div className={`rounded-2xl p-3 border flex flex-col justify-center min-w-0 ${p.balance < 0 ? 'bg-rose-50 border-rose-100' : 'bg-[#C69C3D]/5 border-[#C69C3D]/10'}`}>
                       <p className="text-[0.5rem] text-neutral-400 uppercase font-black tracking-widest mb-1">Balance</p>
-                      <div className={`text-sm font-bold font-mono truncate ${p.balance < 0 ? 'text-rose-600' : 'text-[#C69C3D]'}`}>{renderLargeAmount(p.balance, "justify-start")}</div>
+                      <div className={`text-[0.8125rem] font-bold font-mono truncate ${p.balance < 0 ? 'text-rose-600' : 'text-[#C69C3D]'}`}>{renderLargeAmount(p.balance, "justify-start")}</div>
                     </div>
                   </div>
                 </div>
