@@ -57,11 +57,27 @@ export const ProjectTaskList: React.FC<{
                     Deadline: <span className="text-[#2C2A29] ml-1">{formatDate(task.deadline)}</span>
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 opacity-80">
+                <div className="flex items-center gap-1.5 opacity-80 mt-1">
                   <Activity className="w-3.5 h-3.5 text-[#C69C3D]" />
-                  <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
-                    Progress: <span className="text-[#C69C3D] ml-1">{progress}%</span>
-                  </span>
+                  {task.planned_progress !== undefined ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
+                        Plan: <span className="text-[#2C2A29] ml-1">{Number(task.planned_progress).toFixed(1)}%</span>
+                      </span>
+                      <span className="text-[0.65rem] font-bold text-[#D1D5DB]">|</span>
+                      <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
+                        Act: <span className="text-[#2C2A29] ml-1">{Number(task.actual_progress).toFixed(1)}%</span>
+                      </span>
+                      <span className="text-[0.65rem] font-bold text-[#D1D5DB]">|</span>
+                      <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
+                        Dev: <span className={`ml-1 ${Number(task.deviation) < 0 ? 'text-red-500' : Number(task.deviation) === 0 ? 'text-[#2C2A29]' : 'text-emerald-500'}`}>{Number(task.deviation) > 0 ? '+' : ''}{Number(task.deviation).toFixed(1)}%</span>
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
+                      Progress: <span className="text-[#C69C3D] ml-1">{progress}%</span>
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
