@@ -606,7 +606,7 @@ export default function HaviaMobileApp() {
 
     if (currentView === 'subpage' && apiToken) {
       if (subpageTitle === 'Project') loadProjects(currentProjectFilter, currentProjectPage);
-      else if (subpageTitle === 'My Tasks') loadTasks();
+      else if (subpageTitle === 'My Tasks') loadTasks(null, currentTaskFilter, currentTaskPage);
       else if (subpageTitle === 'Finance') {
         loadExpenses();
         if (userData?.is_admin === "1" || userData?.user_type === "staff") {
