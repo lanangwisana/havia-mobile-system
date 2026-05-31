@@ -116,7 +116,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
           <div className="grid grid-cols-5 gap-3 h-24">
             {(() => {
               const allItems = [
-                { id: 'All Tasks', label: 'Tasks', icon: ClipboardList },
+                { id: 'My Tasks', label: 'Tasks', icon: ClipboardList },
                 { id: 'Project', label: 'Projects', icon: Briefcase, nav: 'project' },
                 { id: 'Events', label: 'Events', icon: Calendar, nav: 'jadwal' },
                 { id: 'Team', label: 'Team', icon: Users },
