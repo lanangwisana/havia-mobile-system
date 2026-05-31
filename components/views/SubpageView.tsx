@@ -5,6 +5,7 @@ import { colors } from '@/lib/utils';
 // Import all content components
 import { ProjectContent } from '../content/ProjectContent';
 import { TaskList } from '../content/TaskList';
+import { ProjectTaskList } from '../content/ProjectTaskList';
 import { FinanceContent } from '../content/FinanceContent';
 import { JadwalContent, EventDetailContent } from '../content/JadwalContent';
 import { TimContent } from '../content/TimContent';
@@ -106,13 +107,12 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           highlightTaskId={props.activeTaskId}
         />;
       case 'Tasks': 
-        return <TaskList 
+        return <ProjectTaskList 
           tasks={props.projectTasks} 
           isLoading={props.isLoadingTasks} 
           projectName={props.activeProjectName} 
           paginationMeta={props.taskPaginationMeta}
           onPageChange={props.onTaskPageChange}
-          onFilterChange={props.onTaskFilterChange}
           highlightTaskId={props.activeTaskId}
         />;
       case 'Finance': 

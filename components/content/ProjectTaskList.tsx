@@ -1,99 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { ClipboardList, Briefcase, Activity, Filter, CheckCircle2, Clock, PlayCircle, ChevronDown } from 'lucide-react';
+import React from 'react';
+import { ClipboardList, Activity, Clock } from 'lucide-react';
 import { colors, formatDate } from '@/lib/utils';
 
-// Shared Task List component
-export const TaskList: React.FC<{
+export const ProjectTaskList: React.FC<{
   tasks: any[];
   isLoading: boolean;
-  projects?: any[];
+  projectName?: string;
   paginationMeta?: any;
   onPageChange?: (page: number) => void;
-  onFilterChange?: (status: string) => void;
   highlightTaskId?: string | null;
-}> = ({ tasks, isLoading, projects, paginationMeta, onPageChange, onFilterChange, highlightTaskId }) => {
-  // Default to OVERDUE tab
-  const [activeFilter, setActiveFilter] = useState('OVERDUE');
-
-  const taskList = tasks;
-
+}> = ({ tasks, isLoading, projectName, paginationMeta, onPageChange, highlightTaskId }) => {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-2">
-      {/* Filter Tabs */}
-      {!isLoading && (
-        <div className="px-1 flex gap-2 z-50">
-          <button 
-            onClick={() => {
-              setActiveFilter('OVERDUE');
-              if (onFilterChange) onFilterChange('OVERDUE');
-            }}
-            className={`flex-1 py-4 px-2 rounded-3xl font-black text-[0.625rem] tracking-[0.15em] uppercase transition-all duration-300 flex flex-col items-center justify-center gap-1.5 ${
-              activeFilter === 'OVERDUE' 
-                ? 'bg-rose-50 border-2 border-rose-500 text-rose-600 shadow-[0_4px_15px_rgba(244,63,94,0.15)]' 
-                : 'bg-white border-2 border-[#E8E4E1] text-[#6B6865] hover:bg-neutral-50'
-            }`}
-          >
-            <Clock className={`w-4 h-4 ${activeFilter === 'OVERDUE' ? 'text-rose-500' : 'text-[#6B6865]'}`} />
-            <span>Overdue Task</span>
-          </button>
-          <button 
-            onClick={() => {
-              setActiveFilter('7_DAYS');
-              if (onFilterChange) onFilterChange('7_DAYS');
-            }}
-            className={`flex-1 py-4 px-2 rounded-3xl font-black text-[0.625rem] tracking-[0.15em] uppercase transition-all duration-300 flex flex-col items-center justify-center gap-1.5 ${
-              activeFilter === '7_DAYS' 
-                ? 'bg-[#F4EBD4]/30 border-2 border-[#C69C3D] text-[#C69C3D] shadow-[0_4px_15px_rgba(198,156,61,0.15)]' 
-                : 'bg-white border-2 border-[#E8E4E1] text-[#6B6865] hover:bg-neutral-50'
-            }`}
-          >
-            <CheckCircle2 className={`w-4 h-4 ${activeFilter === '7_DAYS' ? 'text-[#C69C3D]' : 'text-[#6B6865]'}`} />
-            <span className="text-center">7 Days Deadline</span>
-          </button>
-        </div>
-      )}
-
       <div className="px-1 space-y-5">
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-24 bg-white/50 rounded-[3rem] border border-[#E8E4E1] border-dashed">
            <div className="w-20 h-20 rounded-full bg-[#F4EBD4] flex items-center justify-center mb-6 shadow-inner">
                <Activity className="w-10 h-10 text-[#C69C3D] animate-pulse" />
            </div>
-           <p className="text-[0.625rem] text-[#C69C3D] uppercase tracking-[0.3em] font-black">Updating Tasks...</p>
+           <p className="text-[0.625rem] text-[#C69C3D] uppercase tracking-[0.3em] font-black">Loading Tasks...</p>
         </div>
-      ) : taskList.length === 0 ? (
+      ) : tasks.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[2.5rem] border border-[#E8E4E1] border-dashed">
           <div className="w-16 h-16 rounded-full bg-neutral-50 flex items-center justify-center mb-4 border border-neutral-100">
              <ClipboardList className="w-8 h-8 text-neutral-300" />
           </div>
           <p className="text-[0.625rem] text-neutral-400 tracking-[0.2em] uppercase font-black text-center px-12 leading-relaxed">
-            No tasks with status <br/>
-            <span style={{ color: colors.gold }}>{activeFilter}</span>
+            No tasks found in <br/>
+            <span style={{ color: colors.gold }}>{projectName || 'this project'}</span>
           </p>
         </div>
       ) : (
-        taskList.map((task: any, index: number) => {
+        tasks.map((task: any, index: number) => {
           const statusStr = String(task.status_title || task.status || '').toUpperCase();
           const isDone = statusStr === 'DONE' || statusStr === 'COMPLETED';
           const isInProgress = statusStr === 'IN PROGRESS' || statusStr === 'ACTIVE';
           const taskId = String(task.id || index);
           
-          const proj = projects?.find(p => String(p.id) === String(task.project_id));
-          const projName = task.project_title || (proj ? proj.title : `Project ${task.project_id}`);
           const progress = isDone ? 100 : (isInProgress ? 50 : 0);
 
           return (
             <div 
               key={taskId} 
-              className="bg-white rounded-xl border border-[#E8E4E1] shadow-[0_2px_10px_rgba(0,0,0,0.02)] mb-3 p-4 flex flex-col gap-3 transition-all hover:shadow-md"
+              className={`bg-white rounded-xl border ${highlightTaskId === taskId ? 'border-[#C69C3D] shadow-[0_4px_15px_rgba(198,156,61,0.2)]' : 'border-[#E8E4E1] shadow-[0_2px_10px_rgba(0,0,0,0.02)]'} mb-3 p-4 flex flex-col gap-3 transition-all hover:shadow-md`}
             >
               <div className="flex flex-col">
                 <h4 className="font-black text-[#2C2A29] text-[0.95rem] leading-snug line-clamp-2">
                   {task.title || task.name || `Task ${task.id}`}
                 </h4>
-                <p className="font-bold text-[#C69C3D] text-[0.6875rem] capitalize tracking-wide mt-1 line-clamp-1">
-                  {projName}
-                </p>
               </div>
 
               <div className="flex flex-col gap-1.5 mt-1 border-t border-[#E8E4E1] pt-3">

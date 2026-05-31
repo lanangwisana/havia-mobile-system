@@ -1,7 +1,8 @@
 import React from 'react';
 import { Sparkles, Camera, Image as ImageIcon, User, X } from 'lucide-react';
 import { colors, getUserImage } from '@/lib/utils';
-
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '@/lib/cropImage';
 interface EditProfileContentProps {
   userData: any;
   editForm: any;
@@ -24,10 +25,24 @@ export const EditProfileContent: React.FC<EditProfileContentProps> = ({
   const inputClass = "w-full text-neutral-900 text-sm rounded-xl focus:ring-1 focus:ring-[#C69C3D] focus:border-[#C69C3D] block p-4 placeholder-neutral-400 transition-all border outline-none";
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
+  const [imageSrc, setImageSrc] = React.useState<string | null>(null);
+  const [crop, setCrop] = React.useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = React.useState(1);
+  const [rotation, setRotation] = React.useState(0);
+  const [croppedAreaPixels, setCroppedAreaPixels] = React.useState<any>(null);
+  const [isCropping, setIsCropping] = React.useState(false);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      onUploadImage(file);
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        setImageSrc(reader.result?.toString() || null);
+        setCrop({ x: 0, y: 0 });
+        setZoom(1);
+        setRotation(0);
+      });
+      reader.readAsDataURL(file);
       setShowMenu(false);
     }
   };
@@ -49,6 +64,91 @@ export const EditProfileContent: React.FC<EditProfileContentProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32">
+      {/* Cropper Modal */}
+      {imageSrc && (
+        <div className="fixed inset-0 z-[200] bg-black/95 flex flex-col animate-in fade-in duration-200">
+          <div className="relative flex-1 w-full h-full">
+            <Cropper
+              image={imageSrc}
+              crop={crop}
+              zoom={zoom}
+              rotation={rotation}
+              aspect={1}
+              cropShape="round"
+              showGrid={false}
+              onCropChange={setCrop}
+              onRotationChange={setRotation}
+              onCropComplete={(croppedArea, croppedAreaPixels) => setCroppedAreaPixels(croppedAreaPixels)}
+              onZoomChange={setZoom}
+            />
+          </div>
+          
+          <div className="p-6 pb-12 bg-black space-y-6">
+            <div className="space-y-4">
+              <div>
+                <label className="text-white/60 text-[0.625rem] font-bold uppercase tracking-widest mb-2 block">Zoom</label>
+                <input 
+                  type="range" 
+                  value={zoom} 
+                  min={1} 
+                  max={3} 
+                  step={0.1} 
+                  aria-labelledby="Zoom" 
+                  onChange={(e) => setZoom(Number(e.target.value))} 
+                  className="w-full accent-[#C69C3D]"
+                />
+              </div>
+              <div>
+                <label className="text-white/60 text-[0.625rem] font-bold uppercase tracking-widest mb-2 block">Rotation</label>
+                <input 
+                  type="range" 
+                  value={rotation} 
+                  min={0} 
+                  max={360} 
+                  step={1} 
+                  aria-labelledby="Rotation" 
+                  onChange={(e) => setRotation(Number(e.target.value))} 
+                  className="w-full accent-[#C69C3D]"
+                />
+              </div>
+            </div>
+            
+            <div className="flex gap-4">
+              <button 
+                onClick={() => {
+                  setImageSrc(null);
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                }} 
+                className="flex-1 py-3 rounded-xl border border-white/20 text-white/60 text-xs uppercase tracking-widest font-bold"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={async () => {
+                  setIsCropping(true);
+                  try {
+                    const croppedFile = await getCroppedImg(imageSrc, croppedAreaPixels, rotation);
+                    if (croppedFile) {
+                      onUploadImage(croppedFile);
+                    }
+                  } catch (e) {
+                    console.error(e);
+                  }
+                  setIsCropping(false);
+                  setImageSrc(null);
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                }}
+                disabled={isCropping}
+                className="flex-[2] gold-gradient text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 uppercase tracking-widest text-xs shadow-[0_0_20px_rgba(212,175,55,0.2)]"
+              >
+                {isCropping ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Sparkles className="w-4 h-4" />}
+                {isCropping ? 'Cropping...' : 'Crop & Upload'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
        <div className="flex flex-col items-center mb-2 relative">
         <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
         
