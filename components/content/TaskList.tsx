@@ -99,13 +99,13 @@ export const TaskList: React.FC<{
               <div className="flex flex-col gap-1.5 mt-1 border-t border-[#E8E4E1] pt-3">
                 <div className="flex items-center gap-1.5 opacity-80">
                   <Clock className="w-3.5 h-3.5 text-[#6B6865]" />
-                  <span className="text-[0.65rem] font-bold text-[#6B6865] uppercase tracking-widest">
+                  <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
                     Deadline: <span className="text-[#2C2A29] ml-1">{formatDate(task.deadline)}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 opacity-80">
                   <Activity className="w-3.5 h-3.5 text-[#C69C3D]" />
-                  <span className="text-[0.65rem] font-bold text-[#6B6865] uppercase tracking-widest">
+                  <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
                     Progress: <span className="text-[#C69C3D] ml-1">{progress}%</span>
                   </span>
                 </div>
