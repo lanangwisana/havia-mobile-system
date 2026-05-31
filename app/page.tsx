@@ -354,13 +354,34 @@ export default function HaviaMobileApp() {
 
   const loadTasks = async (projectId: string | null = null, status: string = 'OVERDUE', page: number = 1) => {
     if (!userData?.id || !apiToken) return;
-    setIsLoadingTasks(true);
+    
     setCurrentTaskFilter(status);
     setCurrentTaskPage(page);
+
+    const cacheKey = `havia_tasks_${projectId || 'all'}_${status}_${page}`;
+    const cachedDataStr = localStorage.getItem(cacheKey);
+    let hasValidCache = false;
+
+    if (cachedDataStr) {
+      try {
+        const cached = JSON.parse(cachedDataStr);
+        if (cached && Array.isArray(cached.tasks)) {
+          setProjectTasks(cached.tasks);
+          if (cached.meta) setTaskPaginationMeta(cached.meta);
+          hasValidCache = true;
+          // Set loading to false instantly to show cached data without spinner
+          setIsLoadingTasks(false); 
+        }
+      } catch (e) {
+        console.error("Cache parse error", e);
+      }
+    }
+
+    if (!hasValidCache) {
+      setIsLoadingTasks(true);
+    }
     
     const myId = String(userData.id);
-    console.log(`[LoadTasks] status=${status}, page=${page}, project=${projectId}`);
-
     let endpoint = `haviacms/tasks?status=${status}&page=${page}`;
     if (projectId) endpoint += `&project_id=${projectId}`;
     
@@ -379,12 +400,21 @@ export default function HaviaMobileApp() {
         
         return t;
       });
+      
       setProjectTasks(enrichedTasks);
       if (res.meta) {
         setTaskPaginationMeta(res.meta);
       }
+      
+      // Update Cache silently
+      localStorage.setItem(cacheKey, JSON.stringify({
+        tasks: enrichedTasks,
+        meta: res.meta || null
+      }));
     } else {
-      showToast(`Failed to load tasks: ${res.error}`);
+      if (!hasValidCache) {
+        showToast(`Failed to load tasks: ${res.error}`);
+      }
     }
     setIsLoadingTasks(false);
   };
