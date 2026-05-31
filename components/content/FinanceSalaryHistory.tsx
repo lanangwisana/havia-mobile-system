@@ -81,7 +81,18 @@ export const FinanceSalaryHistory: React.FC<Props> = ({ data, isLoading, paginat
                     const current = paginationMeta.current_page;
                     const total = paginationMeta.total_pages;
                     
-                    if (p === 1 || p === total || (p >= current - 1 && p <= current + 1)) {
+                    let startPage = Math.max(1, current - 1);
+                    let endPage = Math.min(total, current + 1);
+                    
+                    if (endPage - startPage < 2 && total >= 3) {
+                      if (startPage === 1) {
+                        endPage = 3;
+                      } else if (endPage === total) {
+                        startPage = total - 2;
+                      }
+                    }
+                    
+                    if (p >= startPage && p <= endPage) {
                        return (
                         <button
                           key={p}
@@ -95,8 +106,6 @@ export const FinanceSalaryHistory: React.FC<Props> = ({ data, isLoading, paginat
                           {p}
                         </button>
                       );
-                    } else if (p === current - 2 || p === current + 2) {
-                      return <span key={p} className="text-[#6B6865]/20 text-[0.5625rem]">..</span>;
                     }
                     return null;
                   })}
