@@ -352,7 +352,7 @@ export default function HaviaMobileApp() {
     setIsLoadingProjects(false);
   };
 
-  const loadTasks = async (projectId: string | null = null, status: string = 'ALL', page: number = 1) => {
+  const loadTasks = async (projectId: string | null = null, status: string = 'OVERDUE', page: number = 1) => {
     if (!userData?.id || !apiToken) return;
     setIsLoadingTasks(true);
     setCurrentTaskFilter(status);
