@@ -189,33 +189,35 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
                   Prev
                 </button>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
                   {Array.from({ length: paginationMeta.total_pages }, (_, i) => i + 1).map((p) => {
                     const current = paginationMeta.current_page;
                     const total = paginationMeta.total_pages;
                     
-                    // Logic: Show [Current-1], [Current], and [Total]
-                    const isCurrent = p === current;
-                    const isPrev = p === current - 1 && p > 0;
-                    const isLast = p === total;
+                    let startPage = Math.max(1, current - 1);
+                    let endPage = Math.min(total, current + 1);
                     
-                    if (isCurrent || isPrev || isLast) {
+                    if (endPage - startPage < 2 && total >= 3) {
+                      if (startPage === 1) {
+                        endPage = 3;
+                      } else if (endPage === total) {
+                        startPage = total - 2;
+                      }
+                    }
+                    
+                    if (p >= startPage && p <= endPage) {
                        return (
-                        <React.Fragment key={p}>
-                          {isLast && p > current + 1 && (
-                            <span className="w-4 text-center text-neutral-300 text-[0.625rem] font-bold">..</span>
-                          )}
-                          <button
-                            onClick={() => onPageChange?.(p)}
-                            className={`w-9 h-9 rounded-xl font-black text-[0.75rem] transition-all duration-300 flex items-center justify-center ${
-                              isCurrent 
-                                ? 'bg-[#C69C3D] text-white shadow-md shadow-[#C69C3D]/20 scale-110 z-10' 
-                                : 'bg-transparent text-neutral-400 hover:text-neutral-900 hover:bg-neutral-50'
-                            }`}
-                          >
-                            {p}
-                          </button>
-                        </React.Fragment>
+                        <button
+                          key={p}
+                          onClick={() => onPageChange?.(p)}
+                          className={`w-9 h-9 rounded-xl font-black text-[0.75rem] transition-all duration-300 flex items-center justify-center ${
+                            current === p
+                              ? 'bg-[#C69C3D] text-white shadow-md shadow-[#C69C3D]/20 scale-110 z-10' 
+                              : 'bg-transparent text-neutral-400 hover:text-neutral-900 hover:bg-neutral-50'
+                          }`}
+                        >
+                          {p}
+                        </button>
                       );
                     }
                     return null;

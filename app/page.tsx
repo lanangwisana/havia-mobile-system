@@ -312,9 +312,28 @@ export default function HaviaMobileApp() {
   // --- DATA FETCHING ---
   const loadProjects = async (status: string = 'ALL', page: number = 1) => {
     if (!userData?.id || !apiToken) return;
-    setIsLoadingProjects(true);
+    
     setCurrentProjectFilter(status);
     setCurrentProjectPage(page);
+    
+    const cacheKey = `havia_projects_${status}_${page}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    let isUsingCache = false;
+    
+    if (cachedData) {
+      try {
+        const parsed = JSON.parse(cachedData);
+        setProjects(parsed.data);
+        if (parsed.meta) setProjectPaginationMeta(parsed.meta);
+        isUsingCache = true;
+      } catch (e) {
+        console.error("Cache parsing error", e);
+      }
+    }
+
+    if (!isUsingCache) {
+      setIsLoadingProjects(true);
+    }
     
     console.log(`[LoadProjects] status=${status}, page=${page}`);
 
@@ -345,22 +364,48 @@ export default function HaviaMobileApp() {
       if (res.meta) {
         setProjectPaginationMeta(res.meta);
       }
+      
+      // Save to cache
+      localStorage.setItem(cacheKey, JSON.stringify({ data: enriched, meta: res.meta }));
     } else {
-      showToast(`Failed to load projects: ${res.error}`);
+      if (!isUsingCache) {
+        showToast(`Failed to load projects: ${res.error}`);
+      }
     }
     
     setIsLoadingProjects(false);
   };
 
-  const loadTasks = async (projectId: string | null = null, status: string = 'ALL', page: number = 1) => {
+  const loadTasks = async (projectId: string | null = null, status: string = 'OVERDUE', page: number = 1) => {
     if (!userData?.id || !apiToken) return;
-    setIsLoadingTasks(true);
+    
     setCurrentTaskFilter(status);
     setCurrentTaskPage(page);
+
+    const cacheKey = `havia_tasks_${projectId || 'all'}_${status}_${page}`;
+    const cachedDataStr = localStorage.getItem(cacheKey);
+    let hasValidCache = false;
+
+    if (cachedDataStr) {
+      try {
+        const cached = JSON.parse(cachedDataStr);
+        if (cached && Array.isArray(cached.tasks)) {
+          setProjectTasks(cached.tasks);
+          if (cached.meta) setTaskPaginationMeta(cached.meta);
+          hasValidCache = true;
+          // Set loading to false instantly to show cached data without spinner
+          setIsLoadingTasks(false); 
+        }
+      } catch (e) {
+        console.error("Cache parse error", e);
+      }
+    }
+
+    if (!hasValidCache) {
+      setIsLoadingTasks(true);
+    }
     
     const myId = String(userData.id);
-    console.log(`[LoadTasks] status=${status}, page=${page}, project=${projectId}`);
-
     let endpoint = `haviacms/tasks?status=${status}&page=${page}`;
     if (projectId) endpoint += `&project_id=${projectId}`;
     
@@ -379,12 +424,21 @@ export default function HaviaMobileApp() {
         
         return t;
       });
+      
       setProjectTasks(enrichedTasks);
       if (res.meta) {
         setTaskPaginationMeta(res.meta);
       }
+      
+      // Update Cache silently
+      localStorage.setItem(cacheKey, JSON.stringify({
+        tasks: enrichedTasks,
+        meta: res.meta || null
+      }));
     } else {
-      showToast(`Failed to load tasks: ${res.error}`);
+      if (!hasValidCache) {
+        showToast(`Failed to load tasks: ${res.error}`);
+      }
     }
     setIsLoadingTasks(false);
   };
@@ -603,7 +657,7 @@ export default function HaviaMobileApp() {
   const handleProjectClick = (id: string, name: string, taskId: string | null = null) => {
     setActiveProjectId(id);
     setActiveProjectName(name);
-    loadTasks(id);
+    loadTasks(id, 'ALL', 1);
     handleNav('subpage', null, 'Tasks', taskId);
   };
 
