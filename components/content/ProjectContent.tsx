@@ -44,65 +44,7 @@ interface ProjectContentProps {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-2">
-      {/* Filter Dropdown - Always show if not loading so user can change filter even if list is empty */}
-      {!isLoadingProjects && (
-        <div className="px-1 relative z-50">
-          <button 
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center justify-between w-full px-5 py-4 bg-white rounded-3xl border border-[#E8E4E1] shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all duration-300 active:scale-[0.98]"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#C69C3D]/10 flex items-center justify-center">
-                <activeFilterObj.icon className="w-5 h-5 text-[#C69C3D]" />
-              </div>
-              <div className="flex flex-col items-start text-left">
-                <span className="text-[0.5625rem] text-[#6B6865] uppercase tracking-widest font-black">Filter Status</span>
-                <span className="text-[0.8125rem] font-bold text-[#2C2A29] tracking-tight uppercase">{activeFilterObj.label}</span>
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-[#F4EBD4]/50 flex items-center justify-center border border-[#C69C3D]/10">
-              <ChevronDown className={`w-4 h-4 text-[#C69C3D] transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-            </div>
-          </button>
-          
-          {isDropdownOpen && (
-            <div className="absolute top-full left-1 right-1 mt-2 bg-white rounded-[2rem] border border-[#E8E4E1] shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 z-[60]">
-              <div className="p-2 space-y-1">
-                {filters.map((f) => (
-                  <button
-                    key={f.id}
-                    onClick={() => {
-                      setActiveFilter(f.id);
-                      setIsDropdownOpen(false);
-                      if (onFilterChange) onFilterChange(f.id);
-                    }}
-                    className={`flex items-center gap-4 w-full px-5 py-4 rounded-2xl transition-all ${
-                      activeFilter === f.id 
-                        ? 'bg-[#C69C3D] text-white' 
-                        : 'hover:bg-[#F4EBD4]/30 text-[#6B6865]'
-                    }`}
-                  >
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${activeFilter === f.id ? 'bg-white/20' : 'bg-neutral-100'}`}>
-                      <f.icon className={`w-4 h-4 ${activeFilter === f.id ? 'text-white' : 'text-[#C69C3D]'}`} />
-                    </div>
-                    <span className="text-[0.6875rem] font-bold tracking-widest uppercase">
-                      {f.label}
-                    </span>
-                    {activeFilter === f.id && (
-                      <div className="ml-auto w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Backdrop (Removed background as requested) */}
-          {isDropdownOpen && (
-            <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setIsDropdownOpen(false)}></div>
-          )}
-        </div>
-      )}
+
 
       <div className="px-1 space-y-5">
       {isLoadingProjects ? (
