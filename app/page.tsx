@@ -151,7 +151,7 @@ export default function HaviaMobileApp() {
     if (view === 'subpage' && title) {
       const guardMap: Record<string, (u: any) => boolean> = {
         'Project': canAccessProjects,
-        'All Tasks': canAccessProjects,
+        'My Tasks': canAccessProjects,
         'Finance': canAccessFinance,
         'Team': canAccessTeam,
       };
@@ -178,7 +178,7 @@ export default function HaviaMobileApp() {
         setCurrentProjectFilter('ALL');
         setCurrentProjectPage(1);
       }
-      if (title === 'All Tasks' || title === 'Tasks') {
+      if (title === 'My Tasks' || title === 'All Tasks') {
         setCurrentTaskFilter('ALL');
         setCurrentTaskPage(1);
       }
@@ -606,7 +606,7 @@ export default function HaviaMobileApp() {
 
     if (currentView === 'subpage' && apiToken) {
       if (subpageTitle === 'Project') loadProjects(currentProjectFilter, currentProjectPage);
-      else if (subpageTitle === 'All Tasks') loadTasks();
+      else if (subpageTitle === 'My Tasks') loadTasks(null, currentTaskFilter, currentTaskPage);
       else if (subpageTitle === 'Finance') {
         loadExpenses();
         if (userData?.is_admin === "1" || userData?.user_type === "staff") {
@@ -638,27 +638,51 @@ export default function HaviaMobileApp() {
 
   const loadNotifications = async () => {
     if (!apiToken) return;
+    
+    const cacheKey = `havia_notif_${userData?.id || 'guest'}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+      try { setNotifications(JSON.parse(cachedData)); } catch(e) {}
+    }
+    
     const res = await fetchFromApi('haviacms/notifications', apiToken);
     if (res.success) {
-      setNotifications(Array.isArray(res.data) ? res.data : []);
+      const freshData = Array.isArray(res.data) ? res.data : [];
+      setNotifications(freshData);
+      localStorage.setItem(cacheKey, JSON.stringify(freshData));
     }
+  };
+  
+  const syncUserProfile = async () => {
+    if (!apiToken) return;
+    try {
+      const res = await fetchFromApi('haviacms/profile/verify_status', apiToken);
+      if (res.success && res.user) {
+        setUserData(res.user);
+        localStorage.setItem('havia_user', JSON.stringify(res.user));
+      }
+    } catch (e) {}
   };
 
   // Periodic Refresh
   useEffect(() => {
-    if (apiToken && userData) {
+    if (apiToken) {
+      syncUserProfile();
       loadNotifications();
       // Refresh every 5 minutes
-      const interval = setInterval(loadNotifications, 5 * 60 * 1000);
+      const interval = setInterval(() => {
+        syncUserProfile();
+        loadNotifications();
+      }, 5 * 60 * 1000);
       return () => clearInterval(interval);
     }
-  }, [apiToken, userData]);
+  }, [apiToken]);
 
   const handleProjectClick = (id: string, name: string, taskId: string | null = null) => {
     setActiveProjectId(id);
     setActiveProjectName(name);
     loadTasks(id, 'ALL', 1);
-    handleNav('subpage', null, 'Tasks', taskId);
+    handleNav('subpage', null, 'All Tasks', taskId);
   };
 
   const handleSaveProfile = async () => {

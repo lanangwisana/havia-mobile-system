@@ -96,7 +96,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           onPageChange={props.onProjectPageChange}
           onFilterChange={props.onProjectFilterChange}
         />;
-      case 'All Tasks': 
+      case 'My Tasks': 
         return <TaskList 
           tasks={props.projectTasks} 
           isLoading={props.isLoadingTasks} 
@@ -106,7 +106,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           onFilterChange={props.onTaskFilterChange}
           highlightTaskId={props.activeTaskId}
         />;
-      case 'Tasks': 
+      case 'All Tasks': 
         return <ProjectTaskList 
           tasks={props.projectTasks} 
           isLoading={props.isLoadingTasks} 
@@ -234,11 +234,11 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
               onNav('subpage', null, 'Events');
             } else if (subpageTitle === 'Attendance' || subpageTitle === 'Submission History') {
               onNav('subpage', null, 'Team');
-            } else if (subpageTitle === 'Tasks') {
+            } else if (subpageTitle === 'All Tasks') {
               onNav('subpage', 'project', 'Project');
             } else if (subpageTitle === 'Project Summary History' || subpageTitle === 'Payment History') {
               props.onFinanceBack();
-            } else if (subpageTitle === 'All Tasks') {
+            } else if (subpageTitle === 'My Tasks') {
               onNav('dashboard');
             } else {
               onNav('dashboard');
