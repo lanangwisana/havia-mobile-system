@@ -633,7 +633,7 @@ export default function HaviaMobileApp() {
   const handleProjectClick = (id: string, name: string, taskId: string | null = null) => {
     setActiveProjectId(id);
     setActiveProjectName(name);
-    loadTasks(id);
+    loadTasks(id, 'ALL', 1);
     handleNav('subpage', null, 'Tasks', taskId);
   };
 
