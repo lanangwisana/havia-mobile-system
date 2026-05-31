@@ -178,7 +178,11 @@ export default function HaviaMobileApp() {
         setCurrentProjectFilter('ALL');
         setCurrentProjectPage(1);
       }
-      if (title === 'My Tasks' || title === 'All Tasks') {
+      if (title === 'My Tasks') {
+        setCurrentTaskFilter('OVERDUE');
+        setCurrentTaskPage(1);
+        setActiveProjectId(null);
+      } else if (title === 'All Tasks') {
         setCurrentTaskFilter('ALL');
         setCurrentTaskPage(1);
       }
@@ -942,11 +946,13 @@ export default function HaviaMobileApp() {
           taskPaginationMeta={taskPaginationMeta}
           onTaskPageChange={(p: number) => {
             setActiveTaskId(null);
-            loadTasks(activeProjectId, currentTaskFilter, p);
+            const pId = subpageTitle === 'My Tasks' ? null : activeProjectId;
+            loadTasks(pId, currentTaskFilter, p);
           }}
           onTaskFilterChange={(s: string) => {
             setActiveTaskId(null);
-            loadTasks(activeProjectId, s, 1);
+            const pId = subpageTitle === 'My Tasks' ? null : activeProjectId;
+            loadTasks(pId, s, 1);
           }}
           activeProjectName={activeProjectName}
           activeTaskId={activeTaskId}
