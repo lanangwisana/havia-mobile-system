@@ -151,7 +151,7 @@ export default function HaviaMobileApp() {
     if (view === 'subpage' && title) {
       const guardMap: Record<string, (u: any) => boolean> = {
         'Project': canAccessProjects,
-        'All Tasks': canAccessProjects,
+        'My Tasks': canAccessProjects,
         'Finance': canAccessFinance,
         'Team': canAccessTeam,
       };
@@ -178,7 +178,7 @@ export default function HaviaMobileApp() {
         setCurrentProjectFilter('ALL');
         setCurrentProjectPage(1);
       }
-      if (title === 'All Tasks' || title === 'Tasks') {
+      if (title === 'My Tasks' || title === 'All Tasks') {
         setCurrentTaskFilter('ALL');
         setCurrentTaskPage(1);
       }
@@ -606,7 +606,7 @@ export default function HaviaMobileApp() {
 
     if (currentView === 'subpage' && apiToken) {
       if (subpageTitle === 'Project') loadProjects(currentProjectFilter, currentProjectPage);
-      else if (subpageTitle === 'All Tasks') loadTasks();
+      else if (subpageTitle === 'My Tasks') loadTasks();
       else if (subpageTitle === 'Finance') {
         loadExpenses();
         if (userData?.is_admin === "1" || userData?.user_type === "staff") {
@@ -658,7 +658,7 @@ export default function HaviaMobileApp() {
     setActiveProjectId(id);
     setActiveProjectName(name);
     loadTasks(id, 'ALL', 1);
-    handleNav('subpage', null, 'Tasks', taskId);
+    handleNav('subpage', null, 'All Tasks', taskId);
   };
 
   const handleSaveProfile = async () => {
