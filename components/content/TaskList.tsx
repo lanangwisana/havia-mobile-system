@@ -15,18 +15,6 @@ export const TaskList: React.FC<{
 }> = ({ tasks, isLoading, projects, projectName, paginationMeta, onPageChange, onFilterChange, highlightTaskId }) => {
   // Default to OVERDUE tab
   const [activeFilter, setActiveFilter] = useState('OVERDUE');
-  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (highlightTaskId) {
-      setExpandedTaskId(highlightTaskId);
-    }
-  }, [highlightTaskId]);
-
-  const toggleAccordion = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setExpandedTaskId(expandedTaskId === id ? null : id);
-  };
 
   const taskList = tasks;
 
@@ -90,127 +78,37 @@ export const TaskList: React.FC<{
           const isDone = statusStr === 'DONE' || statusStr === 'COMPLETED';
           const isInProgress = statusStr === 'IN PROGRESS' || statusStr === 'ACTIVE';
           const taskId = String(task.id || index);
-          const isExpanded = String(expandedTaskId) === taskId;
           
           const proj = projects?.find(p => String(p.id) === String(task.project_id));
           const projName = projectName || task.project_title || (proj ? proj.title : `Project ${task.project_id}`);
           const progress = isDone ? 100 : (isInProgress ? 50 : 0);
-          
+
           return (
             <div 
               key={taskId} 
-              className="group relative rounded-[2rem] p-[1.5px] transition-all duration-700 mb-4"
-              style={{ 
-                background: isExpanded 
-                  ? 'linear-gradient(135deg, #C69C3D, #F4EBD4, #C69C3D)' 
-                  : 'linear-gradient(135deg, #D4D1CE, #FFFFFF, #D4D1CE)',
-                boxShadow: isExpanded 
-                  ? '0 20px 40px rgba(198, 156, 61, 0.18)' 
-                  : '0 8px 25px rgba(0, 0, 0, 0.04)'
-              }}
+              className="bg-white rounded-xl border border-[#E8E4E1] shadow-[0_2px_10px_rgba(0,0,0,0.02)] mb-3 p-4 flex flex-col gap-3 transition-all hover:shadow-md"
             >
-              <div className="bg-white rounded-[1.92rem] overflow-hidden relative">
-                <div className={`absolute inset-0 transition-opacity duration-700 ${isExpanded ? 'opacity-100' : 'opacity-10'}`}
-                     style={{ background: 'linear-gradient(160deg, #FFFFFF 0%, #F4EBD4 100%)' }} 
-                />
-                
-                {/* Header Section */}
-                <div className="p-6 relative z-10">
-                  <div className="flex justify-between items-center">
-                    <div className="flex gap-5 items-center min-w-0 flex-1">
-                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center border-2 shrink-0 transition-all duration-500 bg-white border-[#C69C3D]/30 text-[#C69C3D] shadow-sm">
-                        {isDone ? <CheckCircle2 className="w-7 h-7" /> : <ClipboardList className="w-7 h-7" />}
-                      </div>
-                      <div className="flex flex-col min-w-0">
-                        <h4 className={`font-black text-[0.9375rem] leading-tight transition-all duration-500 ${isExpanded ? '' : 'truncate'} ${isDone ? 'text-neutral-400' : 'text-[#2C2A29]'}`}>
-                          {projName}
-                        </h4>
-                        <div className="flex items-center gap-2 mt-1.5 opacity-80">
-                          <div className="w-4 h-4 rounded-full bg-[#F4EBD4] flex items-center justify-center border border-[#C69C3D]/10">
-                            <ClipboardList className="w-2.5 h-2.5 text-[#C69C3D]" />
-                          </div>
-                          <p className={`text-[0.6875rem] text-[#2C2A29] font-bold tracking-tight ${isExpanded ? '' : 'truncate max-w-[150px]'}`}>
-                            {task.title || task.name || `Task ${task.id}`}
-                          </p>
-                        </div>
-                        
-                        <div className="flex items-center gap-1 mt-3 flex-nowrap overflow-hidden">
-                          {task.userRole && (
-                            <span className="text-[0.4375rem] px-2.5 py-1 rounded-lg font-black uppercase tracking-tight border shrink-0 bg-[#2C2A29] text-white border-[#2C2A29]">
-                              {task.userRole}
-                            </span>
-                          )}
-                          <span className={`text-[0.4375rem] px-2.5 py-1 rounded-lg font-black uppercase tracking-tight border-2 shrink-0 transition-colors duration-500 ${
-                            isDone ? 'bg-white text-green-600 border-green-500/30' : isInProgress ? 'bg-white text-blue-600 border-blue-500/30' : 'bg-white text-[#C69C3D] border-[#C69C3D]/30'
-                          }`}>
-                            {statusStr}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <button 
-                      onClick={(e) => toggleAccordion(taskId, e)}
-                      className={`ml-3 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 shadow-sm border ${
-                        isExpanded ? 'bg-[#C69C3D] text-white border-[#C69C3D]' : 'bg-white text-[#C69C3D] border-[#E8E4E1]'
-                      }`}
-                    >
-                      <ChevronDown className={`w-5 h-5 transition-transform duration-500 ${isExpanded ? 'rotate-180' : ''}`} />
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Expandable Section */}
-                <div className={`overflow-hidden relative z-10 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isExpanded ? 'max-h-[450px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                  <div className="px-7 pb-8 pt-4 border-t border-[#E8E4E1]">
-                    {/* Inner Card: Dates */}
-                    <div className="flex items-center justify-between gap-4 mb-8 p-4 bg-white/60 rounded-2xl border border-[#E8E4E1] shadow-sm backdrop-blur-md">
-                      <div className="space-y-1.5">
-                        <p className="text-[0.5625rem] text-[#6B6865] uppercase tracking-widest font-black opacity-60">Start Task</p>
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-3.5 h-3.5 text-[#C69C3D]" />
-                          <p className="text-[0.6875rem] text-[#2C2A29] font-black tracking-tight">{formatDate(task.start_date)}</p>
-                        </div>
-                      </div>
-                      <div className="flex-1 flex flex-col items-center gap-1 opacity-20 px-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#C69C3D]"></div>
-                        <div className="flex-1 w-px h-8 border-l-2 border-dashed border-[#C69C3D]"></div>
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#C69C3D]"></div>
-                      </div>
-                      <div className="space-y-1.5 text-right">
-                        <p className="text-[0.5625rem] text-[#6B6865] uppercase tracking-widest font-black opacity-60">Deadline</p>
-                        <div className="flex items-center gap-2 justify-end">
-                          <Clock className="w-3.5 h-3.5 text-[#C69C3D]" />
-                          <p className="text-[0.6875rem] text-[#2C2A29] font-black tracking-tight">{formatDate(task.deadline)}</p>
-                        </div>
-                      </div>
-                    </div>
+              <div className="flex flex-col">
+                <h4 className="font-black text-[#2C2A29] text-[0.95rem] leading-snug line-clamp-2">
+                  {task.title || task.name || `Task ${task.id}`}
+                </h4>
+                <p className="font-bold text-[#C69C3D] text-[0.6875rem] capitalize tracking-wide mt-1 line-clamp-1">
+                  {projName}
+                </p>
+              </div>
 
-                    {/* Description Area */}
-                    <div className="mb-8 px-1">
-                      <p className="text-[0.5625rem] text-[#6B6865] uppercase tracking-[0.2em] font-black mb-2 opacity-60">Description</p>
-                      <p className="text-[0.75rem] leading-relaxed text-[#2C2A29] italic bg-[#F4EBD4]/20 p-4 rounded-2xl border border-[#E8E4E1] border-dashed">
-                        "{task.description?.replace(/(<([^>]+)>)/gi, "") || 'No detailed description.'}"
-                      </p>
-                    </div>
-                    
-                    {/* Progress UI */}
-                    <div className="space-y-3 px-1">
-                      <div className="flex justify-between items-end">
-                        <div>
-                          <p className="text-[0.5625rem] text-[#6B6865] uppercase tracking-[0.2em] font-black mb-1">Current Progress</p>
-                          <div className="flex items-center gap-2">
-                            <Activity className="w-3 h-3 text-[#C69C3D]" />
-                            <span className="text-[0.75rem] font-black text-[#2C2A29]">Task {isDone ? 'Completed' : 'Status'}</span>
-                          </div>
-                        </div>
-                        <p className="text-[1.125rem] font-black italic text-[#C69C3D] drop-shadow-sm">{progress}%</p>
-                      </div>
-                      <div className="h-3 w-full bg-[#2C2A29]/5 rounded-full overflow-hidden p-[2.5px] border border-[#E8E4E1]">
-                        <div style={{ width: `${progress}%` }} className="h-full rounded-full transition-all duration-1000 bg-[#C69C3D]"></div>
-                      </div>
-                    </div>
-                  </div>
+              <div className="flex flex-col gap-1.5 mt-1 border-t border-[#E8E4E1] pt-3">
+                <div className="flex items-center gap-1.5 opacity-80">
+                  <Clock className="w-3.5 h-3.5 text-[#6B6865]" />
+                  <span className="text-[0.65rem] font-bold text-[#6B6865] uppercase tracking-widest">
+                    Deadline: <span className="text-[#2C2A29] ml-1">{formatDate(task.deadline)}</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 opacity-80">
+                  <Activity className="w-3.5 h-3.5 text-[#C69C3D]" />
+                  <span className="text-[0.65rem] font-bold text-[#6B6865] uppercase tracking-widest">
+                    Progress: <span className="text-[#C69C3D] ml-1">{progress}%</span>
+                  </span>
                 </div>
               </div>
             </div>
