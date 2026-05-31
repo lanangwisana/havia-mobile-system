@@ -7,12 +7,11 @@ export const TaskList: React.FC<{
   tasks: any[];
   isLoading: boolean;
   projects?: any[];
-  projectName?: string;
   paginationMeta?: any;
   onPageChange?: (page: number) => void;
   onFilterChange?: (status: string) => void;
   highlightTaskId?: string | null;
-}> = ({ tasks, isLoading, projects, projectName, paginationMeta, onPageChange, onFilterChange, highlightTaskId }) => {
+}> = ({ tasks, isLoading, projects, paginationMeta, onPageChange, onFilterChange, highlightTaskId }) => {
   // Default to OVERDUE tab
   const [activeFilter, setActiveFilter] = useState('OVERDUE');
 
@@ -80,7 +79,7 @@ export const TaskList: React.FC<{
           const taskId = String(task.id || index);
           
           const proj = projects?.find(p => String(p.id) === String(task.project_id));
-          const projName = projectName || task.project_title || (proj ? proj.title : `Project ${task.project_id}`);
+          const projName = task.project_title || (proj ? proj.title : `Project ${task.project_id}`);
           const progress = isDone ? 100 : (isInProgress ? 50 : 0);
 
           return (
