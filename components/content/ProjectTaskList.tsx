@@ -66,11 +66,11 @@ export const ProjectTaskList: React.FC<{
                       </span>
                       <span className="text-[0.65rem] font-bold text-[#D1D5DB]">|</span>
                       <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
-                        Act: <span className="text-[#C69C3D] ml-1">{Number(task.actual_progress).toFixed(1)}%</span>
+                        Act: <span className="text-[#2C2A29] ml-1">{Number(task.actual_progress).toFixed(1)}%</span>
                       </span>
                       <span className="text-[0.65rem] font-bold text-[#D1D5DB]">|</span>
                       <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
-                        Dev: <span className={`ml-1 ${Number(task.deviation) < 0 ? 'text-red-500' : 'text-emerald-500'}`}>{Number(task.deviation) > 0 ? '+' : ''}{Number(task.deviation).toFixed(1)}%</span>
+                        Dev: <span className={`ml-1 ${Number(task.deviation) < 0 ? 'text-red-500' : Number(task.deviation) === 0 ? 'text-[#2C2A29]' : 'text-emerald-500'}`}>{Number(task.deviation) > 0 ? '+' : ''}{Number(task.deviation).toFixed(1)}%</span>
                       </span>
                     </div>
                   ) : (
