@@ -13,8 +13,8 @@ export const TaskList: React.FC<{
   onFilterChange?: (status: string) => void;
   highlightTaskId?: string | null;
 }> = ({ tasks, isLoading, projects, projectName, paginationMeta, onPageChange, onFilterChange, highlightTaskId }) => {
-  const [activeFilter, setActiveFilter] = useState('ALL');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // Default to OVERDUE tab
+  const [activeFilter, setActiveFilter] = useState('OVERDUE');
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -23,70 +23,46 @@ export const TaskList: React.FC<{
     }
   }, [highlightTaskId]);
 
-  const filters = [
-    { id: 'ALL', label: 'ALL', icon: Filter },
-    { id: 'TO DO', label: 'TO DO', icon: Clock },
-    { id: 'IN PROGRESS', label: 'IN PROGRESS', icon: PlayCircle },
-    { id: 'DONE', label: 'DONE', icon: CheckCircle2 },
-  ];
-
   const toggleAccordion = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setExpandedTaskId(expandedTaskId === id ? null : id);
   };
 
-  const activeFilterObj = filters.find(f => f.id === activeFilter) || filters[0];
   const taskList = tasks;
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-2">
-      {/* Filter Dropdown */}
+      {/* Filter Tabs */}
       {!isLoading && (
-        <div className="px-1 relative z-50">
+        <div className="px-1 flex gap-2 z-50">
           <button 
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center justify-between w-full px-5 py-4 bg-white rounded-3xl border border-[#E8E4E1] shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all duration-300 active:scale-[0.98]"
+            onClick={() => {
+              setActiveFilter('OVERDUE');
+              if (onFilterChange) onFilterChange('OVERDUE');
+            }}
+            className={`flex-1 py-4 px-2 rounded-3xl font-black text-[0.625rem] tracking-[0.15em] uppercase transition-all duration-300 flex flex-col items-center justify-center gap-1.5 ${
+              activeFilter === 'OVERDUE' 
+                ? 'bg-rose-50 border-2 border-rose-500 text-rose-600 shadow-[0_4px_15px_rgba(244,63,94,0.15)]' 
+                : 'bg-white border-2 border-[#E8E4E1] text-[#6B6865] hover:bg-neutral-50'
+            }`}
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#C69C3D]/10 flex items-center justify-center">
-                <activeFilterObj.icon className="w-5 h-5 text-[#C69C3D]" />
-              </div>
-              <div className="flex flex-col items-start text-left">
-                <span className="text-[0.5625rem] text-[#6B6865] uppercase tracking-widest font-black">Filter Task</span>
-                <span className="text-[0.8125rem] font-bold text-[#2C2A29] tracking-tight uppercase">{activeFilterObj.label}</span>
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-[#F4EBD4]/50 flex items-center justify-center border border-[#C69C3D]/10">
-              <ChevronDown className={`w-4 h-4 text-[#C69C3D] transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-            </div>
+            <Clock className={`w-4 h-4 ${activeFilter === 'OVERDUE' ? 'text-rose-500' : 'text-[#6B6865]'}`} />
+            <span>Overdue Task</span>
           </button>
-          
-          {isDropdownOpen && (
-            <div className="absolute top-full left-1 right-1 mt-2 bg-white rounded-[2rem] border border-[#E8E4E1] shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 z-[60]">
-              <div className="p-2 space-y-1">
-                {filters.map((f) => (
-                  <button
-                    key={f.id}
-                    onClick={() => {
-                      setActiveFilter(f.id);
-                      setIsDropdownOpen(false);
-                      if (onFilterChange) onFilterChange(f.id);
-                    }}
-                    className={`flex items-center gap-4 w-full px-5 py-4 rounded-2xl transition-all ${
-                      activeFilter === f.id ? 'bg-[#C69C3D] text-white' : 'hover:bg-[#F4EBD4]/30 text-[#6B6865]'
-                    }`}
-                  >
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${activeFilter === f.id ? 'bg-white/20' : 'bg-neutral-100'}`}>
-                      <f.icon className={`w-4 h-4 ${activeFilter === f.id ? 'text-white' : 'text-[#C69C3D]'}`} />
-                    </div>
-                    <span className="text-[0.6875rem] font-bold tracking-widest uppercase">{f.label}</span>
-                    {activeFilter === f.id && <div className="ml-auto w-2 h-2 rounded-full bg-white animate-pulse"></div>}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          {isDropdownOpen && <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setIsDropdownOpen(false)}></div>}
+          <button 
+            onClick={() => {
+              setActiveFilter('7_DAYS');
+              if (onFilterChange) onFilterChange('7_DAYS');
+            }}
+            className={`flex-1 py-4 px-2 rounded-3xl font-black text-[0.625rem] tracking-[0.15em] uppercase transition-all duration-300 flex flex-col items-center justify-center gap-1.5 ${
+              activeFilter === '7_DAYS' 
+                ? 'bg-[#F4EBD4]/30 border-2 border-[#C69C3D] text-[#C69C3D] shadow-[0_4px_15px_rgba(198,156,61,0.15)]' 
+                : 'bg-white border-2 border-[#E8E4E1] text-[#6B6865] hover:bg-neutral-50'
+            }`}
+          >
+            <CheckCircle2 className={`w-4 h-4 ${activeFilter === '7_DAYS' ? 'text-[#C69C3D]' : 'text-[#6B6865]'}`} />
+            <span className="text-center">7 Days Deadline</span>
+          </button>
         </div>
       )}
 
