@@ -7,7 +7,7 @@ import { ProjectContent } from '../content/ProjectContent';
 import { TaskList } from '../content/TaskList';
 import { ProjectTaskList } from '../content/ProjectTaskList';
 import { FinanceContent } from '../content/FinanceContent';
-import { JadwalContent, EventDetailContent } from '../content/JadwalContent';
+import { JadwalContent } from '../content/JadwalContent';
 import { TimContent } from '../content/TimContent';
 import { AbsensiContent } from '../content/AbsensiContent';
 import { AkunContent } from '../content/AkunContent';
@@ -65,6 +65,8 @@ interface SubpageViewProps {
   setEventFilterType: (v: string) => void;
   eventFilterLabel: string;
   setEventFilterLabel: (v: string) => void;
+  eventPaginationMeta?: any;
+  onEventPageChange?: (page: number) => void;
   onOpenLeaveModal?: (type: 'izin' | 'cuti') => void;
   taskPaginationMeta?: any;
   onTaskPageChange?: (page: number) => void;
@@ -157,6 +159,8 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           setFilterType={props.setEventFilterType}
           filterLabel={props.eventFilterLabel}
           setFilterLabel={props.setEventFilterLabel}
+          paginationMeta={props.eventPaginationMeta}
+          onPageChange={props.onEventPageChange}
         />;
       case 'Team': 
         return <TimContent 
@@ -172,10 +176,7 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           isLoadingAttendances={props.isLoadingAttendances} 
         />;
       case 'Event Detail': 
-        return <EventDetailContent 
-          selectedEvent={props.selectedEvent} 
-          onBack={() => onNav('subpage', null, 'Events')} 
-        />;
+        return null; // Event Detail is now inline in Events view
       case 'Account': 
         return <AkunContent 
           userData={props.userData} 
