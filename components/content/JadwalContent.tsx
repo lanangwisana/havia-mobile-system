@@ -238,6 +238,18 @@ export const JadwalContent: React.FC<JadwalContentProps> = ({
             className="px-4 py-2 rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#C69C3D] text-white shadow-md"
           >Next</button>
         </div>
+        
+        <div className="flex items-center gap-3 opacity-40">
+           <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">Page {paginationMeta.current_page} / {paginationMeta.total_pages}</span>
+           <div className="h-1 w-1 rounded-full bg-neutral-400"></div>
+           <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">
+             {paginationMeta.total_records} {
+               filterType.includes('task') ? 'TASKS' :
+               filterType.includes('project') ? 'PROJECTS' :
+               filterType === 'event' ? 'EVENTS' : 'SCHEDULES'
+             }
+           </span>
+        </div>
       </div>
     )}
   </div>
