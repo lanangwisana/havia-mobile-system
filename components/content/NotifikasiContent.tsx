@@ -1,27 +1,50 @@
 import React from 'react';
-import { Activity, Bell, Calendar, Briefcase, Info } from 'lucide-react';
-import { colors } from '@/lib/utils';
+import { Activity, Info } from 'lucide-react';
 
 interface NotifikasiContentProps {
   isLoadingNotif: boolean;
   notifications: any[];
   onProjectClick: (id: string, name: string, taskId?: string | null) => void;
   onNav: (view: string, nav?: string | null, title?: string) => void;
+  paginationMeta?: any;
+  onPageChange?: (page: number) => void;
 }
 
 export const NotifikasiContent: React.FC<NotifikasiContentProps> = ({
-  isLoadingNotif, notifications, onProjectClick, onNav
+  isLoadingNotif, notifications, paginationMeta, onPageChange
 }) => {
-  const handleItemClick = (notif: any) => {
-    if (notif.module === 'project') {
-      onProjectClick(notif.target_id, notif.project_title || 'Project Detail');
-    } else if (notif.module === 'task') {
-      if (notif.project_id) {
-        onProjectClick(notif.project_id, notif.project_title || 'Project Tasks', notif.target_id);
+  const renderPaginationButtons = () => {
+    if (!paginationMeta) return null;
+    const { current_page, total_pages } = paginationMeta;
+    let pages = [];
+    
+    if (total_pages <= 3) {
+      for (let i = 1; i <= total_pages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (current_page === 1) {
+        pages = [1, 2, 3];
+      } else if (current_page === total_pages) {
+        pages = [total_pages - 2, total_pages - 1, total_pages];
       } else {
-        onNav('subpage', null, 'All Tasks');
+        pages = [current_page - 1, current_page, current_page + 1];
       }
     }
+
+    return pages.map(page => (
+      <button 
+        key={page}
+        onClick={() => onPageChange?.(page)}
+        className={`w-8 h-8 rounded-xl font-bold text-[0.6875rem] transition-all flex items-center justify-center border-b-2
+          ${current_page === page 
+            ? 'bg-[#2C2A29] text-white border-[#C69C3D] scale-110 shadow-lg' 
+            : 'bg-white text-neutral-500 border-neutral-100 hover:bg-neutral-50 active:scale-95'
+          }`}
+      >
+        {page}
+      </button>
+    ));
   };
 
   return (
@@ -35,45 +58,39 @@ export const NotifikasiContent: React.FC<NotifikasiContentProps> = ({
         notifications.map((notif: any, index: number) => {
           const isUrgent = notif.severity === 'urgent';
           const accentColor = isUrgent ? 'bg-red-500' : 'bg-[#C69C3D]';
+          const textColor = isUrgent ? 'text-red-600' : 'text-[#C69C3D]';
           
           return (
             <div key={notif.id || index} 
-              onClick={() => handleItemClick(notif)}
-              className="p-5 rounded-2xl bg-white border border-[#E8E4E1] flex gap-5 active:scale-[0.98] transition-all duration-300 cursor-pointer relative group shadow-sm hover:shadow-md"
+              className="p-5 rounded-2xl bg-white border border-[#E8E4E1] flex flex-col gap-3 shadow-sm relative overflow-hidden"
             >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center border shrink-0 transition-transform group-hover:scale-105 duration-500 ${isUrgent ? 'bg-red-50 border-red-100' : 'bg-[#F4EBD4]/30 border-[#E8E4E1]'}`}>
-                {notif.type === 'deadline' ? (
-                  <Calendar className={`w-5 h-5 ${isUrgent ? 'text-red-500' : 'text-[#C69C3D]'}`} />
-                ) : notif.module === 'project' ? (
-                  <Briefcase className="w-5 h-5 text-[#C69C3D]" />
-                ) : (
-                  <Bell className="w-5 h-5 text-[#C69C3D]" />
-                )}
-              </div>
+              {/* Subtle accent line on top */}
+              <div className={`absolute top-0 left-0 right-0 h-1 ${accentColor} opacity-80`}></div>
 
-              <div className="flex-1 space-y-1">
-                <div className="flex justify-between items-start">
-                  <h4 className={`font-black text-[0.875rem] leading-tight ${isUrgent ? 'text-red-600' : 'text-[#2C2A29]'}`}>
+              <div className="flex justify-between items-start pt-1">
+                <div className="flex flex-col gap-1">
+                  <h4 className={`font-black text-[1rem] leading-tight uppercase tracking-wide ${textColor}`}>
                     {notif.title}
                   </h4>
-                  <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-tighter opacity-60">
-                    {notif.date ? new Date(notif.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : ''}
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 rounded-md text-[0.5rem] font-black uppercase tracking-widest ${isUrgent ? 'bg-red-50 text-red-500' : 'bg-[#C69C3D]/10 text-[#C69C3D]'}`}>
+                        {notif.module}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col items-end">
+                  <span className="text-[0.5rem] text-neutral-400 font-black uppercase tracking-widest mb-0.5">Deadline</span>
+                  <span className="text-[0.6875rem] text-neutral-800 font-bold bg-neutral-50 px-2 py-1 rounded-lg border border-neutral-100">
+                    {notif.date ? new Date(notif.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}
                   </span>
                 </div>
-                <p className="text-[0.6875rem] text-[#6B6865] leading-relaxed font-medium line-clamp-2">
+              </div>
+
+              <div className="pt-2 border-t border-neutral-100/50 flex">
+                <p className="text-[0.875rem] text-neutral-700 font-bold leading-snug flex-1 min-w-0 truncate">
                   {notif.message}
                 </p>
-                
-                <div className="pt-2 flex items-center gap-4">
-                   <div className="flex items-center gap-1.5">
-                      <div className={`w-1 h-3 rounded-full ${accentColor}`}></div>
-                      <span className={`px-2 py-0.5 rounded-md text-[0.5rem] font-black uppercase tracking-widest ${isUrgent ? 'bg-red-50 text-red-500' : 'bg-gold/10 text-gold'}`}>
-                          {notif.module}
-                      </span>
-                   </div>
-                   <div className="h-3 w-[1px] bg-neutral-200"></div>
-                   <span className="text-[0.625rem] text-gold font-black group-hover:translate-x-1 transition-transform">View Details →</span>
-                </div>
               </div>
             </div>
           );
@@ -85,6 +102,37 @@ export const NotifikasiContent: React.FC<NotifikasiContentProps> = ({
           </div>
           <p className="text-[0.625rem] text-[#2C2A29] font-black uppercase tracking-[0.3em]">No Active Alerts</p>
           <p className="text-[0.5625rem] text-[#6B6865] font-medium mt-2">Your workspace is all clear</p>
+        </div>
+      )}
+
+      {/* Pagination Container */}
+      {!isLoadingNotif && paginationMeta && paginationMeta.total_pages > 1 && (
+        <div className="flex flex-col items-center gap-4 mt-8 pt-6 border-t border-dashed border-neutral-200">
+          <div className="bg-[#F8F6F3] p-1.5 rounded-2xl flex items-center justify-center gap-2 max-w-[280px] w-full border border-[#E8E4E1]">
+            <button 
+              disabled={paginationMeta.current_page === 1}
+              onClick={() => onPageChange?.(paginationMeta.current_page - 1)}
+              className="px-4 py-2 rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-white text-neutral-600 shadow-sm"
+            >Prev</button>
+            
+            <div className="flex items-center gap-1.5 flex-1 justify-center">
+              {renderPaginationButtons()}
+            </div>
+            
+            <button 
+              disabled={paginationMeta.current_page >= paginationMeta.total_pages}
+              onClick={() => onPageChange?.(paginationMeta.current_page + 1)}
+              className="px-4 py-2 rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#C69C3D] text-white shadow-md"
+            >Next</button>
+          </div>
+          
+          <div className="flex items-center gap-3 opacity-40">
+             <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">Page {paginationMeta.current_page} / {paginationMeta.total_pages}</span>
+             <div className="h-1 w-1 rounded-full bg-neutral-400"></div>
+             <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">
+               {paginationMeta.total_records} NOTIFICATIONS
+             </span>
+          </div>
         </div>
       )}
     </div>
