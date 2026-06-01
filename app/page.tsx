@@ -85,6 +85,8 @@ export default function HaviaMobileApp() {
   const [eventLabels, setEventLabels] = useState<any[]>([]);
   const [eventFilterType, setEventFilterType] = useState('event');
   const [eventFilterLabel, setEventFilterLabel] = useState('');
+  const [eventPaginationMeta, setEventPaginationMeta] = useState<any>(null);
+  const [currentEventPage, setCurrentEventPage] = useState(1);
 
   // Expenses States
   const [expenses, setExpenses] = useState<any[]>([]);
@@ -486,17 +488,35 @@ export default function HaviaMobileApp() {
     setIsLoadingFinanceSummary(false);
   };
 
-  const loadEvents = async (type: string = eventFilterType, label: string = eventFilterLabel) => {
+  const loadEvents = async (type: string = eventFilterType, label: string = eventFilterLabel, page: number = 1) => {
     if (!apiToken || !userData?.id) return;
-    setIsLoadingEvents(true);
     
-    // Pass filters to API
-    let url = `haviacms/events?type=${type}`;
+    setEventFilterType(type);
+    if (label !== undefined) setEventFilterLabel(label);
+    setCurrentEventPage(page);
+
+    const cacheKey = `havia_events_${type}_${label}_${page}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    let isUsingCache = false;
+    
+    if (cachedData) {
+      try {
+        const parsed = JSON.parse(cachedData);
+        setEvents(parsed.data);
+        if (parsed.meta) setEventPaginationMeta(parsed.meta);
+        isUsingCache = true;
+      } catch (e) {}
+    }
+
+    if (!isUsingCache) {
+      setIsLoadingEvents(true);
+    }
+    
+    let url = `haviacms/events?type=${type}&page=${page}`;
     if (label) {
       url += `&label_id=${label}`;
     }
 
-    console.log(`[LoadEvents] type=${type}, label=${label}, url=${url}`);
     const res = await fetchFromApi(url, apiToken);
     
     if (res.success) {
@@ -513,9 +533,14 @@ export default function HaviaMobileApp() {
       }
 
       setEvents(eventsData);
+      if (res.meta) setEventPaginationMeta(res.meta);
+      
+      localStorage.setItem(cacheKey, JSON.stringify({ data: eventsData, meta: res.meta }));
     } else {
-      setEvents([]);
-      if (res.error) showToast(`Failed to sync schedule: ${res.error}`);
+      if (!isUsingCache) {
+        setEvents([]);
+        if (res.error) showToast(`Failed to sync schedule: ${res.error}`);
+      }
     }
     setIsLoadingEvents(false);
   };
@@ -881,7 +906,7 @@ export default function HaviaMobileApp() {
   // Reload events when filters change
   useEffect(() => {
     if (apiToken && currentView === 'subpage' && subpageTitle === 'Events') {
-      loadEvents();
+      loadEvents(eventFilterType, eventFilterLabel, 1);
     }
   }, [eventFilterType, eventFilterLabel]);
 
@@ -1013,6 +1038,8 @@ export default function HaviaMobileApp() {
           setEventFilterType={setEventFilterType}
           eventFilterLabel={eventFilterLabel}
           setEventFilterLabel={setEventFilterLabel}
+          eventPaginationMeta={eventPaginationMeta}
+          onEventPageChange={(p: number) => loadEvents(eventFilterType, eventFilterLabel, p)}
           onOpenLeaveModal={(type) => {
             setLeaveModalType(type);
             setIsLeaveModalOpen(true);
