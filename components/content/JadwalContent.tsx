@@ -5,7 +5,7 @@ import { colors } from '@/lib/utils';
 interface JadwalContentProps {
   isLoadingEvents: boolean;
   events: any[];
-  onEventClick: (event: any) => void;
+  onEventClick?: (event: any) => void;
   onCreateEvent: () => void;
   // New filtering props
   labels: any[];
@@ -13,11 +13,14 @@ interface JadwalContentProps {
   setFilterType: (type: string) => void;
   filterLabel: string;
   setFilterLabel: (label: string) => void;
+  paginationMeta?: any;
+  onPageChange?: (page: number) => void;
 }
 
 export const JadwalContent: React.FC<JadwalContentProps> = ({
   isLoadingEvents, events, onEventClick, onCreateEvent,
-  labels, filterType, setFilterType, filterLabel, setFilterLabel
+  labels, filterType, setFilterType, filterLabel, setFilterLabel,
+  paginationMeta, onPageChange
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -126,42 +129,53 @@ export const JadwalContent: React.FC<JadwalContentProps> = ({
           return (
             <div 
               key={event.id || index} 
-              onClick={() => onEventClick(event)} 
-              className="group relative p-px rounded-[1.8rem] overflow-hidden active:scale-[0.98] transition-all duration-300 shadow-xl"
-              style={{ background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent)' }}
+              className="bg-white p-4 rounded-2xl border border-[#E8E4E1] shadow-sm flex flex-col gap-3"
             >
-              <div className="bg-white p-4 rounded-[1.75rem] relative overflow-hidden border border-neutral-100 shadow-sm transition-all group-active:shadow-none">
-                <div className="flex gap-4 relative z-10 items-center">
-                  <div className="flex flex-col items-center justify-center w-12 h-12 rounded-2xl bg-neutral-50 border border-neutral-200 shrink-0 group-hover:bg-[#C69C3D]/10 group-hover:border-[#C69C3D]/20 transition-colors">
-                    <span className="text-[0.5625rem] font-black text-[#C69C3D] tracking-tighter">{month}</span>
-                    <span className="text-lg font-black text-neutral-900 leading-none">{day}</span>
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-[0.875rem] text-neutral-900 group-hover:text-[#C69C3D] transition-colors truncate mb-1.5 leading-tight">{event.title}</h4>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-neutral-500" />
-                        <span className="text-[0.625rem] text-neutral-400 font-bold">{event.start_time || '08:00'}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {event.location && (
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-neutral-500" />
-                            <span className="text-[0.625rem] text-neutral-400 font-bold truncate max-w-[100px]">{event.location}</span>
-                          </div>
-                        )}
-                        <div className={`px-1.5 py-0.5 rounded-[6px] ${badge.bg} border border-neutral-100 shrink-0 flex items-center justify-center`}>
-                          <span className="text-[0.5rem] font-black uppercase tracking-widest leading-none" style={{ color: badge.color }}>{badge.label}</span>
-                        </div>
-                      </div>
+              <div className="flex items-start gap-3">
+                <div className="flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-neutral-50 border border-neutral-100 shrink-0">
+                  <span className="text-[0.5625rem] font-black text-[#C69C3D] tracking-tighter">{month}</span>
+                  <span className="text-lg font-black text-neutral-900 leading-none">{day}</span>
+                </div>
+                
+                <div className="flex-1 min-w-0 pt-0.5">
+                  <h4 className="font-bold text-[0.875rem] text-neutral-900 truncate leading-tight">{event.title}</h4>
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    <div className={`px-1.5 py-0.5 rounded-[6px] ${badge.bg} border border-neutral-100 shrink-0 flex items-center justify-center`}>
+                      <span className="text-[0.5rem] font-black uppercase tracking-widest leading-none" style={{ color: badge.color }}>{badge.label}</span>
                     </div>
-                  </div>
-                  
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-600 group-hover:text-[#C69C3D] group-hover:bg-[#C69C3D]/5 transition-all">
-                    <ChevronRight className="w-5 h-5" />
+                    {event.location && (
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-neutral-500" />
+                        <span className="text-[0.625rem] text-neutral-500 font-bold truncate max-w-[120px]">{event.location}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5 pt-2 border-t border-[#E8E4E1]">
+                <div className="flex items-center justify-between w-full gap-2 overflow-hidden">
+                  <div className="flex items-center gap-1 opacity-80 shrink-0">
+                    <Clock className="w-3 h-3 text-[#6B6865]" />
+                    <span className="text-[0.6rem] font-bold text-[#6B6865] tracking-wide whitespace-nowrap">
+                      Time: <span className="text-[#2C2A29] ml-0.5">{event.start_time || '08:00'} - {event.end_time || '17:00'}</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 opacity-80 min-w-0">
+                    <User className="w-3 h-3 text-[#6B6865] shrink-0" />
+                    <span className="text-[0.6rem] font-bold text-[#6B6865] tracking-wide whitespace-nowrap shrink-0">
+                      PIC: 
+                    </span>
+                    <span className="text-[0.6rem] font-bold text-[#2C2A29] ml-0.5 truncate min-w-0">
+                      {event.created_by_name || 'Havia Staff'}
+                    </span>
+                  </div>
+                </div>
+                {event.description && (
+                  <p className="text-[0.75rem] text-neutral-500 leading-relaxed font-medium mt-1 line-clamp-2">
+                    {event.description.replace(/(<([^>]+)>)/gi, "")}
+                  </p>
+                )}
               </div>
             </div>
           );
@@ -174,105 +188,70 @@ export const JadwalContent: React.FC<JadwalContentProps> = ({
         <p className="text-[0.625rem] text-neutral-400 tracking-widest uppercase font-bold text-center leading-relaxed">No schedule planned for you yet.</p>
       </div>
     )}
+
+    {/* Pagination UI */}
+    {!isLoadingEvents && paginationMeta && paginationMeta.total_pages > 1 && (
+      <div className="flex flex-col items-center gap-4 mt-4 pb-0 px-4">
+        <div className="flex items-center justify-between w-full max-w-[280px] p-1.5 bg-white rounded-2xl border border-[#E8E4E1] shadow-sm">
+          <button 
+            disabled={paginationMeta.current_page <= 1}
+            onClick={() => onPageChange?.(paginationMeta.current_page - 1)}
+            className="px-4 py-2 rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#2C2A29]/5 text-[#2C2A29]"
+          >Prev</button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: paginationMeta.total_pages }, (_, i) => i + 1).map((p) => {
+              const current = paginationMeta.current_page;
+              const total = paginationMeta.total_pages;
+              
+              let startPage = Math.max(1, current - 1);
+              let endPage = Math.min(total, current + 1);
+              
+              if (endPage - startPage < 2 && total >= 3) {
+                if (startPage === 1) {
+                  endPage = 3;
+                } else if (endPage === total) {
+                  startPage = total - 2;
+                }
+              }
+              
+              if (p >= startPage && p <= endPage) {
+                return (
+                  <button
+                    key={p}
+                    onClick={() => onPageChange?.(p)}
+                    className={`w-8 h-8 rounded-xl font-black text-[0.6875rem] transition-all active:scale-95 flex items-center justify-center ${
+                      current === p 
+                        ? 'bg-[#C69C3D] text-white shadow-md' 
+                        : 'text-[#6B6865] hover:bg-[#F4EBD4]/50'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                );
+              }
+              return null;
+            })}
+          </div>
+          <button 
+            disabled={paginationMeta.current_page >= paginationMeta.total_pages}
+            onClick={() => onPageChange?.(paginationMeta.current_page + 1)}
+            className="px-4 py-2 rounded-xl font-black text-[0.5625rem] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-20 bg-[#C69C3D] text-white shadow-md"
+          >Next</button>
+        </div>
+        
+        <div className="flex items-center gap-3 opacity-40">
+           <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">Page {paginationMeta.current_page} / {paginationMeta.total_pages}</span>
+           <div className="h-1 w-1 rounded-full bg-neutral-400"></div>
+           <span className="text-[0.5625rem] text-[#6B6865] font-black uppercase tracking-widest">
+             {paginationMeta.total_records} {
+               filterType.includes('task') ? 'TASKS' :
+               filterType.includes('project') ? 'PROJECTS' :
+               filterType === 'event' ? 'EVENTS' : 'SCHEDULES'
+             }
+           </span>
+        </div>
+      </div>
+    )}
   </div>
-  );
-};
-
-interface EventDetailContentProps {
-  selectedEvent: any;
-  onBack: () => void;
-}
-
-export const EventDetailContent: React.FC<EventDetailContentProps> = ({ selectedEvent, onBack }) => {
-  if (!selectedEvent) return null;
-  
-  return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32 px-1">
-      {/* Header Banner - Updated to match Image 3 style */}
-      <div 
-        className="w-full h-44 rounded-[2.5rem] relative overflow-hidden shadow-xl border border-neutral-100"
-        style={{ 
-          background: 'linear-gradient(145deg, #FFFFFF, #F5F5F5)',
-        }}
-      >
-        {/* Subtle glow accent like in Image 3 */}
-        <div className="absolute top-0 right-0 w-40 h-40 bg-[#C69C3D]/5 rounded-full blur-[60px] -mr-10 -mt-20"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#C69C3D]/5 rounded-full blur-[50px] -ml-10 -mb-20"></div>
-
-        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-           <Calendar className="w-24 h-24 text-white rotate-12" />
-        </div>
-        
-        <div className="absolute inset-x-8 bottom-8 flex flex-col gap-3">
-          <div className="flex flex-col">
-            <span className="text-[0.5625rem] text-[#C69C3D] font-black uppercase tracking-[0.3em] mb-1">Event Detail</span>
-            <h3 className="text-2xl font-black text-neutral-900 leading-tight drop-shadow-md">{selectedEvent.title}</h3>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <div className="h-0.5 w-6 bg-[#C69C3D] rounded-full"></div>
-            <span className="text-[0.5rem] text-neutral-400 font-bold uppercase tracking-widest">Internal Events</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Content Grid */}
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="p-4 rounded-[1.8rem] bg-neutral-50 border border-neutral-100">
-             <p className="text-[0.4375rem] text-neutral-400 uppercase tracking-[0.2em] font-black mb-2">Start Time</p>
-             <div className="flex items-center gap-2">
-               <div className="w-8 h-8 rounded-xl bg-[#C69C3D]/10 flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-[#C69C3D]" />
-               </div>
-               <p className="text-xs font-black text-neutral-900">{selectedEvent.start_time || '08:00'}</p>
-             </div>
-          </div>
-          <div className="p-4 rounded-[1.8rem] bg-neutral-50 border border-neutral-100">
-             <p className="text-[0.4375rem] text-neutral-400 uppercase tracking-[0.2em] font-black mb-2">End Time</p>
-             <div className="flex items-center gap-2">
-               <div className="w-8 h-8 rounded-xl bg-neutral-200 flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-neutral-500" />
-               </div>
-               <p className="text-xs font-black text-neutral-900">{selectedEvent.end_time || '17:00'}</p>
-             </div>
-          </div>
-        </div>
-
-        <div className="p-5 rounded-[2rem] bg-neutral-50 border border-neutral-100">
-           <p className="text-[0.4375rem] text-neutral-400 uppercase tracking-[0.2em] font-black mb-3">Location Information</p>
-           <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-2xl bg-[#C69C3D]/10 flex items-center justify-center shrink-0">
-                 <MapPin className="w-5 h-5 text-[#C69C3D]" />
-              </div>
-              <p className="text-[0.8125rem] text-neutral-600 leading-relaxed font-bold py-1">{selectedEvent.location || 'Location not yet determined for this agenda.'}</p>
-           </div>
-        </div>
-
-        {selectedEvent.description && (
-          <div className="p-5 rounded-[2rem] bg-neutral-50 border border-neutral-100">
-             <p className="text-[0.4375rem] text-neutral-400 uppercase tracking-[0.2em] font-black mb-3">Event Description</p>
-             <div className="text-[0.8125rem] text-neutral-500 leading-relaxed font-medium">
-               {selectedEvent.description.replace(/(<([^>]+)>)/gi, "")}
-             </div>
-          </div>
-        )}
-
-        <div className="p-5 rounded-[2rem] bg-neutral-50 border border-neutral-100">
-           <p className="text-[0.4375rem] text-neutral-400 uppercase tracking-[0.2em] font-black mb-3">PIC / Creator</p>
-           <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-neutral-100 flex items-center justify-center shrink-0">
-                 <User className="w-5 h-5 text-neutral-400" />
-              </div>
-              <div>
-                <p className="text-xs font-black text-neutral-900">{selectedEvent.created_by_name || 'Havia Staff'}</p>
-                <p className="text-[0.5rem] text-neutral-400 uppercase font-bold tracking-widest">Event Organizer</p>
-              </div>
-           </div>
-        </div>
-
-        
-      </div>
-    </div>
   );
 };

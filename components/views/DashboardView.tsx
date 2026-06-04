@@ -9,9 +9,10 @@ interface DashboardViewProps {
   onNav: (view: string, nav?: string | null, title?: string) => void;
   activeAttendance?: any;
   notifications?: any[];
+  unreadNotifCount?: number;
 }
 
-export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentTime, onNav, activeAttendance, notifications }) => {
+export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentTime, onNav, activeAttendance, notifications, unreadNotifCount = 0 }) => {
   let timeWarningText = null;
   if (currentTime) {
     const [hStr, mStr] = currentTime.split(':');
