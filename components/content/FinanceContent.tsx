@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingDown, Receipt, DollarSign, Tag, Briefcase, Wallet, PieChart, TrendingUp, Banknote } from 'lucide-react';
+import { TrendingDown, Receipt, DollarSign, Tag, Briefcase, Wallet, PieChart, TrendingUp, Banknote, Activity } from 'lucide-react';
 import { colors, formatCurrency } from '@/lib/utils';
 import { canSeeProjectSummary } from '@/lib/permissions';
 
@@ -204,12 +204,6 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1 pr-4">
                         <h4 className="font-bold text-neutral-900 text-[0.8125rem] leading-tight group-hover:text-[#C69C3D] transition-colors">{p.project_title}</h4>
-                        <div className="flex items-center gap-2 mt-1.5">
-                          <span className="text-[0.5625rem] px-2 py-0.5 bg-neutral-50 border border-neutral-200 rounded text-neutral-500 uppercase font-bold tracking-wider">{p.status_title}</span>
-                          <span className="text-[0.5625rem] text-neutral-400 flex items-center gap-1 font-medium italic">
-                            {p.progress}% tasks done • {p.expense_count || 0} items
-                          </span>
-                        </div>
                         {p.expense_titles && (
                           <p className="text-[0.5rem] text-neutral-400 mt-1 leading-tight line-clamp-1 italic">
                             Incl: {p.expense_titles}
@@ -250,19 +244,34 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                         <div>
                           <div className="flex justify-between items-end mb-1.5">
                             <span className="text-[0.5625rem] font-black text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
-                              <TrendingUp className="w-3 h-3 text-[#C69C3D]" />
+                              <Activity className="w-3 h-3 text-[#C69C3D]" />
                               Project Progress
                             </span>
-                            <span className="text-[0.6875rem] font-black font-mono text-[#C69C3D]">
-                              {p.progress}%
-                            </span>
                           </div>
-                          <div className="h-2 bg-neutral-100 rounded-full overflow-hidden flex p-0.5">
-                            <div 
-                              className="h-full rounded-full bg-gradient-to-r from-[#C69C3D] to-[#E5B54F] transition-all duration-1000"
-                              style={{ width: `${p.progress}%` }}
-                            ></div>
-                          </div>
+                          
+                          {p.planned_progress !== undefined ? (
+                            <div className="flex items-center gap-2 mt-2 bg-neutral-50 border border-neutral-100 rounded-xl p-2 px-3">
+                              <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
+                                Pln: <span className="text-[#2C2A29] ml-1">{Number(p.planned_progress).toFixed(1)}%</span>
+                              </span>
+                              <span className="text-[0.65rem] font-bold text-[#D1D5DB]">|</span>
+                              <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
+                                Act: <span className="text-[#2C2A29] ml-1">{Number(p.actual_progress).toFixed(1)}%</span>
+                              </span>
+                              <span className="text-[0.65rem] font-bold text-[#D1D5DB]">|</span>
+                              <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
+                                Dev: <span className={`${Number(p.deviation) < 0 ? 'text-rose-500' : 'text-emerald-500'} ml-1`}>
+                                    {Number(p.deviation) > 0 ? '+' : ''}{Number(p.deviation).toFixed(1)}%
+                                </span>
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 mt-2 bg-neutral-50 border border-neutral-100 rounded-xl p-2 px-3">
+                              <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
+                                  Project Progress: <span className="text-[#2C2A29] ml-1">{p.progress}%</span>
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
 
