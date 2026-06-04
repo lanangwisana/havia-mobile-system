@@ -455,30 +455,77 @@ export default function HaviaMobileApp() {
 
   const loadExpenses = async (page: number = 1) => {
     if (!apiToken) return;
-    setIsLoadingExpenses(true);
     setCurrentExpensesPage(page);
+
+    const cacheKey = `havia_finance_expenses_${page}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    let isUsingCache = false;
+
+    if (cachedData) {
+      try {
+        const parsed = JSON.parse(cachedData);
+        setExpenses(parsed.data);
+        if (parsed.meta) {
+          setExpensesMeta(parsed.meta);
+          setExpensesTotal(parsed.meta.total_items || 0);
+        } else {
+          setExpensesTotal(parsed.data?.length || 0);
+        }
+        isUsingCache = true;
+      } catch (e) {}
+    }
+
+    if (!isUsingCache) {
+      setIsLoadingExpenses(true);
+    }
+
     // Fetch specifically salaries for the logged-in user
     const res = await fetchFromApi(`haviacms/finance/salaries?page=${page}`, apiToken);
     if (res.success) {
-      setExpenses(Array.isArray(res.data) ? res.data : []);
+      const expenseData = Array.isArray(res.data) ? res.data : [];
+      setExpenses(expenseData);
       if (res.meta) {
         setExpensesMeta(res.meta);
         setExpensesTotal(res.meta.total_items || 0);
       } else {
-        setExpensesTotal(res.data?.length || 0);
+        setExpensesTotal(expenseData.length);
       }
+      localStorage.setItem(cacheKey, JSON.stringify({ data: expenseData, meta: res.meta }));
     }
     setIsLoadingExpenses(false);
   };
 
   const loadFinanceSummary = async (page: number = 1) => {
     if (!apiToken || (userData?.is_admin !== "1" && userData?.user_type !== "staff")) return;
-    setIsLoadingFinanceSummary(true);
     setCurrentFinanceSummaryPage(page);
+    
+    const cacheKey = `havia_finance_summary_${page}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    let isUsingCache = false;
+
+    if (cachedData) {
+      try {
+        const parsed = JSON.parse(cachedData);
+        setFinanceSummary(parsed.data);
+        if (parsed.totals) setFinanceTotals(parsed.totals);
+        if (parsed.meta) {
+          setFinanceSummaryMeta(parsed.meta);
+          setFinanceSummaryTotal(parsed.meta.total_items || 0);
+        } else {
+          setFinanceSummaryTotal(parsed.data?.length || 0);
+        }
+        isUsingCache = true;
+      } catch (e) {}
+    }
+
+    if (!isUsingCache) {
+      setIsLoadingFinanceSummary(true);
+    }
     
     const res = await fetchFromApi(`haviacms/finance/summary?page=${page}`, apiToken);
     if (res.success) {
-      setFinanceSummary(Array.isArray(res.data) ? res.data : []);
+      const summaryData = Array.isArray(res.data) ? res.data : [];
+      setFinanceSummary(summaryData);
       if (res.totals) {
         setFinanceTotals(res.totals);
       }
@@ -486,8 +533,9 @@ export default function HaviaMobileApp() {
         setFinanceSummaryMeta(res.meta);
         setFinanceSummaryTotal(res.meta.total_items || 0);
       } else {
-        setFinanceSummaryTotal(res.data?.length || 0);
+        setFinanceSummaryTotal(summaryData.length);
       }
+      localStorage.setItem(cacheKey, JSON.stringify({ data: summaryData, totals: res.totals, meta: res.meta }));
     }
     setIsLoadingFinanceSummary(false);
   };
