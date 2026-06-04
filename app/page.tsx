@@ -47,6 +47,10 @@ export default function HaviaMobileApp() {
   
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isLoadingNotif, setIsLoadingNotif] = useState(false);
+  const [notifPaginationMeta, setNotifPaginationMeta] = useState<any>(null);
+  const [currentNotifPage, setCurrentNotifPage] = useState(1);
+  const [unreadNotifCount, setUnreadNotifCount] = useState(0);
+  const [allNotifIds, setAllNotifIds] = useState<string[]>([]);
   
   const [projects, setProjects] = useState<any[]>([]);
   const [isLoadingProjects, setIsLoadingProjects] = useState(false);
@@ -654,32 +658,69 @@ export default function HaviaMobileApp() {
         loadLeaveTypes();
       }
       else if (subpageTitle === 'Notifications') {
-        const loadNotif = async () => {
-          setIsLoadingNotif(true);
-          const res = await fetchFromApi('haviacms/notifications', apiToken);
-          if (res.success) setNotifications(Array.isArray(res.data) ? res.data : []);
-          setIsLoadingNotif(false);
-        };
-        loadNotif();
+        loadNotifications(currentNotifPage);
       }
     }
   }, [subpageTitle, currentView, apiToken, eventFilterType, eventFilterLabel]);
 
-  const loadNotifications = async () => {
+  // Mark notifications as read when opening the notifications page
+  useEffect(() => {
+    if (subpageTitle === 'Notifications' && allNotifIds.length > 0) {
+      const seenNotifsKey = `havia_read_notifs_${userData?.id || 'guest'}`;
+      localStorage.setItem(seenNotifsKey, JSON.stringify(allNotifIds));
+      setUnreadNotifCount(0);
+    }
+  }, [subpageTitle, allNotifIds, userData]);
+
+  const loadNotifications = async (page = 1) => {
     if (!apiToken) return;
     
-    const cacheKey = `havia_notif_${userData?.id || 'guest'}`;
+    const cacheKey = `havia_notif_${userData?.id || 'guest'}_${page}`;
     const cachedData = localStorage.getItem(cacheKey);
+    let isUsingCache = false;
+    
     if (cachedData) {
-      try { setNotifications(JSON.parse(cachedData)); } catch(e) {}
+      try {
+        const parsed = JSON.parse(cachedData);
+        setNotifications(parsed.data);
+        if (parsed.meta) {
+            setNotifPaginationMeta(parsed.meta);
+            if (parsed.meta.unread_count !== undefined) setUnreadNotifCount(parsed.meta.unread_count);
+            if (parsed.meta.all_ids !== undefined) setAllNotifIds(parsed.meta.all_ids);
+        }
+        isUsingCache = true;
+      } catch(e) {}
     }
     
-    const res = await fetchFromApi('haviacms/notifications', apiToken);
+    if (!isUsingCache) {
+      setIsLoadingNotif(true);
+    }
+    
+    // Read cached seen notifs
+    const seenNotifsKey = `havia_read_notifs_${userData?.id || 'guest'}`;
+    let readIdsParam = '';
+    try {
+        const seenNotifs = localStorage.getItem(seenNotifsKey);
+        if (seenNotifs) {
+            const parsedSeen = JSON.parse(seenNotifs);
+            if (Array.isArray(parsedSeen)) {
+                readIdsParam = '&read_ids=' + parsedSeen.join(',');
+            }
+        }
+    } catch(e) {}
+    
+    const res = await fetchFromApi(`haviacms/notifications?page=${page}${readIdsParam}`, apiToken);
     if (res.success) {
       const freshData = Array.isArray(res.data) ? res.data : [];
       setNotifications(freshData);
-      localStorage.setItem(cacheKey, JSON.stringify(freshData));
+      if (res.meta) {
+          setNotifPaginationMeta(res.meta);
+          if (res.meta.unread_count !== undefined) setUnreadNotifCount(res.meta.unread_count);
+          if (res.meta.all_ids !== undefined) setAllNotifIds(res.meta.all_ids);
+      }
+      localStorage.setItem(cacheKey, JSON.stringify({ data: freshData, meta: res.meta }));
     }
+    setIsLoadingNotif(false);
   };
   
   const syncUserProfile = async () => {
@@ -1004,6 +1045,11 @@ export default function HaviaMobileApp() {
           isLoadingLeaves={isLoadingLeaves}
           notifications={notifications}
           isLoadingNotif={isLoadingNotif}
+          notifPaginationMeta={notifPaginationMeta}
+          onNotifPageChange={(p: number) => {
+            setCurrentNotifPage(p);
+            loadNotifications(p);
+          }}
           userData={userData}
           onFinanceViewAll={() => {
             setSubpageTitle('Project Summary History');

@@ -82,6 +82,8 @@ interface SubpageViewProps {
   onFinanceHistory: () => void;
   onFinanceBack: () => void;
   financeTotals?: any;
+  notifPaginationMeta?: any;
+  onNotifPageChange?: (page: number) => void;
 }
 
 export const SubpageView: React.FC<SubpageViewProps> = (props) => {
@@ -204,6 +206,8 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           notifications={props.notifications} 
           onProjectClick={props.onProjectClick}
           onNav={props.onNav}
+          paginationMeta={props.notifPaginationMeta}
+          onPageChange={props.onNotifPageChange}
         />;
       case 'Reset Password':
         return <ResetPasswordContent 
