@@ -193,7 +193,11 @@ export async function postToApi(endpoint: string, token: string, body: Record<st
     const formData = new FormData();
     Object.entries(body).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        formData.append(key, String(value));
+        if (value instanceof File || value instanceof Blob) {
+          formData.append(key, value);
+        } else {
+          formData.append(key, String(value));
+        }
       }
     });
 
