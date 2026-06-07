@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bell, QrCode, ClipboardList, Users, DollarSign, Calendar, Briefcase, Clock } from 'lucide-react';
 import { colors, getGreeting, getUserImage, getAttendanceStatus } from '@/lib/utils';
-import { getVisibleMenuItems } from '@/lib/permissions';
+import { getVisibleMenuItems, isAdmin } from '@/lib/permissions';
 
 interface DashboardViewProps {
   userData: any;
@@ -116,11 +116,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
           <p className="text-[0.625rem] text-neutral-900 uppercase tracking-[0.3em] font-black mb-3 px-1">Menu</p>
           <div className="grid grid-cols-5 gap-3 h-24">
             {(() => {
+              const userIsAdmin = isAdmin(userData);
+              const teamLabel = userIsAdmin ? 'Team' : 'Attendance';
+              const teamIcon = userIsAdmin ? Users : Clock;
+
               const allItems = [
                 { id: 'My Tasks', label: 'Tasks', icon: ClipboardList },
                 { id: 'Project', label: 'Projects', icon: Briefcase, nav: 'project' },
                 { id: 'Events', label: 'Events', icon: Calendar, nav: 'jadwal' },
-                { id: 'Team', label: 'Team', icon: Users },
+                { id: 'Team', label: teamLabel, icon: teamIcon },
                 { id: 'Finance', label: 'Finance', icon: DollarSign }
               ];
               return getVisibleMenuItems(userData, allItems).map((item) => (
@@ -135,7 +139,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
                     <div className="absolute inset-0 bg-gradient-to-br from-white to-[#F4EBD4]/20 opacity-50"></div>
                     <item.icon className="w-6 h-6 text-[#C69C3D] relative z-10" />
                   </div>
-                  <span className="text-[0.5rem] font-black tracking-widest text-neutral-900 uppercase truncate w-full text-center">{item.label}</span>
+                  <span className="text-[0.45rem] min-[400px]:text-[0.5rem] font-black tracking-wider text-neutral-900 uppercase w-full text-center leading-tight">{item.label}</span>
                 </button>
               ));
             })()}
