@@ -54,6 +54,8 @@ interface SubpageViewProps {
   projectPaginationMeta: any;
   onProjectPageChange: (page: number) => void;
   onProjectFilterChange: (status: string) => void;
+  currentProjectSearch?: string;
+  onProjectSearch?: (s: string) => void;
   apiToken: string;
   onUploadImage: (file: File) => void;
   isUploadingImage: boolean;
@@ -99,6 +101,8 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           paginationMeta={props.projectPaginationMeta}
           onPageChange={props.onProjectPageChange}
           onFilterChange={props.onProjectFilterChange}
+          currentProjectSearch={props.currentProjectSearch}
+          onProjectSearch={props.onProjectSearch}
         />;
       case 'My Tasks': 
         return <TaskList 
