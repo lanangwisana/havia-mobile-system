@@ -78,6 +78,8 @@ interface SubpageViewProps {
   isLoadingFinanceSummary: boolean;
   financeSummaryPaginationMeta?: any;
   onFinanceSummaryPageChange?: (page: number) => void;
+  currentFinanceSearch?: string;
+  onFinanceSearch?: (s: string) => void;
   expensesPaginationMeta?: any;
   onExpensesPageChange?: (page: number) => void;
   onFinanceViewAll: () => void;
@@ -142,6 +144,8 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           financeTotals={props.financeTotals}
           onPageChange={props.onFinanceSummaryPageChange}
           onBack={props.onFinanceBack}
+          currentFinanceSearch={props.currentFinanceSearch}
+          onFinanceSearch={props.onFinanceSearch}
         />;
       case 'Payment History':
         return <FinanceSalaryHistory 

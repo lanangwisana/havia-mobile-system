@@ -1,5 +1,5 @@
-import React from 'react';
-import { ArrowLeft, Briefcase, TrendingDown, TrendingUp, Wallet, Activity } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Briefcase, TrendingDown, TrendingUp, Wallet, Activity, Search } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 
 interface Props {
@@ -9,9 +9,25 @@ interface Props {
   onPageChange?: (page: number) => void;
   onBack: () => void;
   financeTotals?: any;
+  currentFinanceSearch?: string;
+  onFinanceSearch?: (s: string) => void;
 }
 
-export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginationMeta, onPageChange, onBack, financeTotals }) => {
+export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginationMeta, onPageChange, onBack, financeTotals, currentFinanceSearch, onFinanceSearch }) => {
+  const [searchInput, setSearchInput] = useState(currentFinanceSearch || '');
+
+  useEffect(() => {
+    setSearchInput(currentFinanceSearch || '');
+  }, [currentFinanceSearch]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (onFinanceSearch && searchInput !== currentFinanceSearch) {
+        onFinanceSearch(searchInput);
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchInput, onFinanceSearch, currentFinanceSearch]);
   const renderLargeAmount = (amount: number, justifyAlign: string = "justify-end") => {
     const abs = Math.abs(amount || 0);
     
@@ -95,6 +111,22 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
                   formatCurrency(globalTotalBalance)
                 )}
               </p>
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="px-1 mt-6 mb-4">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-neutral-400 group-focus-within:text-[#C69C3D] transition-colors" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search projects..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="w-full bg-white border border-neutral-200 text-neutral-900 text-sm rounded-2xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-[#C69C3D] focus:ring-1 focus:ring-[#C69C3D] transition-all shadow-sm"
+              />
             </div>
           </div>
 

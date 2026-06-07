@@ -100,6 +100,7 @@ export default function HaviaMobileApp() {
   const [isLoadingFinanceSummary, setIsLoadingFinanceSummary] = useState(false);
   const [financeSummaryMeta, setFinanceSummaryMeta] = useState<any>(null);
   const [currentFinanceSummaryPage, setCurrentFinanceSummaryPage] = useState(1);
+  const [currentFinanceSearch, setCurrentFinanceSearch] = useState('');
   const [financeSummaryTotal, setFinanceSummaryTotal] = useState(0);
   const [financeTotals, setFinanceTotals] = useState<any>(null);
   const [expensesMeta, setExpensesMeta] = useState<any>(null);
@@ -501,11 +502,12 @@ export default function HaviaMobileApp() {
     setIsLoadingExpenses(false);
   };
 
-  const loadFinanceSummary = async (page: number = 1) => {
+  const loadFinanceSummary = async (page: number = 1, search: string = currentFinanceSearch) => {
     if (!apiToken || (userData?.is_admin !== "1" && userData?.user_type !== "staff")) return;
     setCurrentFinanceSummaryPage(page);
+    setCurrentFinanceSearch(search);
     
-    const cacheKey = `havia_finance_summary_${page}`;
+    const cacheKey = `havia_finance_summary_${page}_${search}`;
     const cachedData = localStorage.getItem(cacheKey);
     let isUsingCache = false;
 
@@ -528,7 +530,11 @@ export default function HaviaMobileApp() {
       setIsLoadingFinanceSummary(true);
     }
     
-    const res = await fetchFromApi(`haviacms/finance/summary?page=${page}`, apiToken);
+    let endpoint = `haviacms/finance/summary?page=${page}`;
+    if (search) {
+      endpoint += `&search=${encodeURIComponent(search)}`;
+    }
+    const res = await fetchFromApi(endpoint, apiToken);
     if (res.success) {
       const summaryData = Array.isArray(res.data) ? res.data : [];
       setFinanceSummary(summaryData);
@@ -697,8 +703,11 @@ export default function HaviaMobileApp() {
       else if (subpageTitle === 'Finance') {
         loadExpenses();
         if (userData?.is_admin === "1" || userData?.user_type === "staff") {
-          loadFinanceSummary(1);
+          loadFinanceSummary(1, "");
         }
+      }
+      else if (subpageTitle === 'Project Summary History') {
+        loadFinanceSummary(1, currentFinanceSearch);
       }
       else if (subpageTitle === 'Events') {
         loadEvents(eventFilterType, eventFilterLabel);
@@ -1090,7 +1099,9 @@ export default function HaviaMobileApp() {
           financeTotals={financeTotals}
           isLoadingFinanceSummary={isLoadingFinanceSummary}
           financeSummaryPaginationMeta={financeSummaryMeta}
-          onFinanceSummaryPageChange={(p: number) => loadFinanceSummary(p)}
+          onFinanceSummaryPageChange={(p: number) => loadFinanceSummary(p, currentFinanceSearch)}
+          currentFinanceSearch={currentFinanceSearch}
+          onFinanceSearch={(search: string) => loadFinanceSummary(1, search)}
           events={events}
           isLoadingEvents={isLoadingEvents}
           selectedEvent={selectedEvent}
@@ -1109,7 +1120,7 @@ export default function HaviaMobileApp() {
           userData={userData}
           onFinanceViewAll={() => {
             setSubpageTitle('Project Summary History');
-            loadFinanceSummary(1);
+            loadFinanceSummary(1, "");
           }}
           onFinanceHistory={() => {
             setSubpageTitle('Payment History');
@@ -1117,7 +1128,7 @@ export default function HaviaMobileApp() {
           }}
           onFinanceBack={() => {
             setSubpageTitle('Finance');
-            loadFinanceSummary(1);
+            loadFinanceSummary(1, "");
             loadExpenses(1);
           }}
           editForm={editForm}
