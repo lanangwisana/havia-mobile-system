@@ -57,6 +57,7 @@ export default function HaviaMobileApp() {
   const [projectPaginationMeta, setProjectPaginationMeta] = useState<any>(null);
   const [currentProjectPage, setCurrentProjectPage] = useState(1);
   const [currentProjectFilter, setCurrentProjectFilter] = useState('ALL');
+  const [currentProjectSearch, setCurrentProjectSearch] = useState('');
   
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeProjectName, setActiveProjectName] = useState<string>('');
@@ -183,6 +184,7 @@ export default function HaviaMobileApp() {
       if (title === 'Project') {
         setCurrentProjectFilter('ALL');
         setCurrentProjectPage(1);
+        setCurrentProjectSearch('');
       }
       if (title === 'My Tasks') {
         setCurrentTaskFilter('OVERDUE');
@@ -320,13 +322,14 @@ export default function HaviaMobileApp() {
   };
 
   // --- DATA FETCHING ---
-  const loadProjects = async (status: string = 'ALL', page: number = 1) => {
+  const loadProjects = async (status: string = 'ALL', page: number = 1, search: string = currentProjectSearch) => {
     if (!userData?.id || !apiToken) return;
     
     setCurrentProjectFilter(status);
     setCurrentProjectPage(page);
+    setCurrentProjectSearch(search);
     
-    const cacheKey = `havia_projects_${status}_${page}`;
+    const cacheKey = `havia_projects_${status}_${page}_${search}`;
     const cachedData = localStorage.getItem(cacheKey);
     let isUsingCache = false;
     
@@ -347,7 +350,10 @@ export default function HaviaMobileApp() {
     
     console.log(`[LoadProjects] status=${status}, page=${page}`);
 
-    const endpoint = `haviacms/projects?status=${status}&page=${page}`;
+    let endpoint = `haviacms/projects?status=${status}&page=${page}`;
+    if (search) {
+      endpoint += `&search=${encodeURIComponent(search)}`;
+    }
     const res = await fetchFromApi(endpoint, apiToken);
 
     if (res.success) {
@@ -1072,8 +1078,10 @@ export default function HaviaMobileApp() {
           activeTaskId={activeTaskId}
           onProjectClick={handleProjectClick}
           projectPaginationMeta={projectPaginationMeta}
-          onProjectPageChange={(p: number) => loadProjects(currentProjectFilter, p)}
-          onProjectFilterChange={(s: string) => loadProjects(s, 1)}
+          onProjectPageChange={(p: number) => loadProjects(currentProjectFilter, p, currentProjectSearch)}
+          onProjectFilterChange={(s: string) => loadProjects(s, 1, currentProjectSearch)}
+          currentProjectSearch={currentProjectSearch}
+          onProjectSearch={(search: string) => loadProjects(currentProjectFilter, 1, search)}
           expenses={expenses}
           isLoadingExpenses={isLoadingExpenses}
           expensesPaginationMeta={expensesMeta}
