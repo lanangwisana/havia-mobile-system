@@ -22,6 +22,7 @@ interface UserData {
  */
 export function isAdmin(user: UserData | null): boolean {
   if (!user) return false;
+  
   return (
     String(user.is_admin) === "1" ||
     user.permissions?._all_access === true

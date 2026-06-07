@@ -1,5 +1,5 @@
-import React from 'react';
-import { ArrowLeft, Briefcase, TrendingDown, TrendingUp, Wallet, Activity } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Briefcase, TrendingDown, TrendingUp, Wallet, Activity, Search } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 
 interface Props {
@@ -9,9 +9,25 @@ interface Props {
   onPageChange?: (page: number) => void;
   onBack: () => void;
   financeTotals?: any;
+  currentFinanceSearch?: string;
+  onFinanceSearch?: (s: string) => void;
 }
 
-export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginationMeta, onPageChange, onBack, financeTotals }) => {
+export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginationMeta, onPageChange, onBack, financeTotals, currentFinanceSearch, onFinanceSearch }) => {
+  const [searchInput, setSearchInput] = useState(currentFinanceSearch || '');
+
+  useEffect(() => {
+    setSearchInput(currentFinanceSearch || '');
+  }, [currentFinanceSearch]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (onFinanceSearch && searchInput !== currentFinanceSearch) {
+        onFinanceSearch(searchInput);
+      }
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchInput, onFinanceSearch, currentFinanceSearch]);
   const renderLargeAmount = (amount: number, justifyAlign: string = "justify-end") => {
     const abs = Math.abs(amount || 0);
     
@@ -98,6 +114,22 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
             </div>
           </div>
 
+          {/* Search Bar */}
+          <div className="px-1 mt-6 mb-4">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-neutral-400 group-focus-within:text-[#C69C3D] transition-colors" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search projects..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="w-full bg-white border border-neutral-200 text-neutral-900 text-sm rounded-2xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-[#C69C3D] focus:ring-1 focus:ring-[#C69C3D] transition-all shadow-sm"
+              />
+            </div>
+          </div>
+
           {data.length > 0 ? (
             <div className="space-y-4 px-1">
               {data.map((p) => {
@@ -126,20 +158,47 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
 
                 <div className="space-y-6 pt-1 relative z-10">
                   <div className="grid grid-cols-1 gap-5">
+                    {/* Used Budget Section */}
                     <div>
-                      <div className="flex justify-between items-end mb-2">
+                      <div className="flex justify-between items-end mb-1.5">
                         <span className="text-[0.5625rem] font-black text-neutral-400 uppercase tracking-widest flex items-center gap-1.5">
-                          <TrendingDown className={`w-3 h-3 ${isOverBudget ? 'text-rose-500' : 'text-neutral-400'}`} />
-                          Used Budget
+                          <TrendingDown className={`w-3 h-3 ${p.budget_status === 'over' ? 'text-rose-500' : p.budget_status === 'under' ? 'text-emerald-500' : 'text-[#C69C3D]'}`} />
+                          USED BUDGET
                         </span>
-                        <span className={`text-[0.6875rem] font-black font-mono ${isOverBudget ? 'text-rose-600' : 'text-[#C69C3D]'}`}>{ratio}%</span>
+                        <span className={`text-[0.5625rem] font-black uppercase tracking-wider ${
+                          p.budget_status === 'over' ? 'text-rose-600' : 
+                          p.budget_status === 'under' ? 'text-emerald-600' : 'text-neutral-500'
+                        }`}>
+                          {p.budget_status === 'over' ? 'OVER BUDGET' : p.budget_status === 'under' ? 'UNDER BUDGET' : 'ON BUDGET'}
+                        </span>
                       </div>
-                      <div className="h-2 bg-neutral-100 rounded-full overflow-hidden flex p-0.5">
-                        <div 
-                          className={`h-full rounded-full transition-all duration-1000 ${isOverBudget ? 'bg-rose-500' : 'bg-[#C69C3D]'}`}
-                          style={{ width: `${ratio}%` }}
-                        ></div>
+                      
+                      <div className="flex items-center justify-between w-full bg-neutral-50 border border-neutral-100 rounded-xl p-2 px-3 mt-2">
+                         <div className="flex-1 flex items-center justify-start">
+                           <span className="text-[0.55rem] sm:text-[0.6rem] font-bold text-[#6B6865] tracking-wide">
+                             Expenses: <span className="text-[#2C2A29] ml-1 font-mono">{formatCurrency(p.total_expense).replace('IDR', 'Rp')}</span>
+                           </span>
+                         </div>
+                         <span className="text-[0.65rem] font-bold text-[#D1D5DB] shrink-0 mx-1">|</span>
+                         <div className="flex-1 flex items-center justify-end">
+                           <span className="text-[0.55rem] sm:text-[0.6rem] font-bold text-[#6B6865] tracking-wide">
+                             Used RAB: <span className="text-[#2C2A29] ml-1 font-mono">{formatCurrency(p.expected_budget).replace('IDR', 'Rp')}</span>
+                           </span>
+                         </div>
                       </div>
+
+                      {p.expected_budget > 0 && (
+                        <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden flex p-0 mt-3">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-1000 ${
+                              p.budget_status === 'over' ? 'bg-gradient-to-r from-rose-500 to-red-600' : 
+                              p.budget_status === 'under' ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : 
+                              'bg-neutral-300'
+                            }`}
+                            style={{ width: `${Math.min(100, (p.total_expense / p.expected_budget) * 100)}%` }}
+                          ></div>
+                        </div>
+                      )}
                     </div>
 
                     <div>
@@ -153,7 +212,7 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
                       {p.planned_progress !== undefined ? (
                         <div className="flex items-center gap-2 mt-2 bg-neutral-50 border border-neutral-100 rounded-xl p-2 px-3">
                           <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
-                            Pln: <span className="text-[#2C2A29] ml-1">{Number(p.planned_progress).toFixed(1)}%</span>
+                            Plan: <span className="text-[#2C2A29] ml-1">{Number(p.planned_progress).toFixed(1)}%</span>
                           </span>
                           <span className="text-[0.65rem] font-bold text-[#D1D5DB]">|</span>
                           <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
@@ -176,16 +235,7 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 pt-2">
-                    <div className="bg-neutral-50 rounded-2xl p-3 border border-neutral-100 flex flex-col justify-center min-w-0">
-                      <p className="text-[0.5rem] text-neutral-400 uppercase font-black tracking-widest mb-1">Expenses</p>
-                      <div className="text-[0.8125rem] font-bold text-rose-600 font-mono truncate">{renderLargeAmount(p.total_expense, "justify-start")}</div>
-                    </div>
-                    <div className={`rounded-2xl p-3 border flex flex-col justify-center min-w-0 ${p.balance < 0 ? 'bg-rose-50 border-rose-100' : 'bg-[#C69C3D]/5 border-[#C69C3D]/10'}`}>
-                      <p className="text-[0.5rem] text-neutral-400 uppercase font-black tracking-widest mb-1">Balance</p>
-                      <div className={`text-[0.8125rem] font-bold font-mono truncate ${p.balance < 0 ? 'text-rose-600' : 'text-[#C69C3D]'}`}>{renderLargeAmount(p.balance, "justify-start")}</div>
-                    </div>
-                  </div>
+                  {/* Removed Expenses and Balance Cards */}
                 </div>
               </div>
             );

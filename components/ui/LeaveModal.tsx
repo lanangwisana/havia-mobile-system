@@ -22,8 +22,14 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
     leave_type_id: '',
     start_date: new Date().toISOString().split('T')[0],
     end_date: new Date().toISOString().split('T')[0],
-    reason: ''
+    reason: '',
+    file: null as File | null
   });
+
+  const isIzinSelected = React.useMemo(() => {
+    const selected = leaveTypes.find(t => String(t.id) === String(formData.leave_type_id));
+    return selected ? selected.title.toLowerCase().includes('izin') : false;
+  }, [formData.leave_type_id, leaveTypes]);
 
   useEffect(() => {
     if (isOpen) {
@@ -66,10 +72,10 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
               <FileText className="w-5 h-5" />
             </div>
             <div className="flex flex-col min-w-0">
-              <h3 className="text-lg font-black text-neutral-900 uppercase tracking-wider truncate">
+              <h3 className="text-lg font-black text-neutral-900 tracking-wider truncate">
                 Submission
               </h3>
-              <p className="text-[0.625rem] text-neutral-400 font-bold uppercase tracking-widest truncate">Complete the data below</p>
+              <p className="text-xs text-neutral-400 font-bold tracking-wide truncate">Complete the data below</p>
             </div>
           </div>
           <button 
@@ -82,7 +88,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Leave Type */}
             <div className="space-y-2">
-              <label className="text-[0.625rem] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Submission Type</label>
+              <label className="text-xs font-bold text-neutral-500 ml-1">Submission Type</label>
               <div className="relative">
                 <select
                   required
@@ -104,7 +110,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
             {/* Date Range */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[0.625rem] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Start Date</label>
+                <label className="text-xs font-bold text-neutral-500 ml-1">Start Date</label>
                 <input
                   type="date"
                   required
@@ -114,7 +120,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[0.625rem] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">End Date</label>
+                <label className="text-xs font-bold text-neutral-500 ml-1">End Date</label>
                 <input
                   type="date"
                   required
@@ -127,7 +133,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
 
             {/* Reason */}
             <div className="space-y-2">
-              <label className="text-[0.625rem] font-bold text-neutral-400 uppercase tracking-[0.2em] ml-1">Reason / Description</label>
+              <label className="text-xs font-bold text-neutral-500 ml-1">Reason / Description</label>
               <textarea
                 required
                 rows={3}
@@ -137,6 +143,41 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
                 className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl px-4 py-4 text-sm text-neutral-900 focus:outline-none focus:border-[#C69C3D] transition-all resize-none placeholder:text-neutral-400"
               />
             </div>
+
+            {/* File Upload for Izin */}
+            {isIzinSelected && (
+              <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                <label className="text-xs font-bold text-neutral-500 ml-1">Upload Bukti (PDF / Gambar Maks. 5MB)</label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept=".pdf,image/png,image/jpeg,image/jpg"
+                    onChange={(e) => {
+                      const selected = e.target.files?.[0];
+                      if (selected) {
+                        const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+                        if (!allowedTypes.includes(selected.type)) {
+                          alert("Hanya file PDF, JPG, dan PNG yang diperbolehkan.");
+                          e.target.value = '';
+                          setFormData({ ...formData, file: null });
+                          return;
+                        }
+                        if (selected.size > 5 * 1024 * 1024) {
+                          alert("Ukuran file maksimal 5MB.");
+                          e.target.value = '';
+                          setFormData({ ...formData, file: null });
+                          return;
+                        }
+                        setFormData({ ...formData, file: selected });
+                      } else {
+                        setFormData({ ...formData, file: null });
+                      }
+                    }}
+                    className="w-full bg-neutral-50 border border-neutral-100 rounded-2xl px-4 py-3 text-sm text-neutral-900 focus:outline-none focus:border-[#C69C3D] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#C69C3D]/10 file:text-[#C69C3D] hover:file:bg-[#C69C3D]/20 cursor-pointer"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Info Box */}
             <div className="flex gap-3 p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl">
@@ -150,7 +191,7 @@ export const LeaveModal: React.FC<LeaveModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 ${
+              className={`w-full py-5 rounded-2xl font-black text-sm tracking-wide transition-all flex items-center justify-center gap-2 ${
                 isSubmitting 
                   ? 'bg-neutral-800 text-neutral-500' 
                   : 'bg-[#C69C3D] text-[#0A0A0A] hover:bg-[#D4A848] active:scale-[0.98] shadow-[0_10px_30px_-10px_rgba(198,156,61,0.3)]'
