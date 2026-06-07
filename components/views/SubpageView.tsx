@@ -88,6 +88,8 @@ interface SubpageViewProps {
   financeTotals?: any;
   notifPaginationMeta?: any;
   onNotifPageChange?: (page: number) => void;
+  teamMembers?: any[];
+  isLoadingTeam?: boolean;
 }
 
 export const SubpageView: React.FC<SubpageViewProps> = (props) => {
@@ -179,6 +181,9 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           isLoadingAttendances={props.isLoadingAttendances} 
           leaves={props.leaves}
           onOpenLeaveModal={props.onOpenLeaveModal}
+          userData={props.userData}
+          teamMembers={props.teamMembers}
+          isLoadingTeam={props.isLoadingTeam}
         />;
       case 'Attendance': 
         return <AbsensiContent 
