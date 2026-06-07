@@ -107,13 +107,15 @@ export default function HaviaMobileApp() {
   const [currentExpensesPage, setCurrentExpensesPage] = useState(1);
   const [expensesTotal, setExpensesTotal] = useState(0);
 
-  // Attendances States
+  // Team / Attendance
   const [attendances, setAttendances] = useState<any[]>([]);
   const [isLoadingAttendances, setIsLoadingAttendances] = useState(false);
   const [activeAttendance, setActiveAttendance] = useState<any | null>(null);
   const [lastFinishedAttendance, setLastFinishedAttendance] = useState<any | null>(null);
   const [leaves, setLeaves] = useState<any[]>([]);
   const [isLoadingLeaves, setIsLoadingLeaves] = useState(false);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [isLoadingTeam, setIsLoadingTeam] = useState(false);
   const [leaveTypes, setLeaveTypes] = useState<any[]>([]);
   const [isLoadingLeaveTypes, setIsLoadingLeaveTypes] = useState(false);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
@@ -134,6 +136,8 @@ export default function HaviaMobileApp() {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(''), 3000);
   };
+
+  const isAdmin = (user: any) => String(user?.is_admin) === "1" || user?.role_id === "admin";
 
   const handleNav = (view: string, nav?: string | null, title: string = '', taskId: string | null = null) => {
     // SECURITY GUARD: Check status + sync permissions on every navigation
@@ -360,7 +364,7 @@ export default function HaviaMobileApp() {
     if (res.success) {
       const projectPool = Array.isArray(res.data) ? res.data : [];
       
-      const isAdmin = String(userData.is_admin) === "1" || userData.role_id === "admin";
+      const admin = isAdmin(userData);
       const myId = String(userData.id);
 
       const enriched = projectPool.map((p: any) => {
@@ -369,7 +373,7 @@ export default function HaviaMobileApp() {
         const pCollabs = p.collaborators ? String(p.collaborators).split(',').map((id: string) => id.trim()) : [];
         const isProjectCollab = pCollabs.includes(myId);
 
-        if (isAdmin) p.userRole = 'ADMIN';
+        if (admin) p.userRole = 'ADMIN';
         else if (isProjectPic) p.userRole = 'PIC';
         else if (isProjectCollab) p.userRole = 'KOLABORATOR';
         else p.userRole = 'TEAM MEMBER';
@@ -503,7 +507,7 @@ export default function HaviaMobileApp() {
   };
 
   const loadFinanceSummary = async (page: number = 1, search: string = currentFinanceSearch) => {
-    if (!apiToken || (userData?.is_admin !== "1" && userData?.user_type !== "staff")) return;
+    if (!apiToken || !isAdmin(userData)) return;
     setCurrentFinanceSummaryPage(page);
     setCurrentFinanceSearch(search);
     
@@ -619,17 +623,79 @@ export default function HaviaMobileApp() {
 
   const loadLeaves = async () => {
     if (!apiToken) return;
-    setIsLoadingLeaves(true);
+    const cacheKey = 'swr_havia_leaves';
+    const cachedData = localStorage.getItem(cacheKey);
+    let isUsingCache = false;
+
+    if (cachedData) {
+      try {
+        setLeaves(JSON.parse(cachedData));
+        isUsingCache = true;
+      } catch (e) {}
+    }
+
+    if (!isUsingCache) {
+      setIsLoadingLeaves(true);
+    }
+
     const res = await fetchFromApi('haviacms/leaves', apiToken);
-    if (res.success) setLeaves(Array.isArray(res.data) ? res.data : []);
+    if (res.success) {
+      const data = Array.isArray(res.data) ? res.data : [];
+      setLeaves(data);
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+    }
     setIsLoadingLeaves(false);
+  };
+
+  const loadTeamMembers = async () => {
+    if (!apiToken || !isAdmin(userData)) return;
+    const cacheKey = 'swr_havia_teams';
+    const cachedData = localStorage.getItem(cacheKey);
+    let isUsingCache = false;
+
+    if (cachedData) {
+      try {
+        setTeamMembers(JSON.parse(cachedData));
+        isUsingCache = true;
+      } catch (e) {}
+    }
+
+    if (!isUsingCache) {
+      setIsLoadingTeam(true);
+    }
+
+    const res = await fetchFromApi(`haviacms/teams?_t=${Date.now()}`, apiToken);
+    if (res.success) {
+      const data = Array.isArray(res.data) ? res.data : [];
+      setTeamMembers(data);
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+    }
+    setIsLoadingTeam(false);
   };
 
   const loadLeaveTypes = async () => {
     if (!apiToken) return;
-    setIsLoadingLeaveTypes(true);
+    const cacheKey = 'swr_havia_leave_types';
+    const cachedData = localStorage.getItem(cacheKey);
+    let isUsingCache = false;
+
+    if (cachedData) {
+      try {
+        setLeaveTypes(JSON.parse(cachedData));
+        isUsingCache = true;
+      } catch (e) {}
+    }
+
+    if (!isUsingCache) {
+      setIsLoadingLeaveTypes(true);
+    }
+
     const res = await fetchFromApi('haviacms/leave_types', apiToken);
-    if (res.success) setLeaveTypes(Array.isArray(res.data) ? res.data : []);
+    if (res.success) {
+      const data = Array.isArray(res.data) ? res.data : [];
+      setLeaveTypes(data);
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+    }
     setIsLoadingLeaveTypes(false);
   };
 
@@ -702,7 +768,7 @@ export default function HaviaMobileApp() {
       else if (subpageTitle === 'My Tasks') loadTasks(null, currentTaskFilter, currentTaskPage);
       else if (subpageTitle === 'Finance') {
         loadExpenses();
-        if (userData?.is_admin === "1" || userData?.user_type === "staff") {
+        if (isAdmin(userData)) {
           loadFinanceSummary(1, "");
         }
       }
@@ -719,6 +785,7 @@ export default function HaviaMobileApp() {
         loadAttendances();
         loadLeaves();
         loadLeaveTypes();
+        if (isAdmin(userData)) loadTeamMembers();
       }
       else if (subpageTitle === 'Notifications') {
         loadNotifications(currentNotifPage);
@@ -1118,6 +1185,8 @@ export default function HaviaMobileApp() {
             loadNotifications(p);
           }}
           userData={userData}
+          teamMembers={teamMembers}
+          isLoadingTeam={isLoadingTeam}
           onFinanceViewAll={() => {
             setSubpageTitle('Project Summary History');
             loadFinanceSummary(1, "");
