@@ -54,6 +54,8 @@ interface SubpageViewProps {
   projectPaginationMeta: any;
   onProjectPageChange: (page: number) => void;
   onProjectFilterChange: (status: string) => void;
+  currentProjectSearch?: string;
+  onProjectSearch?: (s: string) => void;
   apiToken: string;
   onUploadImage: (file: File) => void;
   isUploadingImage: boolean;
@@ -76,6 +78,8 @@ interface SubpageViewProps {
   isLoadingFinanceSummary: boolean;
   financeSummaryPaginationMeta?: any;
   onFinanceSummaryPageChange?: (page: number) => void;
+  currentFinanceSearch?: string;
+  onFinanceSearch?: (s: string) => void;
   expensesPaginationMeta?: any;
   onExpensesPageChange?: (page: number) => void;
   onFinanceViewAll: () => void;
@@ -84,6 +88,8 @@ interface SubpageViewProps {
   financeTotals?: any;
   notifPaginationMeta?: any;
   onNotifPageChange?: (page: number) => void;
+  teamMembers?: any[];
+  isLoadingTeam?: boolean;
 }
 
 export const SubpageView: React.FC<SubpageViewProps> = (props) => {
@@ -99,6 +105,8 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           paginationMeta={props.projectPaginationMeta}
           onPageChange={props.onProjectPageChange}
           onFilterChange={props.onProjectFilterChange}
+          currentProjectSearch={props.currentProjectSearch}
+          onProjectSearch={props.onProjectSearch}
         />;
       case 'My Tasks': 
         return <TaskList 
@@ -138,6 +146,8 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           financeTotals={props.financeTotals}
           onPageChange={props.onFinanceSummaryPageChange}
           onBack={props.onFinanceBack}
+          currentFinanceSearch={props.currentFinanceSearch}
+          onFinanceSearch={props.onFinanceSearch}
         />;
       case 'Payment History':
         return <FinanceSalaryHistory 
@@ -171,6 +181,9 @@ export const SubpageView: React.FC<SubpageViewProps> = (props) => {
           isLoadingAttendances={props.isLoadingAttendances} 
           leaves={props.leaves}
           onOpenLeaveModal={props.onOpenLeaveModal}
+          userData={props.userData}
+          teamMembers={props.teamMembers}
+          isLoadingTeam={props.isLoadingTeam}
         />;
       case 'Attendance': 
         return <AbsensiContent 

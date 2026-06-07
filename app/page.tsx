@@ -57,6 +57,7 @@ export default function HaviaMobileApp() {
   const [projectPaginationMeta, setProjectPaginationMeta] = useState<any>(null);
   const [currentProjectPage, setCurrentProjectPage] = useState(1);
   const [currentProjectFilter, setCurrentProjectFilter] = useState('ALL');
+  const [currentProjectSearch, setCurrentProjectSearch] = useState('');
   
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [activeProjectName, setActiveProjectName] = useState<string>('');
@@ -99,19 +100,22 @@ export default function HaviaMobileApp() {
   const [isLoadingFinanceSummary, setIsLoadingFinanceSummary] = useState(false);
   const [financeSummaryMeta, setFinanceSummaryMeta] = useState<any>(null);
   const [currentFinanceSummaryPage, setCurrentFinanceSummaryPage] = useState(1);
+  const [currentFinanceSearch, setCurrentFinanceSearch] = useState('');
   const [financeSummaryTotal, setFinanceSummaryTotal] = useState(0);
   const [financeTotals, setFinanceTotals] = useState<any>(null);
   const [expensesMeta, setExpensesMeta] = useState<any>(null);
   const [currentExpensesPage, setCurrentExpensesPage] = useState(1);
   const [expensesTotal, setExpensesTotal] = useState(0);
 
-  // Attendances States
+  // Team / Attendance
   const [attendances, setAttendances] = useState<any[]>([]);
   const [isLoadingAttendances, setIsLoadingAttendances] = useState(false);
   const [activeAttendance, setActiveAttendance] = useState<any | null>(null);
   const [lastFinishedAttendance, setLastFinishedAttendance] = useState<any | null>(null);
   const [leaves, setLeaves] = useState<any[]>([]);
   const [isLoadingLeaves, setIsLoadingLeaves] = useState(false);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [isLoadingTeam, setIsLoadingTeam] = useState(false);
   const [leaveTypes, setLeaveTypes] = useState<any[]>([]);
   const [isLoadingLeaveTypes, setIsLoadingLeaveTypes] = useState(false);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
@@ -132,6 +136,8 @@ export default function HaviaMobileApp() {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(''), 3000);
   };
+
+  const isAdmin = (user: any) => String(user?.is_admin) === "1" || user?.role_id === "admin";
 
   const handleNav = (view: string, nav?: string | null, title: string = '', taskId: string | null = null) => {
     // SECURITY GUARD: Check status + sync permissions on every navigation
@@ -183,6 +189,7 @@ export default function HaviaMobileApp() {
       if (title === 'Project') {
         setCurrentProjectFilter('ALL');
         setCurrentProjectPage(1);
+        setCurrentProjectSearch('');
       }
       if (title === 'My Tasks') {
         setCurrentTaskFilter('OVERDUE');
@@ -320,13 +327,14 @@ export default function HaviaMobileApp() {
   };
 
   // --- DATA FETCHING ---
-  const loadProjects = async (status: string = 'ALL', page: number = 1) => {
+  const loadProjects = async (status: string = 'ALL', page: number = 1, search: string = currentProjectSearch) => {
     if (!userData?.id || !apiToken) return;
     
     setCurrentProjectFilter(status);
     setCurrentProjectPage(page);
+    setCurrentProjectSearch(search);
     
-    const cacheKey = `havia_projects_${status}_${page}`;
+    const cacheKey = `havia_projects_${status}_${page}_${search}`;
     const cachedData = localStorage.getItem(cacheKey);
     let isUsingCache = false;
     
@@ -347,13 +355,16 @@ export default function HaviaMobileApp() {
     
     console.log(`[LoadProjects] status=${status}, page=${page}`);
 
-    const endpoint = `haviacms/projects?status=${status}&page=${page}`;
+    let endpoint = `haviacms/projects?status=${status}&page=${page}`;
+    if (search) {
+      endpoint += `&search=${encodeURIComponent(search)}`;
+    }
     const res = await fetchFromApi(endpoint, apiToken);
 
     if (res.success) {
       const projectPool = Array.isArray(res.data) ? res.data : [];
       
-      const isAdmin = String(userData.is_admin) === "1" || userData.role_id === "admin";
+      const admin = isAdmin(userData);
       const myId = String(userData.id);
 
       const enriched = projectPool.map((p: any) => {
@@ -362,7 +373,7 @@ export default function HaviaMobileApp() {
         const pCollabs = p.collaborators ? String(p.collaborators).split(',').map((id: string) => id.trim()) : [];
         const isProjectCollab = pCollabs.includes(myId);
 
-        if (isAdmin) p.userRole = 'ADMIN';
+        if (admin) p.userRole = 'ADMIN';
         else if (isProjectPic) p.userRole = 'PIC';
         else if (isProjectCollab) p.userRole = 'KOLABORATOR';
         else p.userRole = 'TEAM MEMBER';
@@ -495,11 +506,12 @@ export default function HaviaMobileApp() {
     setIsLoadingExpenses(false);
   };
 
-  const loadFinanceSummary = async (page: number = 1) => {
-    if (!apiToken || (userData?.is_admin !== "1" && userData?.user_type !== "staff")) return;
+  const loadFinanceSummary = async (page: number = 1, search: string = currentFinanceSearch) => {
+    if (!apiToken || !isAdmin(userData)) return;
     setCurrentFinanceSummaryPage(page);
+    setCurrentFinanceSearch(search);
     
-    const cacheKey = `havia_finance_summary_${page}`;
+    const cacheKey = `havia_finance_summary_${page}_${search}`;
     const cachedData = localStorage.getItem(cacheKey);
     let isUsingCache = false;
 
@@ -522,7 +534,11 @@ export default function HaviaMobileApp() {
       setIsLoadingFinanceSummary(true);
     }
     
-    const res = await fetchFromApi(`haviacms/finance/summary?page=${page}`, apiToken);
+    let endpoint = `haviacms/finance/summary?page=${page}`;
+    if (search) {
+      endpoint += `&search=${encodeURIComponent(search)}`;
+    }
+    const res = await fetchFromApi(endpoint, apiToken);
     if (res.success) {
       const summaryData = Array.isArray(res.data) ? res.data : [];
       setFinanceSummary(summaryData);
@@ -607,17 +623,79 @@ export default function HaviaMobileApp() {
 
   const loadLeaves = async () => {
     if (!apiToken) return;
-    setIsLoadingLeaves(true);
+    const cacheKey = 'swr_havia_leaves';
+    const cachedData = localStorage.getItem(cacheKey);
+    let isUsingCache = false;
+
+    if (cachedData) {
+      try {
+        setLeaves(JSON.parse(cachedData));
+        isUsingCache = true;
+      } catch (e) {}
+    }
+
+    if (!isUsingCache) {
+      setIsLoadingLeaves(true);
+    }
+
     const res = await fetchFromApi('haviacms/leaves', apiToken);
-    if (res.success) setLeaves(Array.isArray(res.data) ? res.data : []);
+    if (res.success) {
+      const data = Array.isArray(res.data) ? res.data : [];
+      setLeaves(data);
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+    }
     setIsLoadingLeaves(false);
+  };
+
+  const loadTeamMembers = async () => {
+    if (!apiToken || !isAdmin(userData)) return;
+    const cacheKey = 'swr_havia_teams';
+    const cachedData = localStorage.getItem(cacheKey);
+    let isUsingCache = false;
+
+    if (cachedData) {
+      try {
+        setTeamMembers(JSON.parse(cachedData));
+        isUsingCache = true;
+      } catch (e) {}
+    }
+
+    if (!isUsingCache) {
+      setIsLoadingTeam(true);
+    }
+
+    const res = await fetchFromApi(`haviacms/teams?_t=${Date.now()}`, apiToken);
+    if (res.success) {
+      const data = Array.isArray(res.data) ? res.data : [];
+      setTeamMembers(data);
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+    }
+    setIsLoadingTeam(false);
   };
 
   const loadLeaveTypes = async () => {
     if (!apiToken) return;
-    setIsLoadingLeaveTypes(true);
+    const cacheKey = 'swr_havia_leave_types';
+    const cachedData = localStorage.getItem(cacheKey);
+    let isUsingCache = false;
+
+    if (cachedData) {
+      try {
+        setLeaveTypes(JSON.parse(cachedData));
+        isUsingCache = true;
+      } catch (e) {}
+    }
+
+    if (!isUsingCache) {
+      setIsLoadingLeaveTypes(true);
+    }
+
     const res = await fetchFromApi('haviacms/leave_types', apiToken);
-    if (res.success) setLeaveTypes(Array.isArray(res.data) ? res.data : []);
+    if (res.success) {
+      const data = Array.isArray(res.data) ? res.data : [];
+      setLeaveTypes(data);
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+    }
     setIsLoadingLeaveTypes(false);
   };
 
@@ -690,9 +768,12 @@ export default function HaviaMobileApp() {
       else if (subpageTitle === 'My Tasks') loadTasks(null, currentTaskFilter, currentTaskPage);
       else if (subpageTitle === 'Finance') {
         loadExpenses();
-        if (userData?.is_admin === "1" || userData?.user_type === "staff") {
-          loadFinanceSummary(1);
+        if (isAdmin(userData)) {
+          loadFinanceSummary(1, "");
         }
+      }
+      else if (subpageTitle === 'Project Summary History') {
+        loadFinanceSummary(1, currentFinanceSearch);
       }
       else if (subpageTitle === 'Events') {
         loadEvents(eventFilterType, eventFilterLabel);
@@ -704,6 +785,7 @@ export default function HaviaMobileApp() {
         loadAttendances();
         loadLeaves();
         loadLeaveTypes();
+        if (isAdmin(userData)) loadTeamMembers();
       }
       else if (subpageTitle === 'Notifications') {
         loadNotifications(currentNotifPage);
@@ -1072,8 +1154,10 @@ export default function HaviaMobileApp() {
           activeTaskId={activeTaskId}
           onProjectClick={handleProjectClick}
           projectPaginationMeta={projectPaginationMeta}
-          onProjectPageChange={(p: number) => loadProjects(currentProjectFilter, p)}
-          onProjectFilterChange={(s: string) => loadProjects(s, 1)}
+          onProjectPageChange={(p: number) => loadProjects(currentProjectFilter, p, currentProjectSearch)}
+          onProjectFilterChange={(s: string) => loadProjects(s, 1, currentProjectSearch)}
+          currentProjectSearch={currentProjectSearch}
+          onProjectSearch={(search: string) => loadProjects(currentProjectFilter, 1, search)}
           expenses={expenses}
           isLoadingExpenses={isLoadingExpenses}
           expensesPaginationMeta={expensesMeta}
@@ -1082,7 +1166,9 @@ export default function HaviaMobileApp() {
           financeTotals={financeTotals}
           isLoadingFinanceSummary={isLoadingFinanceSummary}
           financeSummaryPaginationMeta={financeSummaryMeta}
-          onFinanceSummaryPageChange={(p: number) => loadFinanceSummary(p)}
+          onFinanceSummaryPageChange={(p: number) => loadFinanceSummary(p, currentFinanceSearch)}
+          currentFinanceSearch={currentFinanceSearch}
+          onFinanceSearch={(search: string) => loadFinanceSummary(1, search)}
           events={events}
           isLoadingEvents={isLoadingEvents}
           selectedEvent={selectedEvent}
@@ -1099,9 +1185,11 @@ export default function HaviaMobileApp() {
             loadNotifications(p);
           }}
           userData={userData}
+          teamMembers={teamMembers}
+          isLoadingTeam={isLoadingTeam}
           onFinanceViewAll={() => {
             setSubpageTitle('Project Summary History');
-            loadFinanceSummary(1);
+            loadFinanceSummary(1, "");
           }}
           onFinanceHistory={() => {
             setSubpageTitle('Payment History');
@@ -1109,7 +1197,7 @@ export default function HaviaMobileApp() {
           }}
           onFinanceBack={() => {
             setSubpageTitle('Finance');
-            loadFinanceSummary(1);
+            loadFinanceSummary(1, "");
             loadExpenses(1);
           }}
           editForm={editForm}

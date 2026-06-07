@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Activity, Briefcase, User, Clock, Filter, CheckCircle2, AlertCircle, XCircle, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Activity, Briefcase, User, Clock, Filter, CheckCircle2, AlertCircle, XCircle, ChevronDown, Search } from 'lucide-react';
 import { colors, formatDate } from '@/lib/utils';
 
 interface ProjectContentProps {
@@ -9,13 +9,25 @@ interface ProjectContentProps {
   paginationMeta?: any;
   onPageChange?: (page: number) => void;
   onFilterChange?: (status: string) => void;
+  currentProjectSearch?: string;
+  onProjectSearch?: (s: string) => void;
 }
 
   export const ProjectContent: React.FC<ProjectContentProps> = ({
-  isLoadingProjects, projects, onProjectClick, paginationMeta, onPageChange, onFilterChange
+  isLoadingProjects, projects, onProjectClick, paginationMeta, onPageChange, onFilterChange, currentProjectSearch, onProjectSearch
 }) => {
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState(currentProjectSearch || '');
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchInput !== currentProjectSearch && onProjectSearch) {
+         onProjectSearch(searchInput);
+      }
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [searchInput, currentProjectSearch, onProjectSearch]);
 
   const filters = [
     { id: 'ALL', label: 'ALL', icon: Filter },
@@ -47,6 +59,19 @@ interface ProjectContentProps {
 
 
       <div className="px-1 space-y-5">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:border-[#C69C3D] focus:ring-1 focus:ring-[#C69C3D] sm:text-sm transition duration-150 ease-in-out shadow-sm"
+            placeholder="Search project by name..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+        </div>
+
       {isLoadingProjects ? (
         <div className="flex flex-col items-center justify-center py-24 bg-white/50 rounded-[3rem] border border-[#E8E4E1] border-dashed">
            <div className="w-20 h-20 rounded-full bg-[#F4EBD4] flex items-center justify-center mb-6 shadow-inner">
