@@ -237,13 +237,13 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                           <div className="flex items-center justify-between w-full bg-neutral-50 border border-neutral-100 rounded-xl p-2 px-3 mt-2">
                              <div className="flex-1 flex items-center justify-start">
                                <span className="text-[0.55rem] sm:text-[0.6rem] font-bold text-[#6B6865] tracking-wide">
-                                 Expenses: <span className="text-[#2C2A29] ml-1 font-mono">{formatCurrency(p.total_expense).replace('IDR', 'Rp')}</span>
+                                 Actual RAB Used: <span className="text-[#2C2A29] ml-1 font-mono">{formatCurrency(p.total_expense).replace('IDR', 'Rp')}</span>
                                </span>
                              </div>
                              <span className="text-[0.65rem] font-bold text-[#D1D5DB] shrink-0 mx-1">|</span>
                              <div className="flex-1 flex items-center justify-end">
                                <span className="text-[0.55rem] sm:text-[0.6rem] font-bold text-[#6B6865] tracking-wide">
-                                 Used RAB: <span className="text-[#2C2A29] ml-1 font-mono">{formatCurrency(p.expected_budget).replace('IDR', 'Rp')}</span>
+                                 Expected RAB Used: <span className="text-[#2C2A29] ml-1 font-mono">{formatCurrency(p.expected_budget).replace('IDR', 'Rp')}</span>
                                </span>
                              </div>
                           </div>
