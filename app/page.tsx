@@ -805,7 +805,20 @@ export default function HaviaMobileApp() {
   const loadNotifications = async (page = 1) => {
     if (!apiToken) return;
     
-    const cacheKey = `havia_notif_${userData?.id || 'guest'}_${page}`;
+    // SWR FIX: Ambil ID dari localStorage untuk menghindari stale state closure pada saat background sync
+    let currentUserId = userData?.id;
+    if (!currentUserId) {
+      try {
+        const savedUserStr = localStorage.getItem('havia_user');
+        if (savedUserStr) {
+          const savedUser = JSON.parse(savedUserStr);
+          currentUserId = savedUser?.id;
+        }
+      } catch (e) {}
+    }
+    const finalUserId = currentUserId || 'guest';
+
+    const cacheKey = `havia_notif_${finalUserId}_${page}`;
     const cachedData = localStorage.getItem(cacheKey);
     let isUsingCache = false;
     
@@ -819,6 +832,7 @@ export default function HaviaMobileApp() {
             if (parsed.meta.all_ids !== undefined) setAllNotifIds(parsed.meta.all_ids);
         }
         isUsingCache = true;
+        setIsLoadingNotif(false);
       } catch(e) {}
     }
     
@@ -827,7 +841,7 @@ export default function HaviaMobileApp() {
     }
     
     // Read cached seen notifs
-    const seenNotifsKey = `havia_read_notifs_${userData?.id || 'guest'}`;
+    const seenNotifsKey = `havia_read_notifs_${finalUserId}`;
     let readIdsParam = '';
     try {
         const seenNotifs = localStorage.getItem(seenNotifsKey);
