@@ -1,18 +1,21 @@
 import React from 'react';
 import { Mail, User, ChevronRight, Lock, LogOut } from 'lucide-react';
 import { colors, getUserImage } from '@/lib/utils';
+import { getRoleNameFromId, getActualRoleId } from '@/lib/permissions';
+import { useRouter } from 'next/navigation';
 
 interface AkunContentProps {
   userData: any;
-  onNav: (view: string, nav?: string | null, title?: string) => void;
   onEditProfile: () => void;
   onLogout: () => void;
   showToast: (msg: string) => void;
 }
 
 export const AkunContent: React.FC<AkunContentProps> = ({
-  userData, onNav, onEditProfile, onLogout, showToast
-}) => (
+  userData, onEditProfile, onLogout, showToast
+}) => {
+  const router = useRouter();
+  return (
   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32">
     <div className="flex flex-col items-center mb-6">
       <div className="relative w-28 h-28 mb-4">
@@ -22,7 +25,9 @@ export const AkunContent: React.FC<AkunContentProps> = ({
         </div>
       </div>
       <h2 className="text-2xl font-bold text-neutral-900 tracking-wide">{userData?.first_name} {userData?.last_name || ''}</h2>
-      <span style={{ color: colors.gold }} className="text-[0.625rem] font-bold uppercase tracking-[0.2em] mt-1">{userData?.role_title || userData?.job_title || 'USER'}</span>
+      <span style={{ color: colors.gold }} className="text-[0.625rem] font-bold uppercase tracking-[0.2em] mt-1">
+        {getRoleNameFromId(getActualRoleId(userData), userData) || 'USER'}
+      </span>
       <div className="mt-4 px-4 py-1.5 bg-neutral-100 border border-neutral-300/50 rounded-full flex items-center gap-2">
         <Mail className="w-3 h-3 text-neutral-600" />
         <span className="text-xs text-neutral-600 font-medium">{userData?.email || 'email@haviastudio.com'}</span>
@@ -50,7 +55,7 @@ export const AkunContent: React.FC<AkunContentProps> = ({
       </button>
 
       {/* Reset Password Button */}
-      <button onClick={() => onNav('subpage', null, 'Reset Password')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-full text-left flex items-center justify-between p-4 rounded-2xl border-2 active:scale-[0.98] transition-all group hover:border-[#C69C3D] mt-3">
+      <button onClick={() => router.push('/account/reset-password')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-full text-left flex items-center justify-between p-4 rounded-2xl border-2 active:scale-[0.98] transition-all group hover:border-[#C69C3D] mt-3">
         <div className="flex items-center gap-4">
           <div className="bg-neutral-100 p-3 rounded-xl group-hover:bg-[#C69C3D]/10 transition-colors border border-neutral-200">
             <Lock className="w-5 h-5 text-neutral-500 group-hover:text-[#C69C3D] transition-colors" />
@@ -72,4 +77,5 @@ export const AkunContent: React.FC<AkunContentProps> = ({
       </button>
     </div>
   </div>
-);
+  );
+};

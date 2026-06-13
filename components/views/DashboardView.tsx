@@ -1,18 +1,19 @@
 import React from 'react';
-import { Bell, QrCode, ClipboardList, Users, DollarSign, Calendar, Briefcase, Clock } from 'lucide-react';
-import { colors, getGreeting, getUserImage, getAttendanceStatus } from '@/lib/utils';
-import { getVisibleMenuItems, isAdmin } from '@/lib/permissions';
+import { Bell, ClipboardList, Users, DollarSign, Calendar, Briefcase, Clock } from 'lucide-react';
+import { colors, getGreeting, getUserImage } from '@/lib/utils';
+import { getVisibleMenuItems, isAdmin, getRoleNameFromId, getActualRoleId } from '@/lib/permissions';
+import { useRouter } from 'next/navigation';
 
 interface DashboardViewProps {
   userData: any;
   currentTime: string;
-  onNav: (view: string, nav?: string | null, title?: string) => void;
   activeAttendance?: any;
   notifications?: any[];
   unreadNotifCount?: number;
 }
 
-export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentTime, onNav, activeAttendance, notifications, unreadNotifCount = 0 }) => {
+export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentTime, activeAttendance, notifications, unreadNotifCount = 0 }) => {
+  const router = useRouter();
   let timeWarningText = null;
   if (currentTime) {
     const [hStr, mStr] = currentTime.split(':');
@@ -31,7 +32,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
   if (displayName.length > 20) nameSizeClass = "text-[1rem]";
   else if (displayName.length > 14) nameSizeClass = "text-[1.15rem]";
 
-  const displayRole = userData?.role_title || userData?.job_title || 'TEAM MEMBER';
+  const actualRoleId = getActualRoleId(userData);
+  const mappedRole = getRoleNameFromId(actualRoleId, userData);
+  const displayRole = mappedRole || 'TEAM MEMBER';
   let roleSizeClass = "text-[0.625rem]";
   if (displayRole.length > 25) roleSizeClass = "text-[0.45rem]";
   else if (displayRole.length > 15) roleSizeClass = "text-[0.55rem]";
@@ -48,7 +51,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
             <h2 className="text-[1rem] font-black text-neutral-900 tracking-tight leading-none">Enjoy your work!</h2>
           </div>
         </div>
-        <button onClick={() => onNav('subpage', null, 'Notifications')} style={{ backgroundColor: colors.card }} className="w-10 h-10 rounded-full border border-[#E8E4E1] flex items-center justify-center relative hover:bg-neutral-50 active:scale-95 transition-all">
+        <button onClick={() => router.push('/notifications')} style={{ backgroundColor: colors.card }} className="w-10 h-10 rounded-full border border-[#E8E4E1] flex items-center justify-center relative hover:bg-neutral-50 active:scale-95 transition-all">
           <Bell className="w-5 h-5 text-[#6B6865]" />
           {notifications && notifications.length > 0 && (
             <span style={{ backgroundColor: colors.gold }} className="absolute -top-1 -right-1 w-5 h-5 rounded-full ring-2 ring-white flex items-center justify-center text-[0.625rem] font-black text-white">
@@ -121,16 +124,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
               const teamIcon = userIsAdmin ? Users : Clock;
 
               const allItems = [
-                { id: 'My Tasks', label: 'Tasks', icon: ClipboardList },
-                { id: 'Project', label: 'Projects', icon: Briefcase, nav: 'project' },
-                { id: 'Events', label: 'Events', icon: Calendar, nav: 'jadwal' },
-                { id: 'Team', label: teamLabel, icon: teamIcon },
-                { id: 'Finance', label: 'Finance', icon: DollarSign }
+                { id: 'My Tasks', label: 'Tasks', icon: ClipboardList, route: '/tasks' },
+                { id: 'Project', label: 'Projects', icon: Briefcase, route: '/projects' },
+                { id: 'Events', label: 'Events', icon: Calendar, route: '/events' },
+                { id: 'Team', label: teamLabel, icon: teamIcon, route: '/team' },
+                { id: 'Finance', label: 'Finance', icon: DollarSign, route: '/finance' }
               ];
               return getVisibleMenuItems(userData, allItems).map((item) => (
                 <button 
                   key={item.id} 
-                  onClick={() => onNav('subpage', item.nav || null, item.id)} 
+                  onClick={() => router.push(item.route || '/')} 
                   className="flex flex-col items-center gap-3 active:scale-95 transition-all duration-300 w-full"
                 >
                   <div 

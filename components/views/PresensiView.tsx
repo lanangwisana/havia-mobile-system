@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Clock, MapPin, LogIn, LogOut } from 'lucide-react';
 import { colors } from '@/lib/utils';
 
+import { useRouter } from 'next/navigation';
+
 interface PresensiViewProps {
-  onNav: (view: string) => void;
   currentTime: string;
   handleAddAttendance: () => void;
   handleResetAttendance: () => void;
@@ -13,8 +14,9 @@ interface PresensiViewProps {
 }
 
 export const PresensiView: React.FC<PresensiViewProps> = ({
-  onNav, currentTime, handleAddAttendance, handleResetAttendance, isSubmittingAttendance, activeAttendance, lastFinishedAttendance
+  currentTime, handleAddAttendance, handleResetAttendance, isSubmittingAttendance, activeAttendance, lastFinishedAttendance
 }) => {
+  const router = useRouter();
   const isClockedIn = !!activeAttendance;
   const [showFinishedTime, setShowFinishedTime] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -62,7 +64,7 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
   return (
     <section className="h-full w-full flex flex-col relative z-40 animate-in slide-in-from-bottom-4 duration-300 overflow-hidden">
       <div className="px-6 py-6 flex items-center justify-between z-20">
-        <button onClick={() => onNav('dashboard')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-10 h-10 rounded-full border-2 flex items-center justify-center hover:bg-neutral-100 transition-colors shadow-md">
+        <button onClick={() => router.push('/dashboard')} style={{ backgroundColor: colors.card, borderColor: colors.border }} className="w-10 h-10 rounded-full border-2 flex items-center justify-center hover:bg-neutral-100 transition-colors shadow-md">
           <ArrowLeft className="w-5 h-5 text-neutral-900" />
         </button>
         <h2 className="font-bold text-sm uppercase tracking-widest text-neutral-900">Attendance</h2>
