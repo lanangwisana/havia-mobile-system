@@ -11,9 +11,8 @@ export const TaskList: React.FC<{
   onPageChange?: (page: number) => void;
   onFilterChange?: (status: string) => void;
   highlightTaskId?: string | null;
-}> = ({ tasks, isLoading, projects, paginationMeta, onPageChange, onFilterChange, highlightTaskId }) => {
-  // Default to OVERDUE tab
-  const [activeFilter, setActiveFilter] = useState('OVERDUE');
+  currentFilter?: string;
+}> = ({ tasks, isLoading, projects, paginationMeta, onPageChange, onFilterChange, highlightTaskId, currentFilter = 'OVERDUE' }) => {
 
   const taskList = tasks;
 
@@ -24,30 +23,28 @@ export const TaskList: React.FC<{
         <div className="px-1 flex gap-2 z-50">
           <button 
             onClick={() => {
-              setActiveFilter('OVERDUE');
               if (onFilterChange) onFilterChange('OVERDUE');
             }}
             className={`flex-1 py-4 px-2 rounded-3xl font-black text-[0.625rem] tracking-[0.15em] uppercase transition-all duration-300 flex flex-col items-center justify-center gap-1.5 ${
-              activeFilter === 'OVERDUE' 
+              currentFilter === 'OVERDUE' 
                 ? 'bg-rose-50 border-2 border-rose-500 text-rose-600 shadow-[0_4px_15px_rgba(244,63,94,0.15)]' 
                 : 'bg-white border-2 border-[#E8E4E1] text-[#6B6865] hover:bg-neutral-50'
             }`}
           >
-            <Clock className={`w-4 h-4 ${activeFilter === 'OVERDUE' ? 'text-rose-500' : 'text-[#6B6865]'}`} />
+            <Clock className={`w-4 h-4 ${currentFilter === 'OVERDUE' ? 'text-rose-500' : 'text-[#6B6865]'}`} />
             <span>Overdue Task</span>
           </button>
           <button 
             onClick={() => {
-              setActiveFilter('7_DAYS');
               if (onFilterChange) onFilterChange('7_DAYS');
             }}
             className={`flex-1 py-4 px-2 rounded-3xl font-black text-[0.625rem] tracking-[0.15em] uppercase transition-all duration-300 flex flex-col items-center justify-center gap-1.5 ${
-              activeFilter === '7_DAYS' 
+              currentFilter === '7_DAYS' 
                 ? 'bg-[#F4EBD4]/30 border-2 border-[#C69C3D] text-[#C69C3D] shadow-[0_4px_15px_rgba(198,156,61,0.15)]' 
                 : 'bg-white border-2 border-[#E8E4E1] text-[#6B6865] hover:bg-neutral-50'
             }`}
           >
-            <CheckCircle2 className={`w-4 h-4 ${activeFilter === '7_DAYS' ? 'text-[#C69C3D]' : 'text-[#6B6865]'}`} />
+            <CheckCircle2 className={`w-4 h-4 ${currentFilter === '7_DAYS' ? 'text-[#C69C3D]' : 'text-[#6B6865]'}`} />
             <span className="text-center">7 Days Deadline</span>
           </button>
         </div>
@@ -68,7 +65,7 @@ export const TaskList: React.FC<{
           </div>
           <p className="text-[0.625rem] text-neutral-400 tracking-[0.2em] uppercase font-black text-center px-12 leading-relaxed">
             No tasks with status <br/>
-            <span style={{ color: colors.gold }}>{activeFilter}</span>
+            <span style={{ color: colors.gold }}>{currentFilter}</span>
           </p>
         </div>
       ) : (

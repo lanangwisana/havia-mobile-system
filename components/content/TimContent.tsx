@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, ChevronRight, History, Users, ArrowLeft, Loader2, Briefcase, DollarSign, CalendarRange, Info, Clock } from 'lucide-react';
 import { colors, getUserImage, formatCurrency } from '@/lib/utils';
-import { isAdmin } from '@/lib/permissions';
+import { canSeeTeamDashboard } from '@/lib/permissions';
 import { fetchFromApi } from '@/app/actions';
+import { useRouter } from 'next/navigation';
 
 interface TimContentProps {
-  onNav: (view: string, nav?: string | null, title?: string) => void;
   attendances: any[];
   isLoadingAttendances: boolean;
   leaves: any[];
@@ -16,7 +16,6 @@ interface TimContentProps {
 }
 
 export const TimContent: React.FC<TimContentProps> = ({ 
-  onNav, 
   attendances, 
   isLoadingAttendances, 
   leaves,
@@ -28,14 +27,15 @@ export const TimContent: React.FC<TimContentProps> = ({
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [memberSummary, setMemberSummary] = useState<any>(null);
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
+  const router = useRouter();
 
-  const adminMode = isAdmin(userData);
+  const adminMode = canSeeTeamDashboard(userData);
 
   useEffect(() => {
     if (!adminMode && userData?.id) {
       const loadMySummary = async () => {
         const cacheKey = `swr_havia_member_summary_${userData.id}`;
-        const cachedData = localStorage.getItem(cacheKey);
+        const cachedData = sessionStorage.getItem(cacheKey);
         let isUsingCache = false;
 
         if (cachedData) {
@@ -54,7 +54,7 @@ export const TimContent: React.FC<TimContentProps> = ({
           const res = await fetchFromApi(`haviacms/teams/summary/${userData.id}?_t=${Date.now()}`, token);
           if (res.success) {
             setMemberSummary(res.data);
-            localStorage.setItem(cacheKey, JSON.stringify(res.data));
+            sessionStorage.setItem(cacheKey, JSON.stringify(res.data));
           }
         } catch (e) {
           console.error(e);
@@ -70,7 +70,7 @@ export const TimContent: React.FC<TimContentProps> = ({
     setSelectedMember(member);
     
     const cacheKey = `swr_havia_member_summary_${member.id}`;
-    const cachedData = localStorage.getItem(cacheKey);
+    const cachedData = sessionStorage.getItem(cacheKey);
     let isUsingCache = false;
 
     if (cachedData) {
@@ -92,7 +92,7 @@ export const TimContent: React.FC<TimContentProps> = ({
       
       if (res.success) {
         setMemberSummary(res.data);
-        localStorage.setItem(cacheKey, JSON.stringify(res.data));
+        sessionStorage.setItem(cacheKey, JSON.stringify(res.data));
       }
     } catch (e) {
       console.error(e);
@@ -312,7 +312,7 @@ export const TimContent: React.FC<TimContentProps> = ({
 
           <div className="px-1 pt-4">
             <button 
-              onClick={() => onNav('subpage', null, 'Submission History')}
+              onClick={() => router.push('/team/leaves')}
               className="w-full flex items-center justify-between p-4 bg-neutral-50 border border-neutral-100 rounded-2xl hover:border-neutral-200 transition-all active:scale-[0.98] group"
             >
               <div className="flex items-center gap-3">
