@@ -124,6 +124,31 @@ export function canAccessTeam(user: UserData | null): boolean {
 }
 
 /**
+ * Cek apakah user bisa melihat module Team (sebagai Team, bukan Attendance)
+ * - Super Admin (role_id 1 atau title "super admin"): YES
+ * - HR & Admin Projek (role_id 7 atau title "hr & admin projek"): YES
+ * - Sisanya: NO (akan melihat Attendance)
+ */
+export function canSeeTeamDashboard(user: UserData | null): boolean {
+  if (!user) return false;
+  
+  const roleId = parseInt(String(getActualRoleId(user)), 10);
+  const roleTitle = String(user.role_title || '').trim().toLowerCase();
+  
+  // Berdasarkan Role ID
+  if (roleId === 1) return true; // Super Admin
+  if (roleId === 7 || roleId === 2) return true; // HR & Admin Projek
+  
+  // Super Admin flag di tabel users (karena Super Admin sejati di CRM sering tidak punya role_id)
+  if (String(user.is_admin) === "1" || user.is_admin === 1) return true;
+  
+  // Fallback berdasarkan Role Title
+  if (roleTitle === 'super admin' || roleTitle === 'admin' || roleTitle === 'hr & admin projek') return true;
+  
+  return false;
+}
+
+/**
  * Events/Schedule — selalu tampil untuk semua user termasuk OB
  */
 export function canAccessEvents(user: UserData | null): boolean {

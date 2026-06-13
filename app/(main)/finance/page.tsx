@@ -5,12 +5,14 @@ import { PageWrapper } from '@/components/ui/PageWrapper';
 import { FinanceContent } from '@/components/content/FinanceContent';
 import { useFinance } from '@/hooks/useFinance';
 import { useAuth } from '@/app/providers/AuthProvider';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { canSeeProjectSummary } from '@/lib/permissions';
 
 export default function FinancePage() {
   const { apiToken, userData } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const defaultTab = searchParams.get('tab') as 'overview' | 'salary' | null;
   
   const {
     expenses, isLoadingExpenses, loadExpenses,
@@ -37,6 +39,7 @@ export default function FinancePage() {
         userData={userData}
         onViewAll={() => router.push('/finance/summary')}
         onHistory={() => router.push('/finance/history')}
+        defaultTab={defaultTab}
       />
     </PageWrapper>
   );

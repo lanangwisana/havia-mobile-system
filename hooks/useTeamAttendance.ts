@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { fetchFromApi, postToApi, deleteFromApi } from '@/app/actions';
-import { isAdmin } from '@/lib/permissions';
+import { canSeeTeamDashboard } from '@/lib/permissions';
 
 interface UseTeamAttendanceProps {
   apiToken: string;
@@ -51,7 +51,7 @@ export function useTeamAttendance({ apiToken, userData, showToast }: UseTeamAtte
   };
 
   const loadTeamMembers = async () => {
-    if (!apiToken || !isAdmin(userData)) return;
+    if (!apiToken || !canSeeTeamDashboard(userData)) return;
     const cacheKey = 'swr_havia_teams';
     const cachedData = sessionStorage.getItem(cacheKey);
     let isUsingCache = false;

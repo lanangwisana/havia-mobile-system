@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bell, ClipboardList, Users, DollarSign, Calendar, Briefcase, Clock } from 'lucide-react';
 import { colors, getGreeting, getUserImage } from '@/lib/utils';
-import { getVisibleMenuItems, isAdmin, getRoleNameFromId, getActualRoleId } from '@/lib/permissions';
+import { getVisibleMenuItems, isAdmin, getRoleNameFromId, getActualRoleId, canSeeTeamDashboard } from '@/lib/permissions';
 import { useRouter } from 'next/navigation';
 
 interface DashboardViewProps {
@@ -119,9 +119,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ userData, currentT
           <p className="text-[0.625rem] text-neutral-900 uppercase tracking-[0.3em] font-black mb-3 px-1">Menu</p>
           <div className="grid grid-cols-5 gap-3 h-24">
             {(() => {
-              const userIsAdmin = isAdmin(userData);
-              const teamLabel = userIsAdmin ? 'Team' : 'Attendance';
-              const teamIcon = userIsAdmin ? Users : Clock;
+              const canSeeTeam = canSeeTeamDashboard(userData);
+              const teamLabel = canSeeTeam ? 'Team' : 'Attendance';
+              const teamIcon = canSeeTeam ? Users : Clock;
 
               const allItems = [
                 { id: 'My Tasks', label: 'Tasks', icon: ClipboardList, route: '/tasks' },

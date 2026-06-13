@@ -12,6 +12,7 @@ interface FinanceContentProps {
   onViewAll?: () => void;
   onHistory?: () => void;
   financeTotals?: any;
+  defaultTab?: 'overview' | 'salary' | null;
 }
 
 export const FinanceContent: React.FC<FinanceContentProps> = ({ 
@@ -22,7 +23,8 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   userData,
   onViewAll,
   onHistory,
-  financeTotals
+  financeTotals,
+  defaultTab
 }) => {
   const isUserAdmin = Number(userData?.is_admin) === 1;
   
@@ -30,14 +32,17 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   const canSeeOverview = canSeeProjectSummary(userData);
 
   // Initial tab selection: Default ke overview jika punya akses (Admin/PM)
-  const [activeTab, setActiveTab] = useState<'overview' | 'salary'>(canSeeOverview ? 'overview' : 'salary');
+  const [activeTab, setActiveTab] = useState<'overview' | 'salary'>(
+    defaultTab === 'salary' ? 'salary' : (defaultTab === 'overview' ? 'overview' : (canSeeOverview ? 'overview' : 'salary'))
+  );
 
   // Sync tab selection if permissions change after initial load
   React.useEffect(() => {
-    if (canSeeOverview && activeTab === 'salary' && expenses.length === 0) {
+    // Only auto-switch to overview if there's no explicit defaultTab and expenses have finished loading
+    if (!defaultTab && canSeeOverview && activeTab === 'salary' && expenses.length === 0 && !isLoadingExpenses) {
       setActiveTab('overview');
     }
-  }, [canSeeOverview]);
+  }, [canSeeOverview, defaultTab, expenses.length, isLoadingExpenses]);
 
   // RBAC Filter: Admin & PM see all projects, others don't see project summary at all
   const filteredSummary = canSeeOverview ? financeSummary : [];
@@ -52,12 +57,18 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   const isRestrictedRole = !isUserAdmin && canSeeOverview;
 
   // Filter salaries specifically (ONLY for non-admin and non-restricted roles)
-  const salaryExpenses = isUserAdmin
-    ? expenses.filter(exp => {
-        const category = (exp.category_title || exp.category_name || exp.category || '').toLowerCase();
-        return !category.includes('project expense');
-      })
-    : expenses; // Staff see all items returned from the server (filtered by user_id in backend)
+  // Backend `/salaries` endpoint already returns strictly filtered salary data. No frontend category filtering needed.
+  const salaryExpenses = expenses;
+
+  // Sort descending by date (or ID) and limit to 5
+  const sortedSalaryExpenses = [...salaryExpenses].sort((a, b) => {
+    const dateA = new Date(a.expense_date || a.date || 0).getTime();
+    const dateB = new Date(b.expense_date || b.date || 0).getTime();
+    if (dateA !== dateB) return dateB - dateA;
+    return (parseInt(b.id) || 0) - (parseInt(a.id) || 0);
+  });
+  
+  const displaySalaryExpenses = sortedSalaryExpenses.slice(0, 5);
 
   const totalSalaryAmount = salaryExpenses.reduce((sum, exp) => {
     const amt = parseFloat(exp.amount || '0');
@@ -237,13 +248,13 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
                           <div className="flex items-center justify-between w-full bg-neutral-50 border border-neutral-100 rounded-xl p-2 px-3 mt-2">
                              <div className="flex-1 flex items-center justify-start">
                                <span className="text-[0.55rem] sm:text-[0.6rem] font-bold text-[#6B6865] tracking-wide">
-                                 Actual RAB Used: <span className="text-[#2C2A29] ml-1 font-mono">{formatCurrency(p.total_expense).replace('IDR', 'Rp')}</span>
+                                 Plan RAB Used: <span className="text-[#2C2A29] ml-1 font-mono">{formatCurrency(p.expected_budget).replace('IDR', 'Rp')}</span>
                                </span>
                              </div>
                              <span className="text-[0.65rem] font-bold text-[#D1D5DB] shrink-0 mx-1">|</span>
                              <div className="flex-1 flex items-center justify-end">
                                <span className="text-[0.55rem] sm:text-[0.6rem] font-bold text-[#6B6865] tracking-wide">
-                                 Plan RAB Used: <span className="text-[#2C2A29] ml-1 font-mono">{formatCurrency(p.expected_budget).replace('IDR', 'Rp')}</span>
+                                 Actual RAB Used: <span className="text-[#2C2A29] ml-1 font-mono">{formatCurrency(p.total_expense).replace('IDR', 'Rp')}</span>
                                </span>
                              </div>
                           </div>
@@ -309,7 +320,8 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
         </div>
       ) : (
         <SalarySection 
-          salaryExpenses={salaryExpenses} 
+          salaryExpenses={displaySalaryExpenses} 
+          totalSalaryCount={salaryExpenses.length}
           totalSalaryAmount={totalSalaryAmount} 
           isLoadingExpenses={isLoadingExpenses} 
           onHistory={onHistory}
@@ -321,7 +333,7 @@ export const FinanceContent: React.FC<FinanceContentProps> = ({
   );
 };
 
-const SalarySection = ({ salaryExpenses, totalSalaryAmount, isLoadingExpenses, onHistory, title, label }: any) => {
+const SalarySection = ({ salaryExpenses, totalSalaryCount, totalSalaryAmount, isLoadingExpenses, onHistory, title, label }: any) => {
   return (
     <div className="space-y-5">
       <div className="px-1">
@@ -358,7 +370,7 @@ const SalarySection = ({ salaryExpenses, totalSalaryAmount, isLoadingExpenses, o
         <h3 className="text-sm font-bold text-[#2C2A29] tracking-wide flex items-center gap-2">
           <span className="w-1 h-4 bg-[#C69C3D] rounded-full"></span>
           Salary & Payroll Records
-          <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[0.625rem] text-neutral-500 font-bold">{salaryExpenses.length}</span>
+          <span className="px-2 py-0.5 bg-neutral-100 rounded-full text-[0.625rem] text-neutral-500 font-bold">{totalSalaryCount || salaryExpenses.length}</span>
         </h3>
         <button 
           onClick={onHistory}

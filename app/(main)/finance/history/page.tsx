@@ -20,7 +20,7 @@ export default function FinanceHistoryPage() {
   }, [apiToken]);
 
   return (
-    <PageWrapper title="Payment History" backRoute="/finance">
+    <PageWrapper title="Payment History" backRoute="/finance?tab=salary">
       <FinanceSalaryHistory 
         data={expenses}
         isLoading={isLoadingExpenses}

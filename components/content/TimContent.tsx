@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, ChevronRight, History, Users, ArrowLeft, Loader2, Briefcase, DollarSign, CalendarRange, Info, Clock } from 'lucide-react';
 import { colors, getUserImage, formatCurrency } from '@/lib/utils';
-import { isAdmin } from '@/lib/permissions';
+import { canSeeTeamDashboard } from '@/lib/permissions';
 import { fetchFromApi } from '@/app/actions';
 import { useRouter } from 'next/navigation';
 
@@ -29,7 +29,7 @@ export const TimContent: React.FC<TimContentProps> = ({
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
   const router = useRouter();
 
-  const adminMode = isAdmin(userData);
+  const adminMode = canSeeTeamDashboard(userData);
 
   useEffect(() => {
     if (!adminMode && userData?.id) {

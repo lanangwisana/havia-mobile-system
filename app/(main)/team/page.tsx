@@ -5,7 +5,7 @@ import { PageWrapper } from '@/components/ui/PageWrapper';
 import { TimContent } from '@/components/content/TimContent';
 import { useTeamAttendance } from '@/hooks/useTeamAttendance';
 import { useAuth } from '@/app/providers/AuthProvider';
-import { isAdmin } from '@/lib/permissions';
+import { canSeeTeamDashboard } from '@/lib/permissions';
 import { LeaveModal } from '@/components/ui/LeaveModal';
 
 export default function TeamPage() {
@@ -26,12 +26,12 @@ export default function TeamPage() {
       loadAttendances();
       loadLeaves();
       loadLeaveTypes();
-      if (isAdmin(userData)) loadTeamMembers();
+      if (canSeeTeamDashboard(userData)) loadTeamMembers();
     }
   }, [apiToken, userData]);
 
   return (
-    <PageWrapper title="Team" backRoute="/dashboard">
+    <PageWrapper title={canSeeTeamDashboard(userData) ? "Teams" : "Attendance"} backRoute="/dashboard">
       <TimContent 
         attendances={attendances}
         isLoadingAttendances={isLoadingAttendances}
