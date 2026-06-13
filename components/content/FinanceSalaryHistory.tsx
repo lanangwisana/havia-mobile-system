@@ -20,7 +20,12 @@ export const FinanceSalaryHistory: React.FC<Props> = ({ data, isLoading, paginat
       ) : data.length > 0 ? (
         <div className="space-y-4 px-1">
           <div className="space-y-4 pt-2">
-            {data.map((expense: any, idx: number) => {
+            {[...data].sort((a, b) => {
+              const dateA = new Date(a.expense_date || a.date || 0).getTime();
+              const dateB = new Date(b.expense_date || b.date || 0).getTime();
+              if (dateA !== dateB) return dateB - dateA;
+              return (parseInt(b.id) || 0) - (parseInt(a.id) || 0);
+            }).map((expense: any, idx: number) => {
               const amount = parseFloat(expense.amount || '0');
               const taxAmt = parseFloat(expense.tax_amount || expense.tax || '0');
               const tax2Amt = parseFloat(expense.second_tax_amount || expense.second_tax || '0');

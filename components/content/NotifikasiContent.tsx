@@ -2,16 +2,14 @@ import React from 'react';
 import { Activity, Info } from 'lucide-react';
 
 interface NotifikasiContentProps {
-  isLoadingNotif: boolean;
+  isLoading: boolean;
   notifications: any[];
-  onProjectClick: (id: string, name: string, taskId?: string | null) => void;
-  onNav: (view: string, nav?: string | null, title?: string) => void;
   paginationMeta?: any;
   onPageChange?: (page: number) => void;
 }
 
 export const NotifikasiContent: React.FC<NotifikasiContentProps> = ({
-  isLoadingNotif, notifications, onProjectClick, onNav, paginationMeta, onPageChange
+  isLoading, notifications, paginationMeta, onPageChange
 }) => {
   const renderPaginationButtons = () => {
     if (!paginationMeta) return null;
@@ -50,7 +48,7 @@ export const NotifikasiContent: React.FC<NotifikasiContentProps> = ({
 
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-32">
-      {isLoadingNotif ? (
+      {isLoading ? (
         <div className="flex flex-col items-center justify-center py-20">
            <div className="w-10 h-10 rounded-full border-t-2 border-[#C69C3D] animate-spin mb-4"></div>
            <p className="text-[0.625rem] text-neutral-400 font-black uppercase tracking-widest">Scanning System...</p>
@@ -107,7 +105,7 @@ export const NotifikasiContent: React.FC<NotifikasiContentProps> = ({
       )}
 
       {/* Pagination Container */}
-      {!isLoadingNotif && paginationMeta && paginationMeta.total_pages > 1 && (
+      {!isLoading && paginationMeta && paginationMeta.total_pages > 1 && (
         <div className="flex flex-col items-center gap-4 mt-8 pt-6 border-t border-dashed border-neutral-200">
           <div className="bg-[#F8F6F3] p-1.5 rounded-2xl flex items-center justify-center gap-2 max-w-[280px] w-full border border-[#E8E4E1]">
             <button 

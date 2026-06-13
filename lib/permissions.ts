@@ -18,6 +18,51 @@ interface UserData {
 }
 
 /**
+ * Mendapatkan nama role berdasarkan role_id
+ */
+export function getRoleNameFromId(roleId: string | number | undefined, user?: any): string {
+  if (user && (user.is_admin === "1" || user.is_admin === 1)) {
+    return 'Super Admin';
+  }
+
+  if (!roleId) return '';
+  const id = parseInt(String(roleId), 10);
+  switch (id) {
+    case 6: return 'Projek Manager';
+    case 7: return 'HR & Admin Projek';
+    case 8: return 'Arsitek Manager';
+    case 9: return 'Drafter';
+    case 10: return 'Household (OB)';
+    case 11: return 'Arsitek';
+    case 12: return 'Marketing';
+    case 13: return 'Estimator';
+    default: return '';
+  }
+}
+
+/**
+ * Helper to safely extract role_id from userData
+ */
+export function getActualRoleId(user: any): string | number | undefined {
+  if (!user) return undefined;
+  if (user.role_id) return user.role_id;
+  
+  if (user.permissions) {
+    if (typeof user.permissions === 'string') {
+      try {
+        const parsed = JSON.parse(user.permissions);
+        return parsed.role_id;
+      } catch (e) {
+        return undefined;
+      }
+    } else {
+      return user.permissions.role_id;
+    }
+  }
+  return undefined;
+}
+
+/**
  * Cek apakah user adalah admin (bypass semua permission)
  */
 export function isAdmin(user: UserData | null): boolean {
@@ -45,8 +90,8 @@ function getPerm(user: UserData | null, key: string): string {
  */
 function isOBRole(user: UserData | null): boolean {
   if (!user) return false;
-  if (isAdmin(user)) return false;
-  return getPerm(user, "do_not_show_projects") === "1";
+  const roleId = parseInt(String(getActualRoleId(user)), 10);
+  return roleId === 10;
 }
 
 // =============================================================
@@ -75,7 +120,32 @@ export function canAccessFinance(user: UserData | null): boolean {
  */
 export function canAccessTeam(user: UserData | null): boolean {
   if (!user) return false;
-  return !isOBRole(user);
+  return true; // Semua role bisa akses Team / Attendance
+}
+
+/**
+ * Cek apakah user bisa melihat module Team (sebagai Team, bukan Attendance)
+ * - Super Admin (role_id 1 atau title "super admin"): YES
+ * - HR & Admin Projek (role_id 7 atau title "hr & admin projek"): YES
+ * - Sisanya: NO (akan melihat Attendance)
+ */
+export function canSeeTeamDashboard(user: UserData | null): boolean {
+  if (!user) return false;
+  
+  const roleId = parseInt(String(getActualRoleId(user)), 10);
+  const roleTitle = String(user.role_title || '').trim().toLowerCase();
+  
+  // Berdasarkan Role ID
+  if (roleId === 1) return true; // Super Admin
+  if (roleId === 7 || roleId === 2) return true; // HR & Admin Projek
+  
+  // Super Admin flag di tabel users (karena Super Admin sejati di CRM sering tidak punya role_id)
+  if (String(user.is_admin) === "1" || user.is_admin === 1) return true;
+  
+  // Fallback berdasarkan Role Title
+  if (roleTitle === 'super admin' || roleTitle === 'admin' || roleTitle === 'hr & admin projek') return true;
+  
+  return false;
 }
 
 /**
@@ -98,39 +168,41 @@ export function canAccessEvents(user: UserData | null): boolean {
  */
 export function canSeeProjectSummary(user: UserData | null): boolean {
   if (!user) return false;
-  if (isAdmin(user)) return true;
   
-  const roleId = parseInt(String(user.role_id), 10);
+  const roleId = parseInt(String(getActualRoleId(user)), 10);
+  
+  // Prioritas utama: Jika dia role yang sangat direstriksi (OB, Drafter, dll), langsung blokir
+  const isRestrictedRole = [9, 10, 11, 13].includes(roleId);
+  if (isRestrictedRole) return false;
+
+  if (isAdmin(user)) return true;
   const jobTitle = (user.job_title || '').toLowerCase();
   const roleTitle = (user.role_title || user.permissions?.role_title || '').toLowerCase();
 
   // Role Mapping:
-  // 1: Super Admin
-  // 2: HR & Admin Projek
-  // 3: Marketing
-  // 4: Projek Manager
-  // 5: Arsitek Manager
-  // 6: Arsitek
-  // 7: Drafter
-  // 8: Estimator
-  // 9: Household (OB)
+  // 6: Projek Manager
+  // 7: HR & Admin Projek
+  // 8: Arsitek Manager
+  // 9: Drafter
+  // 10: Household (OB)
+  // 11: Arsitek
+  // 12: Marketing
+  // 13: Estimator
 
   // Full Access Roles (bisa lihat)
-  const isHRAdmin = roleId === 2 || jobTitle.includes('hr & admin') || roleTitle.includes('hr & admin');
+  const isHRAdmin = roleId === 7 || jobTitle.includes('hr & admin') || roleTitle.includes('hr & admin');
   if (isHRAdmin) return true;
 
   // Partial Access Roles (bisa lihat project summary)
-  const isMarketing = roleId === 3 || jobTitle.includes('marketing') || roleTitle.includes('marketing');
-  const isPM = roleId === 4 || jobTitle.includes('projek manager') || roleTitle.includes('projek manager') || jobTitle.includes('pm') || roleTitle.includes('pm');
-  const isArsitekMgr = roleId === 5 || jobTitle.includes('arsitek manager') || roleTitle.includes('arsitek manager');
+  const isMarketing = roleId === 12 || jobTitle.includes('marketing') || roleTitle.includes('marketing');
+  const isPM = roleId === 6 || jobTitle.includes('projek manager') || roleTitle.includes('projek manager') || jobTitle.includes('pm') || roleTitle.includes('pm');
+  const isArsitekMgr = roleId === 8 || jobTitle.includes('arsitek manager') || roleTitle.includes('arsitek manager');
   
   if (isMarketing || isPM || isArsitekMgr) return true;
 
-  // Restricted Access Roles (HANYA boleh melihat Salary, bukan Project Summary)
-  const isRestrictedRole = [6, 7, 8, 9].includes(roleId);
   const restrictedKeywords = ['household', 'ob', 'office boy', 'drafter', 'estimator', 'arsitek'];
   
-  if (isRestrictedRole || restrictedKeywords.some(kw => jobTitle.includes(kw) || roleTitle.includes(kw))) {
+  if (restrictedKeywords.some(kw => jobTitle.includes(kw) || roleTitle.includes(kw))) {
     return false;
   }
   
@@ -147,6 +219,7 @@ interface QuickMenuItem {
   label: string;
   icon: any;
   nav?: string;
+  route?: string;
 }
 
 /**
@@ -158,6 +231,7 @@ export function getVisibleMenuItems(user: UserData | null, allItems: QuickMenuIt
 
   const accessMap: Record<string, (u: UserData | null) => boolean> = {
     'All Tasks': canAccessProjects,
+    'My Tasks': canAccessProjects,
     'Project': canAccessProjects,
     'Events': canAccessEvents,
     'Team': canAccessTeam,

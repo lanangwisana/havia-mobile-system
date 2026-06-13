@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { AuthProvider } from "./providers/AuthProvider";
 
 export const metadata: Metadata = {
   title: "Havia Mobile System",
@@ -35,7 +36,9 @@ export default function RootLayout({
         <link id="dynamic-favicon" rel="icon" type="image/png" href="/LogoHavia_primary2.png" />
       </head>
       <body className="antialiased">
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
         <script
           dangerouslySetInnerHTML={{
             __html: `
