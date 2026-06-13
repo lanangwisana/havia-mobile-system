@@ -15,7 +15,7 @@ import {
 
 // Import Lib & Utils
 import { colors } from '@/lib/utils';
-import { canAccessProjects, canAccessFinance, canAccessTeam } from '@/lib/permissions';
+import { canAccessProjects, canAccessFinance, canAccessTeam, canSeeProjectSummary } from '@/lib/permissions';
 
 // Import UI Components
 import { Toast } from '@/components/ui/Toast';
@@ -507,11 +507,12 @@ export default function HaviaMobileApp() {
   };
 
   const loadFinanceSummary = async (page: number = 1, search: string = currentFinanceSearch) => {
-    if (!apiToken || !isAdmin(userData)) return;
+    if (!apiToken || !canSeeProjectSummary(userData)) return;
     setCurrentFinanceSummaryPage(page);
     setCurrentFinanceSearch(search);
     
-    const cacheKey = `havia_finance_summary_${page}_${search}`;
+    // Gunakan ID user pada cache key untuk mencegah kebocoran data (cache poisoning) antar user
+    const cacheKey = `havia_finance_summary_user_${userData?.id}_${page}_${search}`;
     const cachedData = localStorage.getItem(cacheKey);
     let isUsingCache = false;
 
@@ -768,7 +769,7 @@ export default function HaviaMobileApp() {
       else if (subpageTitle === 'My Tasks') loadTasks(null, currentTaskFilter, currentTaskPage);
       else if (subpageTitle === 'Finance') {
         loadExpenses();
-        if (isAdmin(userData)) {
+        if (canSeeProjectSummary(userData)) {
           loadFinanceSummary(1, "");
         }
       }

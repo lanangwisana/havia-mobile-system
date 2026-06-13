@@ -100,22 +100,37 @@ export function canSeeProjectSummary(user: UserData | null): boolean {
   if (!user) return false;
   if (isAdmin(user)) return true;
   
+  const roleId = parseInt(String(user.role_id), 10);
   const jobTitle = (user.job_title || '').toLowerCase();
   const roleTitle = (user.role_title || user.permissions?.role_title || '').toLowerCase();
 
-  // Role HR & Admin Projek harus bisa lihat
-  if (jobTitle.includes('hr & admin') || roleTitle.includes('hr & admin')) return true;
+  // Role Mapping:
+  // 1: Super Admin
+  // 2: HR & Admin Projek
+  // 3: Marketing
+  // 4: Projek Manager
+  // 5: Arsitek Manager
+  // 6: Arsitek
+  // 7: Drafter
+  // 8: Estimator
+  // 9: Household (OB)
 
-  // Role Manager (Projek Manager, Arsitek Manager) & Marketing harus bisa lihat
-  const isManager = jobTitle.includes('manager') || roleTitle.includes('manager');
-  const isMarketing = jobTitle.includes('marketing') || roleTitle.includes('marketing');
+  // Full Access Roles (bisa lihat)
+  const isHRAdmin = roleId === 2 || jobTitle.includes('hr & admin') || roleTitle.includes('hr & admin');
+  if (isHRAdmin) return true;
+
+  // Partial Access Roles (bisa lihat project summary)
+  const isMarketing = roleId === 3 || jobTitle.includes('marketing') || roleTitle.includes('marketing');
+  const isPM = roleId === 4 || jobTitle.includes('projek manager') || roleTitle.includes('projek manager') || jobTitle.includes('pm') || roleTitle.includes('pm');
+  const isArsitekMgr = roleId === 5 || jobTitle.includes('arsitek manager') || roleTitle.includes('arsitek manager');
   
-  if (isManager || isMarketing) return true;
+  if (isMarketing || isPM || isArsitekMgr) return true;
 
-  // Role-role ini HANYA boleh melihat Salary, bukan Project Summary
+  // Restricted Access Roles (HANYA boleh melihat Salary, bukan Project Summary)
+  const isRestrictedRole = [6, 7, 8, 9].includes(roleId);
   const restrictedKeywords = ['household', 'ob', 'office boy', 'drafter', 'estimator', 'arsitek'];
   
-  if (restrictedKeywords.some(kw => jobTitle.includes(kw) || roleTitle.includes(kw))) {
+  if (isRestrictedRole || restrictedKeywords.some(kw => jobTitle.includes(kw) || roleTitle.includes(kw))) {
     return false;
   }
   
