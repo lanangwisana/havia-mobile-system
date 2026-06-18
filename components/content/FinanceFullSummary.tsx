@@ -212,16 +212,16 @@ export const FinanceFullSummary: React.FC<Props> = ({ data, isLoading, paginatio
                       {p.planned_progress !== undefined ? (
                         <div className="flex items-center gap-2 mt-2 bg-neutral-50 border border-neutral-100 rounded-xl p-2 px-3">
                           <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
-                            Plan: <span className="text-[#2C2A29] ml-1">{Number(p.planned_progress).toFixed(1)}%</span>
+                            Plan: <span className="text-[#2C2A29] ml-1">{Number(p.planned_progress).toFixed(2)}%</span>
                           </span>
                           <span className="text-[0.65rem] font-bold text-[#D1D5DB]">|</span>
                           <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
-                            Act: <span className="text-[#2C2A29] ml-1">{Number(p.actual_progress).toFixed(1)}%</span>
+                            Act: <span className="text-[#2C2A29] ml-1">{Number(p.actual_progress).toFixed(2)}%</span>
                           </span>
                           <span className="text-[0.65rem] font-bold text-[#D1D5DB]">|</span>
                           <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
                             Dev: <span className={`${Number(p.deviation) < 0 ? 'text-rose-500' : 'text-emerald-500'} ml-1`}>
-                                {Number(p.deviation) > 0 ? '+' : ''}{Number(p.deviation).toFixed(1)}%
+                                {Number(p.deviation) > 0 ? '+' : ''}{Number(p.deviation).toFixed(2)}%
                             </span>
                           </span>
                         </div>
