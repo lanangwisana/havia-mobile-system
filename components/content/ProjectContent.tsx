@@ -113,15 +113,15 @@ interface ProjectContentProps {
                     {project.planned_progress !== undefined ? (
                       <div className="flex items-center gap-2">
                         <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
-                          Plan: <span className="text-[#2C2A29] ml-1">{Number(project.planned_progress).toFixed(1)}%</span>
+                          Plan: <span className="text-[#2C2A29] ml-1">{Number(project.planned_progress).toFixed(2)}%</span>
                         </span>
                         <span className="text-[0.65rem] font-bold text-[#D1D5DB]">|</span>
                         <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
-                          Act: <span className="text-[#2C2A29] ml-1">{Number(project.actual_progress).toFixed(1)}%</span>
+                          Act: <span className="text-[#2C2A29] ml-1">{Number(project.actual_progress).toFixed(2)}%</span>
                         </span>
                         <span className="text-[0.65rem] font-bold text-[#D1D5DB]">|</span>
                         <span className="text-[0.65rem] font-bold text-[#6B6865] tracking-wide">
-                          Dev: <span className={`ml-1 ${Number(project.deviation) < 0 ? 'text-red-500' : Number(project.deviation) === 0 ? 'text-[#2C2A29]' : 'text-emerald-500'}`}>{Number(project.deviation) > 0 ? '+' : ''}{Number(project.deviation).toFixed(1)}%</span>
+                          Dev: <span className={`ml-1 ${Number(project.deviation) < 0 ? 'text-red-500' : Number(project.deviation) === 0 ? 'text-[#2C2A29]' : 'text-emerald-500'}`}>{Number(project.deviation) > 0 ? '+' : ''}{Number(project.deviation).toFixed(2)}%</span>
                         </span>
                       </div>
                     ) : (
