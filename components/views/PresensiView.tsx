@@ -30,6 +30,8 @@ export const PresensiView: React.FC<PresensiViewProps> = ({
         setShowFinishedTime(false);
       }, 5000); // 5 detik
       return () => clearTimeout(timer);
+    } else {
+      setShowFinishedTime(false);
     }
   }, [isClockedIn, lastFinishedAttendance?.id, lastFinishedAttendance?.out_time]);
 
