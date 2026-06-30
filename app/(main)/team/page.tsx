@@ -3,7 +3,9 @@
 import React, { useEffect } from 'react';
 import { PageWrapper } from '@/components/ui/PageWrapper';
 import { TimContent } from '@/components/content/TimContent';
-import { useTeamAttendance } from '@/hooks/useTeamAttendance';
+import { useClocking } from '@/hooks/useClocking';
+import { useLeaves } from '@/hooks/useLeaves';
+import { useTeam } from '@/hooks/useTeam';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { canSeeTeamDashboard } from '@/lib/permissions';
 import { LeaveModal } from '@/components/ui/LeaveModal';
@@ -12,14 +14,20 @@ export default function TeamPage() {
   const { apiToken, userData, showToast } = useAuth();
   
   const {
-    attendances, isLoadingAttendances, loadAttendances,
+    attendances, isLoadingAttendances, loadAttendances
+  } = useClocking({ apiToken, userData, showToast });
+
+  const {
     leaves, isLoadingLeaves, loadLeaves,
-    teamMembers, isLoadingTeam, loadTeamMembers,
     leaveTypes, loadLeaveTypes,
     isLeaveModalOpen, setIsLeaveModalOpen,
     leaveModalType, setLeaveModalType,
     isSubmittingLeave, handleLeaveSubmit
-  } = useTeamAttendance({ apiToken, userData, showToast });
+  } = useLeaves({ apiToken, showToast });
+
+  const {
+    teamMembers, isLoadingTeam, loadTeamMembers
+  } = useTeam({ apiToken, userData });
 
   useEffect(() => {
     if (apiToken) {
