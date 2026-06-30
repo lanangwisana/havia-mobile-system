@@ -3,13 +3,13 @@
 import React, { useEffect } from 'react';
 import { PageWrapper } from '@/components/ui/PageWrapper';
 import { RiwayatPengajuanContent } from '@/components/content/RiwayatPengajuanContent';
-import { useTeamAttendance } from '@/hooks/useTeamAttendance';
+import { useLeaves } from '@/hooks/useLeaves';
 import { useAuth } from '@/app/providers/AuthProvider';
 
 export default function TeamLeavesPage() {
-  const { apiToken, userData, showToast } = useAuth();
+  const { apiToken, showToast } = useAuth();
   
-  const { leaves, isLoadingLeaves, loadLeaves } = useTeamAttendance({ apiToken, userData, showToast });
+  const { leaves, isLoadingLeaves, loadLeaves } = useLeaves({ apiToken, showToast });
 
   useEffect(() => {
     if (apiToken) {
