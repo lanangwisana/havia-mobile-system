@@ -5,7 +5,9 @@ import { useAppAuth } from '@/hooks/useAppAuth';
 import { useFinance } from '@/hooks/useFinance';
 import { useProjectsAndTasks } from '@/hooks/useProjectsAndTasks';
 import { useEvents } from '@/hooks/useEvents';
-import { useTeamAttendance } from '@/hooks/useTeamAttendance';
+import { useClocking } from '@/hooks/useClocking';
+import { useLeaves } from '@/hooks/useLeaves';
+import { useTeam } from '@/hooks/useTeam';
 import { Toast } from '@/components/ui/Toast';
 import { canAccessProjects, canAccessFinance, canAccessTeam } from '@/lib/permissions';
 
@@ -57,7 +59,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const finance = useFinance({ apiToken: auth.apiToken, userData: auth.userData });
   const projectsAndTasks = useProjectsAndTasks({ apiToken: auth.apiToken, userData: auth.userData, showToast });
   const eventsData = useEvents({ apiToken: auth.apiToken, userData: auth.userData, showToast });
-  const teamAttendance = useTeamAttendance({ apiToken: auth.apiToken, userData: auth.userData, showToast });
+  const clocking = useClocking({ apiToken: auth.apiToken, userData: auth.userData, showToast });
+  const leavesData = useLeaves({ apiToken: auth.apiToken, showToast });
+  const teamData = useTeam({ apiToken: auth.apiToken, userData: auth.userData });
 
   const handleNav = (view: string, nav?: string | null, title: string = '', taskId: string | null = null) => {
     // SECURITY GUARD: Check status + sync permissions on every navigation
@@ -118,12 +122,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         eventsData.loadEvents(eventsData.eventFilterType, eventsData.eventFilterLabel);
         if (eventsData.eventLabels.length === 0) eventsData.loadEventLabels();
       } else if (title === 'Team' || title === 'Attendance') {
-        teamAttendance.loadAttendances();
+        clocking.loadAttendances();
         if (title === 'Team') {
-          teamAttendance.loadLeaves();
-          teamAttendance.loadLeaveTypes();
-          import('@/lib/permissions').then(({ isAdmin }) => {
-            if (isAdmin(auth.userData)) teamAttendance.loadTeamMembers();
+          leavesData.loadLeaves();
+          leavesData.loadLeaveTypes();
+          import('@/lib/permissions').then(({ canSeeTeamDashboard }) => {
+            if (canSeeTeamDashboard(auth.userData)) teamData.loadTeamMembers();
           });
         }
       } else if (title === 'Edit Profile') {
@@ -168,7 +172,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     ...finance,
     ...projectsAndTasks,
     ...eventsData,
-    ...teamAttendance,
+    ...clocking,
+    ...leavesData,
+    ...teamData,
   };
 
   return (
